@@ -5,48 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>La carte — Pizza Food, Chennevières-sur-Marne</title>
   <meta name="description" content="La carte complète de Pizza Food : 190 produits dans 21 catégories. Pizzas Junior, Senior ou Mega, burgers, tacos, sandwichs, tex-mex, desserts et boissons.">
-  <meta name="theme-color" content="#292622">
+  <meta name="theme-color" content="#ff4100">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bowlby+One+SC&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Bowlby+One+SC&family=Open+Sans:wght@400;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <noscript><style>.curtain{display:none}</style></noscript>
 </head>
 <body data-page="carte">
   <div class="curtain" id="curtain" aria-hidden="true">
-    <div class="curtain__word"><span>La carte</span></div>
-    <div class="curtain__line"><i></i></div>
+    <div class="curtain__pizza pz pz--svg" data-svgpizza="" data-interactive="off"></div>
+    <p class="curtain__word">La carte</p>
+    <p class="curtain__count"><span id="curtainCount">0</span>%</p>
   </div>
 
   <main>
-    <section class="hero hero--page">
-      <div class="hero__media"><img src="img/bandeaux/emporter.webp" alt="" fetchpriority="high"></div>
-      <div class="hero__meta"><span>190 produits · 21 catégories</span><span>Pizzas en Junior · Senior · Mega</span></div>
-      <div class="hero__center">
-        <p class="eyebrow">Pizza Food — Chennevières-sur-Marne</p>
-        <h1 class="hero__title">La <em>carte</em></h1>
+    <section class="phero band--orange">
+      <div>
+        <p class="eyebrow eyebrow--yellow" data-reveal="up">Étape 2 — remplissez le panier</p>
+        <h1 class="phero__title" data-split>La carte</h1>
+        <p class="phero__text" data-reveal="up">Pizzas tomate, crème fraîche, barbecue et calzones, burgers, tacos, sandwichs, assiettes, tex-mex, salades, desserts et boissons. Les offres se calculent toutes seules dans le panier.</p>
+        <div class="phero__chips" data-reveal="up">
+          <span style="--r:-3deg">190 produits</span><span style="--r:2deg">21 catégories</span><span style="--r:-2deg">Junior · Senior · Mega</span>
+        </div>
       </div>
-      <div class="hero__bottom">
-        <p class="lede" data-reveal>Pizzas tomate, crème fraîche, barbecue et calzones, burgers, tacos, sandwichs, assiettes, tex-mex, salades, desserts et boissons. Ajoutez au panier : les offres se calculent toutes seules.</p>
-        <p class="open" data-open data-reveal></p>
+      <div class="phero__art" data-reveal="pop">
+        <div class="pz pz--svg" data-svgpizza="85" data-label="Pizza Texas" data-cursor="Croque !"></div>
+        <div class="burst-badge" data-burst="20" style="--fs:15px"><span>Livraison<b>3e offerte</b></span></div>
       </div>
     </section>
 
-    <div class="offer-strip">
-      <span>En livraison : <b>2 achetées = la 3e offerte</b></span>
-      <span>À emporter : <b>1 achetée = la 2e offerte</b></span>
-      <span>* Pizzas Senior et Mega, sauf Marguerita</span>
+    <div class="offer-strip marquee" data-marquee="1">
+      <div class="marquee__track">
+        <span>En livraison : 2 achetées = la 3e offerte</span><i>✺</i><span>À emporter : 1 achetée = la 2e offerte</span><i>✺</i><span>Pizzas Senior et Mega, sauf Marguerita</span><i>✺</i>
+      </div>
     </div>
 
-    <section class="sec envies-box" id="envies" aria-label="Vos envies">
-      <div>
+    <section class="band band--pink envies-box" id="envies" aria-label="Vos envies">
+      <div class="section-head" style="margin-bottom:34px">
         <p class="eyebrow">Vos envies</p>
-        <h2 class="display display--sm">Une envie <em>précise</em> ?</h2>
+        <h2 class="title-3d title-3d--md title-3d--orange">Une envie précise&nbsp;?</h2>
       </div>
-      <div>
-        <div class="envies" id="enviesBtns" role="group" aria-label="Filtrer par ingrédient"></div>
-        <p class="envies-status" id="enviesStatus" aria-live="polite"></p>
-      </div>
+      <div class="envies" id="enviesBtns" role="group" aria-label="Filtrer par ingrédient"></div>
+      <p class="envies-status" id="enviesStatus" aria-live="polite"></p>
     </section>
 
     <nav class="catbar" aria-label="Catégories de la carte"><div class="catbar__inner" id="catbar"></div></nav>
@@ -55,6 +56,7 @@
   </main>
 
   <script src="js/data.js"></script>
+  <script src="js/pizza.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
