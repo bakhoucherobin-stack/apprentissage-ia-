@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Bowlby+One+SC&family=Open+Sans:wght@400;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=7.1">
+  <link rel="stylesheet" href="css/style.css?v=7.2">
   <noscript><style>.curtain{display:none}</style></noscript>
 </head>
 <body data-page="home">
@@ -41,7 +41,7 @@
           <div class="showcase__shadow" aria-hidden="true"></div>
           <div class="showcase__drop">
             <div class="showcase__tilt" id="heroTilt">
-              <div class="pz pz--svg" data-svgpizza="" data-nosats="1" data-label="Pizza qui tourne" data-cursor="Croque !"></div>
+              <div class="pz pz--svg" data-svgpizza="" data-nosats="1" data-steady="1" data-label="Pizza qui tourne" data-cursor="Croque !"></div>
             </div>
           </div>
           <div class="showcase__ings" id="heroIngs" aria-hidden="true"></div>
@@ -159,7 +159,12 @@
       <div class="section-head rail-sec__head" data-sfx>
         <p class="eyebrow" data-reveal="up">Le reste de la carte</p>
         <h2 class="title-3d">Pas que des pizzas</h2>
-        <p class="lede" data-reveal="up">Burgers, tacos, sandwichs, tex-mex, desserts… faites défiler, tout arrive.</p>
+        <p class="lede" data-reveal="up">Burgers, tacos, sandwichs, tex-mex, desserts… faites glisser la barre, tout arrive.</p>
+      </div>
+      <div class="rail-ctrl">
+        <button class="rail-ctrl__arrow" type="button" data-dir="-1" aria-label="Catégories précédentes">←</button>
+        <div class="rail-ctrl__bar" id="railBar" role="slider" tabindex="0" aria-label="Faire défiler les catégories" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="rail-ctrl__thumb"><i></i><i></i><i></i></span></div>
+        <button class="rail-ctrl__arrow" type="button" data-dir="1" aria-label="Catégories suivantes">→</button>
       </div>
       <div class="rail" id="rail"><div class="rail__track" id="railTrack"></div></div>
     </section>
@@ -240,10 +245,10 @@
     </section>
   </main>
 
-  <script>window.PF_VERSION = "7.1 (15/10)";</script>
-  <script src="js/config.js?v=7.1"></script>
-  <script src="js/data.js?v=7.1"></script>
-  <script src="js/pizza.js?v=7.1"></script>
-  <script src="js/main.js?v=7.1"></script>
+  <script>window.PF_VERSION = "7.2 (15/10)";</script>
+  <script src="js/config.js?v=7.2"></script>
+  <script src="js/data.js?v=7.2"></script>
+  <script src="js/pizza.js?v=7.2"></script>
+  <script src="js/main.js?v=7.2"></script>
 </body>
 </html>

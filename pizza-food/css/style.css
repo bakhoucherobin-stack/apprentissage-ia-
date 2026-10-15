@@ -386,8 +386,19 @@ button { cursor: pointer; }
 
 /* ---------- PAS QUE DES PIZZAS : rangée de cartes ---------- */
 .rail-sec { padding-bottom: clamp(40px, 5vw, 70px); }
-.rail-sec__head { translate: 0 calc((.5 - var(--sp, .5)) * 70px); }
-.rail { padding: 30px 0 90px; }
+.rail-sec__head.section-head { margin-bottom: clamp(26px, 3vw, 40px); }
+.rail { padding: 40px 0 80px; }
+.rail__track { cursor: grab; touch-action: pan-y; user-select: none; }
+.rail__track.is-drag { cursor: grabbing; }
+.rail__track.is-drag .rcard { pointer-events: none; }
+.rail-ctrl { position: relative; z-index: 2; display: flex; align-items: center; gap: 14px; width: min(760px, 100%); margin: 0 auto; padding: 0 16px; }
+.rail-ctrl__bar { position: relative; flex: 1; height: 22px; border: 3px solid var(--charcoal); border-radius: 999px; background: var(--cream); box-shadow: 4px 4px 0 var(--charcoal); cursor: pointer; touch-action: none; outline-offset: 4px; }
+.rail-ctrl__thumb { position: absolute; top: -3px; bottom: -3px; left: -3px; display: flex; align-items: center; justify-content: center; gap: 4px; width: 60px; border: 3px solid var(--charcoal); border-radius: 999px; background: var(--orange); transition: background .2s, scale .25s var(--ease-pop); will-change: transform; }
+.rail-ctrl__thumb i { width: 3px; height: 10px; border-radius: 2px; background: var(--yellow); }
+.rail-ctrl__bar:hover .rail-ctrl__thumb, .rail-ctrl__bar.is-drag .rail-ctrl__thumb { background: var(--charcoal); }
+.rail-ctrl__bar.is-drag .rail-ctrl__thumb { scale: 1.06 1.15; }
+.rail-ctrl__arrow { flex: none; display: grid; place-items: center; width: 48px; height: 48px; border: 3px solid var(--charcoal); border-radius: 50%; background: var(--charcoal); color: var(--yellow); font-size: 22px; font-weight: 700; line-height: 1; cursor: pointer; transition: transform .35s var(--ease-pop), background .2s, color .2s; }
+.rail-ctrl__arrow:hover { transform: scale(1.12); background: var(--orange); color: var(--charcoal); }
 .rail__track { display: flex; gap: clamp(18px, 2.4vw, 32px); width: max-content; will-change: transform; }
 .rcard { flex: none; width: clamp(230px, 24vw, 330px); color: var(--charcoal); text-decoration: none; transform-origin: 50% 100%; will-change: transform; }
 .rcard__inner { position: relative; display: grid; gap: 8px; padding: 20px 20px 22px; background: var(--bg); border: var(--border); box-shadow: 8px 8px 0 var(--charcoal); transition: transform .45s var(--ease-pop), box-shadow .45s var(--ease-pop); }

@@ -325,6 +325,8 @@
         if (!el.dataset.nosats) attach(el);
       } else if (!inside && el._hover) { el._hover = false; release(el); }
       const scale = r.width / 260;
+      // pizza « fixe » (vitrine) : elle s'ouvre au survol mais ne suit pas le curseur
+      if (el.dataset.steady) { el.style.setProperty('--cut', (inside ? 9 * scale : 0).toFixed(2)); continue; }
       const cut = (k * 7 + (inside ? 9 : 0)) * scale;
       // La pizza fuit légèrement le curseur et tourne vers lui
       const push = -k * 10 * scale;

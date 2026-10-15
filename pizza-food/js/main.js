@@ -670,7 +670,7 @@
       };
     });
     let landed = false, kick = 0;
-    const st = { t0: 0, theta: 0, spin: 9, hover: 0 };
+    const st = { t0: 0, theta: 0, spin: 12, hover: 0 };
     wrap.addEventListener('pointerdown', () => {
       ings.forEach(g => { const d = Math.hypot(g.x, g.y) || 1; g.vx += g.x / d * 26; g.vy += g.y / d * 26; g.vr += (Math.random() - .5) * 40; });
       kick = 1;
@@ -690,13 +690,12 @@
         const mx = mouse.x - cx, my = mouse.y - cy, md = Math.hypot(mx, my);
         const inside = md < R * .95;
         st.hover = lerp(st.hover, inside ? 1 : 0, .08);
-        st.spin = lerp(st.spin, inside ? 60 : 9, .05);
+        // la pizza tourne toujours à la même vitesse ; seul le survol l'ouvre
         st.theta += st.spin / 60;
         const svg = $('svg', pzEl);
         if (svg) svg.style.transform = `rotate(${(st.theta + scrollP * 160).toFixed(2)}deg)`;
-        // la pizza s'incline vers le curseur
+        // seuls les ingrédients suivent un peu le curseur (parallaxe)
         const tx = clamp(mx / (R * 3), -1, 1), ty = clamp(my / (R * 3), -1, 1);
-        tilt.style.transform = `perspective(900px) rotateX(${(-ty * 16).toFixed(2)}deg) rotateY(${(tx * 16).toFixed(2)}deg) scale(${(1 + st.hover * .05).toFixed(3)})`;
         kick *= .9;
         ings.forEach((g, i) => {
           if (!landed) { g.el.style.transform = 'translate(-50%,-50%) scale(0)'; return; }
@@ -707,7 +706,7 @@
           g.vx += (hx - g.x) * .06; g.vy += (hy - g.y) * .06;
           // fuite du curseur
           const dx = g.x - mx, dy = g.y - my, d = Math.hypot(dx, dy);
-          if (d < 120) { g.vx += dx / (d || 1) * (120 - d) * .09; g.vy += dy / (d || 1) * (120 - d) * .09; g.vr += (dx > 0 ? 1 : -1) * 1.5; }
+          if (d < 150) { g.vx += dx / (d || 1) * (150 - d) * .1; g.vy += dy / (d || 1) * (150 - d) * .1; g.vr += (dx > 0 ? 1 : -1) * 1.8; }
           g.vx *= .82; g.vy *= .82; g.vr *= .9;
           g.x += g.vx; g.y += g.vy; g.rot += g.vr + .4 + st.hover * 1.5;
           g.el.style.transform = `translate(calc(${g.x.toFixed(1)}px - 50%), calc(${g.y.toFixed(1)}px - 50%)) rotate(${g.rot.toFixed(1)}deg) scale(${(g.sc * g.size / 30).toFixed(3)})`;
@@ -755,6 +754,70 @@
           <span class="rcard__go" aria-hidden="true">→</span>
         </span></a>`;
     }).join('');
+  }
+
+  // La rangée se pilote avec sa barre (ou en glissant les cartes), plus avec le scroll de la page
+  function railControl() {
+    const sec = $('.rail-sec'), track = $('#railTrack'), bar = $('#railBar');
+    if (!sec || !track || !bar) return null;
+    const thumb = $('.rail-ctrl__thumb', bar), cards = $$('.rcard', track);
+    let p = 0, x = null, thumbW = 60;
+    const pad = () => clamp(innerWidth * .04, 16, 60);
+    const max = () => Math.max(0, track.scrollWidth - innerWidth + pad() * 2);
+    const set = v => { p = clamp(v); bar.setAttribute('aria-valuenow', Math.round(p * 100)); };
+    const fromBar = (cx, grab) => { const r = bar.getBoundingClientRect(); set((cx - r.left - grab) / Math.max(1, r.width - thumbW)); };
+    // barre : on attrape la poignée ou on clique n'importe où
+    bar.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      bar.setPointerCapture(e.pointerId);
+      const tr = thumb.getBoundingClientRect();
+      const grab = e.clientX >= tr.left && e.clientX <= tr.right ? e.clientX - tr.left : thumbW / 2;
+      bar.classList.add('is-drag');
+      fromBar(e.clientX, grab);
+      const move = ev => fromBar(ev.clientX, grab);
+      const up = () => { bar.classList.remove('is-drag'); bar.removeEventListener('pointermove', move); bar.removeEventListener('pointerup', up); bar.removeEventListener('pointercancel', up); };
+      bar.addEventListener('pointermove', move); bar.addEventListener('pointerup', up); bar.addEventListener('pointercancel', up);
+    });
+    bar.addEventListener('keydown', e => {
+      const step = { ArrowRight: .1, ArrowLeft: -.1, PageDown: .25, PageUp: -.25 }[e.key];
+      if (step) { e.preventDefault(); set(p + step); }
+      if (e.key === 'Home') { e.preventDefault(); set(0); }
+      if (e.key === 'End') { e.preventDefault(); set(1); }
+    });
+    $$('.rail-ctrl__arrow', sec).forEach(b => b.addEventListener('click', () => set(p + +b.dataset.dir * Math.min(.5, (innerWidth * .6) / Math.max(1, max())))));
+    // glisser les cartes directement (le scroll vertical de la page reste libre)
+    let drag = null, moved = 0;
+    track.addEventListener('pointerdown', e => { if (e.button) return; drag = { x: e.clientX, p }; moved = 0; });
+    addEventListener('pointermove', e => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x; moved = Math.max(moved, Math.abs(dx));
+      if (moved > 6) { set(drag.p - dx / Math.max(1, max())); track.classList.add('is-drag'); }
+    });
+    addEventListener('pointerup', () => { drag = null; setTimeout(() => track.classList.remove('is-drag'), 0); });
+    track.addEventListener('click', e => { if (moved > 6) { e.preventDefault(); e.stopPropagation(); moved = 0; } }, true);
+    track.addEventListener('dragstart', e => e.preventDefault());
+    return {
+      frame(vh) {
+        const r = sec.getBoundingClientRect();
+        if (r.top > vh || r.bottom < 0) return;
+        const target = pad() - p * max();
+        x = x === null || reduceMotion ? target : lerp(x, target, .14);
+        track.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`;
+        // poignée proportionnelle à la part visible
+        const br = bar.clientWidth;
+        thumbW = clamp(br * innerWidth / Math.max(innerWidth, track.scrollWidth + pad() * 2), 56, br);
+        const shown = max() ? (pad() - x) / max() : 0;
+        thumb.style.width = thumbW + 'px';
+        thumb.style.transform = `translateX(${(clamp(shown) * (br - thumbW)).toFixed(1)}px)`;
+        if (reduceMotion) return;
+        cards.forEach(c => {
+          const cr = c.getBoundingClientRect();
+          const d = clamp((cr.left + cr.width / 2 - innerWidth / 2) / (innerWidth / 2), -1.4, 1.4);
+          c.style.transform = `translateY(${(d * d * 70).toFixed(1)}px) rotate(${(d * 9).toFixed(2)}deg) scale(${(1 - Math.min(Math.abs(d), 1) * .14).toFixed(3)})`;
+          c.style.setProperty('--d', d.toFixed(3));
+        });
+      }
+    };
   }
 
   /* ---------- Cartes de la carte : apparition au scroll ---------- */
@@ -988,8 +1051,7 @@
     const mani = $('#manifesto');
     const showcase = heroShowcase(), letters = $('.hero__title') ? heroLetters() : null;
     const sfx = $$('[data-sfx]');
-    const railSec = $('.rail-sec'), railTrack = $('#railTrack'), railCards = railTrack ? $$('.rcard', railTrack) : [];
-    let railX = innerWidth * .35;
+    const rail = railControl();
     loop.showcase = showcase;
     let maniWords = [];
     if (mani) {
@@ -1011,7 +1073,9 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(size);
     toTop.addEventListener('click', () => scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }));
 
+    let lastT = performance.now();
     const frame = () => {
+      const tNow = performance.now(), dt = Math.min(.05, (tNow - lastT) / 1000); lastT = tNow;
       const y = scrollY, vh = innerHeight, dy = y - lastY;
       vel = lerp(vel, dy, .2);
       if (Math.abs(dy) > .5) dir = dy > 0 ? 1 : -1;
@@ -1036,30 +1100,17 @@
           if (r.bottom < -100 || r.top > vh + 100) return;
           el.style.setProperty('--sp', clamp((vh - r.top) / (vh + r.height)).toFixed(3));
         });
-        if (railSec) {
-          const r = railSec.getBoundingClientRect();
-          if (r.top < vh && r.bottom > 0) {
-            const p = clamp((vh - r.top) / (vh + r.height));
-            const max = Math.max(0, railTrack.scrollWidth - innerWidth + 40);
-            railX = lerp(railX, innerWidth * .35 - p * (max + innerWidth * .35), .12);
-            railTrack.style.transform = `translate3d(${railX.toFixed(1)}px,0,0)`;
-            railCards.forEach(c => {
-              const cr = c.getBoundingClientRect();
-              const d = clamp((cr.left + cr.width / 2 - innerWidth / 2) / (innerWidth / 2), -1.4, 1.4);
-              c.style.transform = `translateY(${(d * d * 70).toFixed(1)}px) rotate(${(d * 9).toFixed(2)}deg) scale(${(1 - Math.min(Math.abs(d), 1) * .14).toFixed(3)})`;
-              c.style.setProperty('--d', d.toFixed(3));
-            });
-          }
-        }
         floaties.forEach(el => { const d = +el.dataset.depth; el.style.translate = `${mouse.nx * d * 30}px ${mouse.ny * d * 30 - y * d * .35}px`; });
         speedEls.forEach(el => { const r = el.parentElement.getBoundingClientRect(); el.style.translate = `0 ${((r.top + r.height / 2 - vh / 2) * +el.dataset.speed).toFixed(1)}px`; });
+        // bandeaux : vitesse constante, indépendante du scroll
         marquees.forEach(m => {
-          m.x -= m.dir * dir * (1.2 + Math.min(Math.abs(vel) * .35, 30));
+          m.x -= m.dir * 70 * dt;
           if (m.x <= -m.half) m.x += m.half;
           if (m.x > 0) m.x -= m.half;
           m.track.style.transform = `translate3d(${m.x}px,0,0)`;
         });
       }
+      if (rail) rail.frame(vh);
       if (hSec) {
         const r = hSec.getBoundingClientRect();
         if (r.top < vh && r.bottom > 0) {

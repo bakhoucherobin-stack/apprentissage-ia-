@@ -8,7 +8,7 @@ Décompressez le dossier puis double-cliquez sur `index.html`. Pas d'installatio
 
 ## Pages
 
-- `index.html` : accueil (héros, mode de commande, offres, pizzas stars, défilement horizontal, Vos envies, chiffres, infos)
+- `index.html` : accueil (héros, mode de commande, offres, pizzas stars, rangée de catégories pilotée par une barre, Vos envies, chiffres, infos)
 - `carte.html` : les 190 produits des 21 catégories, filtre « Vos envies », barre de catégories
 - `livraison.html` : vérificateur de code postal, 11 villes, engagement 40 min, offres, à emporter
 
@@ -16,7 +16,7 @@ Décompressez le dossier puis double-cliquez sur `index.html`. Pas d'installatio
 
 - Pizzas (photos réelles) découpées en 8 parts : quand le curseur approche, la pizza bouge et se découpe, la part la plus proche sort ; au survol les ingrédients de la recette s'envolent ; au clic, explosion.
 - Les autres produits projettent aussi leurs ingrédients (frites, salade, cheddar, chocolat…).
-- Chargement avec pizza qui tourne, rideau entre les pages, lettres qui tombent, bandeaux défilants liés au scroll, défilement horizontal épinglé, texte qui s'allume, compteurs, curseur personnalisé, boutons magnétiques, pluie d'ingrédients au clic dans le vide.
+- Chargement avec pizza qui tourne, rideau entre les pages, lettres qui tombent, bandeaux défilants à vitesse constante, rangée de catégories avec barre de défilement (ou glisser les cartes), pizza vitrine qui tourne et s'ouvre au survol avec ingrédients poussés par le curseur, texte qui s'allume, compteurs, curseur personnalisé, boutons magnétiques, pluie d'ingrédients au clic dans le vide.
 
 ## Fin de commande : aperçu 3D
 
