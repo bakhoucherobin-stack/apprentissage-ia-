@@ -86,7 +86,6 @@
     const link = (href, label, key) => `<a href="${href}" class="nav__link"${page === key ? ' aria-current="page"' : ''} data-cursor="${label}"><span data-text="${label}">${label}</span></a>`;
     document.body.insertAdjacentHTML('afterbegin', `
       <div class="progress" aria-hidden="true"><i id="progress"></i></div>
-      <div class="cursor" id="cursor" aria-hidden="true"><span id="cursorLabel"></span></div>
       <header class="nav" id="nav">
         <div class="nav__side">
           <button class="nav__burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mmenu"><span></span><span></span><span></span></button>
@@ -1003,21 +1002,8 @@
 
   function setupPointer() {
     if (!finePointer || reduceMotion) return null;
-    document.documentElement.classList.add('has-cursor');
-    const el = $('#cursor');
-    // Le point jaune remplace la souris : il est placé directement à chaque mouvement, sans retard
-    el.style.opacity = 0;
-    const place = e => { el.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`; el.style.opacity = 1; };
-    document.addEventListener('pointermove', place, { passive: true });
-    document.addEventListener('pointerdown', place, { passive: true });
-    document.addEventListener('pointerover', e => {
-      // le curseur reste un petit rond jaune : il grossit à peine sur les éléments cliquables
-      el.classList.toggle('is-hover', !!e.target.closest('[data-cursor], a, button, label, .pz'));
-    });
-    document.addEventListener('pointerdown', () => el.classList.add('is-down'));
-    document.addEventListener('pointerup', () => el.classList.remove('is-down'));
-    document.addEventListener('mouseleave', () => { el.style.opacity = 0; });
-    document.addEventListener('mouseenter', () => { el.style.opacity = 1; });
+    // curseur normal du système (plus de point personnalisé)
+    const el = $('#cursor'); if (el) el.remove();
     $$('.magnetic').forEach(m => {
       m.addEventListener('pointermove', e => { const r = m.getBoundingClientRect(); m.style.translate = `${(e.clientX - r.left - r.width / 2) * .3}px ${(e.clientY - r.top - r.height / 2) * .4}px`; });
       m.addEventListener('pointerleave', () => { m.style.translate = '0 0'; });

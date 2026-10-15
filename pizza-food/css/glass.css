@@ -1,0 +1,152 @@
+/* =========================================================
+   PIZZA FOOD — effet « liquid glass »
+   Se charge après raffine.css. Des halos de couleur flottent
+   derrière la page ; les présentations (vitrine, pizzas stars,
+   produits, cartes, panneaux, panier, fenêtres) deviennent des
+   plaques de verre : translucides, floutées, bords lumineux et
+   reflet qui suit la souris (js/glass.js règle --gx / --gy).
+   Pour l'enlever : retirer ce fichier (et js/glass.js) des pages.
+   ========================================================= */
+:root {
+  --glass-fill: linear-gradient(140deg, rgba(255, 255, 255, .58), rgba(255, 255, 255, .22) 55%, rgba(255, 255, 255, .36));
+  --glass-shine: radial-gradient(420px circle at var(--gx, 22%) var(--gy, -10%), rgba(255, 255, 255, .75), rgba(255, 255, 255, 0) 55%);
+  --glass-blur: blur(18px) saturate(185%);
+  --glass-edge:
+    inset 0 1px 0 rgba(255, 255, 255, .95),
+    inset 1px 0 0 rgba(255, 255, 255, .55),
+    inset 0 -1px 0 rgba(255, 255, 255, .35),
+    inset 0 0 0 1px rgba(255, 255, 255, .28),
+    inset 0 -14px 26px -18px rgba(255, 140, 40, .28),
+    inset 0 14px 22px -16px rgba(255, 255, 255, .9);
+  --glass-drop: 0 22px 50px -12px rgba(140, 50, 0, .22), 0 4px 12px rgba(140, 50, 0, .07);
+  --glass-drop-hover: 0 34px 70px -14px rgba(140, 50, 0, .32), 0 6px 16px rgba(140, 50, 0, .09);
+}
+
+/* ---------- Halos de couleur derrière la page ---------- */
+body { background: #fff3e2; }
+body::before {
+  content: ''; position: fixed; inset: -20vmax; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(30vmax 26vmax at 10% 16%, rgba(255, 199, 0, .85), transparent 70%),
+    radial-gradient(28vmax 24vmax at 90% 10%, rgba(255, 80, 20, .55), transparent 70%),
+    radial-gradient(34vmax 28vmax at 82% 74%, rgba(255, 130, 120, .65), transparent 70%),
+    radial-gradient(30vmax 26vmax at 14% 84%, rgba(255, 140, 30, .6), transparent 70%),
+    radial-gradient(26vmax 22vmax at 48% 46%, rgba(255, 205, 90, .6), transparent 70%),
+    radial-gradient(18vmax 16vmax at 62% 30%, rgba(255, 100, 60, .35), transparent 70%);
+  filter: blur(30px);
+  animation: glass-drift 26s ease-in-out infinite alternate;
+}
+@keyframes glass-drift { 50% { transform: translate3d(3vmax, -2vmax, 0) rotate(4deg) scale(1.05); } 100% { transform: translate3d(-3vmax, 2vmax, 0) rotate(-3deg); } }
+main { position: relative; z-index: 0; }
+
+/* les fonds clairs deviennent transparents pour laisser voir les halos */
+.band--orange, .band--pink, .band--yellow, .band--lemon, .band--cream, .hero, .phero, .co-hero, .cat:nth-of-type(odd), .cat:nth-of-type(even) { background: transparent !important; }
+.cat:nth-of-type(even) { background: rgba(255, 255, 255, .12) !important; }
+.band--orange:not(.hero):not(.phero):not(.co-hero), .band--pink { background: rgba(255, 255, 255, .12) !important; }
+
+/* ---------- La plaque de verre ---------- */
+.mode__card, .offer, .card, .panel, .stats-bar, .number, .rcard__inner, .infos__col, .co__panel, .co__sum, .co__recap, .co__sug, .co__addr, .checker form, .zone, .envie, .chip, .phero__chips span, .catbar a, .review, .cart, .modal__box, .cmp__box, .co__steps button, .seg, .toast, .reviews__arrows button {
+  background: var(--glass-shine), var(--glass-fill) !important;
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255, 255, 255, .7) !important;
+  box-shadow: var(--glass-edge), var(--glass-drop) !important;
+}
+.mode__card:hover, .offer:hover, .card:hover, .number:hover, .rcard:hover .rcard__inner, .co__sug:hover, .panel:hover {
+  box-shadow: var(--glass-edge), var(--glass-drop-hover) !important;
+}
+/* petites pastilles : ombre plus légère */
+.chip, .envie, .zone, .catbar a, .phero__chips span, .co__steps button, .seg { box-shadow: var(--glass-edge), 0 6px 16px -6px rgba(140, 50, 0, .2) !important; }
+.chip:hover, .catbar a:hover, .envie:hover { background: linear-gradient(140deg, rgba(255, 214, 80, .85), rgba(255, 199, 0, .55)) !important; color: var(--ink); }
+.catbar a.is-active, .envie[aria-pressed="true"], .seg button[aria-pressed="true"], .co__steps button.is-done { background: linear-gradient(140deg, rgba(41, 42, 44, .92), rgba(41, 42, 44, .78)) !important; color: var(--yellow) !important; }
+.co__steps button.is-current, .mode__card[aria-checked="true"], .co__addr.is-on {
+  background: var(--glass-shine), linear-gradient(140deg, rgba(255, 228, 130, .82), rgba(255, 199, 0, .38)) !important;
+  border-color: rgba(255, 236, 170, .95) !important;
+}
+.seg { overflow: hidden; }
+.seg button { background: transparent; }
+.zone--hq { background: linear-gradient(140deg, rgba(41, 42, 44, .92), rgba(41, 42, 44, .75)) !important; }
+.zone.is-match { background: linear-gradient(140deg, rgba(255, 214, 80, .9), rgba(255, 199, 0, .6)) !important; }
+
+/* ---------- Vitrine (héros) : la pizza posée sur un disque de verre ---------- */
+.hero__pizza-wrap::before { inset: -6%; background: radial-gradient(circle at 40% 35%, #ffd84a, #ffb300 55%, #ff7a1a); filter: blur(28px); opacity: .85; animation: glass-pulse 6s ease-in-out infinite; }
+@keyframes glass-pulse { 50% { transform: scale(1.06); opacity: .7; } }
+.hero__pizza-wrap .showcase__drop {
+  padding: 5%;
+  background: var(--glass-shine), linear-gradient(140deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, .14) 60%, rgba(255, 255, 255, .32)) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(190%); backdrop-filter: blur(14px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, .8);
+  box-shadow: var(--glass-edge), inset 0 0 40px rgba(255, 255, 255, .25), 0 40px 80px -20px rgba(150, 50, 0, .45) !important;
+}
+.hero__facts > div, .hero__kicker {
+  padding: 12px 18px; border-radius: 18px;
+  background: var(--glass-fill); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255, 255, 255, .75); box-shadow: var(--glass-edge), 0 10px 26px -10px rgba(140, 50, 0, .25);
+}
+.hero__kicker { border-radius: 999px; padding: 8px 16px; }
+.hero__facts { gap: 14px; }
+
+/* ---------- Pizzas stars : disque de verre et halo coloré ---------- */
+.star__burst::before {
+  inset: 6%;
+  background: var(--glass-shine), linear-gradient(140deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, .12) 60%, rgba(255, 255, 255, .3)) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(190%); backdrop-filter: blur(12px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, .8);
+  box-shadow: var(--glass-edge), 0 30px 60px -18px rgba(150, 50, 0, .4);
+}
+.star__burst::after { content: ''; position: absolute; inset: 4%; z-index: -1; border-radius: 50%; background: radial-gradient(circle, #ffc700, #ff7a1a 70%); filter: blur(34px); opacity: .95; }
+.star:nth-child(even) .star__burst::after { background: radial-gradient(circle, #ffb0a0, #ff5a2a 70%); }
+.star__burst { isolation: isolate; }
+.star__tag { z-index: 3; background: linear-gradient(140deg, #3a3b3e, #232426); color: #ffc700; font-size: 13px; letter-spacing: .04em; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 6px 14px -6px rgba(0, 0, 0, .5); }
+
+/* ---------- Produits : bulle de verre derrière la photo ---------- */
+.card__media::before, .rcard__media::before {
+  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, .9), rgba(255, 255, 255, .25) 60%), radial-gradient(circle, rgba(255, 199, 0, .55), rgba(255, 120, 30, .2)) !important;
+  border: 1px solid rgba(255, 255, 255, .8) !important;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .9), inset 0 -10px 22px rgba(255, 150, 40, .22), 0 14px 30px -12px rgba(150, 50, 0, .35);
+}
+.rcard__media::before { scale: .9; }
+.card__media > img, .rcard__media img { position: relative; }
+.offer__img { border: 1px solid rgba(255, 255, 255, .7); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), 0 14px 30px -14px rgba(0, 0, 0, .4); }
+
+/* ---------- Barres : navigation, catégories, bandeaux ---------- */
+.nav.is-scrolled, .catbar {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .62), rgba(255, 255, 255, .38)) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, .8);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, .6), 0 10px 30px -14px rgba(140, 50, 0, .25);
+}
+.nav__cart { background: linear-gradient(140deg, rgba(41, 42, 44, .94), rgba(41, 42, 44, .78)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 10px 24px -10px rgba(0, 0, 0, .5); }
+.marquee--yellow { background: linear-gradient(180deg, rgba(255, 214, 70, .85), rgba(255, 199, 0, .7)); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7); }
+.offer-strip, .marquee--pink { background: linear-gradient(180deg, rgba(41, 42, 44, .9), rgba(41, 42, 44, .82)); }
+
+/* ---------- Boutons : effet verre bombé ---------- */
+.btn--pill, .btn--dark, .rail-ctrl__arrow, .catbar__arrow, .rcard__go { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 -3px 8px rgba(0, 0, 0, .18), 0 10px 22px -8px rgba(160, 40, 0, .5) !important; }
+.btn--pill { background: linear-gradient(180deg, #ff6a2e, #ff4100 60%, #e83a00); }
+.btn--dark { background: linear-gradient(180deg, #3b3c3f, #292a2c 60%, #1d1e20); }
+.btn--ghost { background: var(--glass-fill); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border-color: rgba(41, 42, 44, .85); box-shadow: var(--glass-edge); }
+.btn--ghost:hover { background: var(--ink); }
+
+/* ---------- Fenêtres ---------- */
+.modal { background: rgba(41, 42, 44, .35); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.cmp { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); background: rgba(41, 42, 44, .4); }
+.modal__head, .cmp__head, .cmp__foot, .cmp__sizes, .cmp__body, .modal__body, .cart__head, .cart__foot { background: transparent !important; }
+.cmp__box, .modal__box { background: var(--glass-shine), linear-gradient(140deg, rgba(255, 252, 245, .9), rgba(255, 248, 236, .78)) !important; }
+.cart { background: linear-gradient(160deg, rgba(255, 252, 245, .86), rgba(255, 246, 232, .72)) !important; border-radius: 26px 0 0 26px; }
+.field input, .field textarea, .field select { background: rgba(255, 255, 255, .6); }
+
+/* ---------- Plateau de la commande ---------- */
+.co__visual .v2d::before { background: radial-gradient(closest-side, rgba(255, 199, 0, .55), rgba(255, 199, 0, 0)); }
+
+/* ---------- Téléphones : flou plus léger (plus fluide) ---------- */
+@media (max-width: 860px) {
+  :root { --glass-blur: blur(10px) saturate(170%); }
+  .card, .chip { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .card { background: var(--glass-shine), linear-gradient(140deg, rgba(255, 255, 255, .78), rgba(255, 255, 255, .5)) !important; }
+  body::before { animation: none; }
+}
+/* la carte compte ~190 produits : pas de flou sous chaque carte pour rester fluide */
+body[data-page="carte"] .card { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--glass-shine), linear-gradient(140deg, rgba(255, 255, 255, .7), rgba(255, 255, 255, .32)) !important; }
+.no-motion body::before, .no-motion .hero__pizza-wrap::before { animation: none; }
+.card__media::before { scale: .86; }
+.card:hover .card__media::before { scale: 1; }

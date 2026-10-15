@@ -8,6 +8,10 @@ Refonte du site de Pizza Food (34 rue du Général de Gaulle, 94430 Chennevière
 
 Pour revenir à l'ancien style « néon circus », il suffit de supprimer la ligne `<link rel="stylesheet" href="css/raffine.css…">` dans les 4 pages HTML.
 
+## Effet « liquid glass » (version 11)
+
+`css/glass.css` (+ `js/glass.js`) ajoute des halos de couleur qui flottent derrière la page et transforme les présentations en plaques de verre : vitrine (pizza posée sur un disque de verre), pizzas stars, cartes produits, modes de commande, offres, avis, panier, fenêtres, barres de navigation. Le reflet suit la souris. Pour l'enlever : supprimer les lignes `glass.css` et `glass.js` dans les 4 pages HTML. Le curseur de la souris est celui du système (plus de point jaune).
+
 ## Ouvrir le site
 
 Décompressez le dossier puis double-cliquez sur `index.html`. Pas d'installation. Une connexion Internet est nécessaire pour les polices.
@@ -22,7 +26,7 @@ Décompressez le dossier puis double-cliquez sur `index.html`. Pas d'installatio
 ## Animations et interactions
 
 - Pizzas (photos réelles) découpées en 8 parts : quand le curseur approche, la pizza bouge et se découpe, la part la plus proche sort. Au clic, quelques ingrédients s'échappent (rien au survol, pour garder le site fluide).
-- Chargement avec pizza qui tourne, rideau entre les pages, lettres qui tombent, bandeaux défilants à vitesse constante, rangée de catégories avec barre de défilement (ou glisser les cartes), pizza vitrine qui tourne et s'ouvre au survol avec ingrédients poussés par le curseur, texte qui s'allume, compteurs, curseur personnalisé, boutons magnétiques, pluie d'ingrédients au clic dans le vide.
+- Chargement avec pizza qui tourne, rideau entre les pages, lettres qui tombent, bandeaux défilants à vitesse constante, rangée de catégories avec barre de défilement (ou glisser les cartes), pizza vitrine qui tourne et s'ouvre au survol avec ingrédients poussés par le curseur, texte qui s'allume, compteurs, boutons magnétiques, pluie d'ingrédients au clic dans le vide.
 
 ## Composer un produit (comme sur le site d'origine)
 
