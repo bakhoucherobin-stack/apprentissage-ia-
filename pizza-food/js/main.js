@@ -205,7 +205,7 @@
     saveCart();
     const p = PRODUCTS[id];
     const r = fromEl.getBoundingClientRect();
-    PZ.burst(r.left + r.width / 2, r.top + r.height / 2, PZ.bitsFor(p), { count: 5, power: 8 });
+    PZ.burst(r.left + r.width / 2, r.top + r.height / 2, PZ.bitsFor(p), { count: 3, power: 8 });
     flyToCart(fromEl, p).then(() => {
       renderCart();
       const b = $('#cartBtn'); b.classList.remove('is-bump'); void b.offsetWidth; b.classList.add('is-bump');
@@ -266,7 +266,7 @@
     if (announce) {
       const o = OFFERS[mode];
       toast(`Mode : <b>${mode}</b>${o ? ' · ' + o.label : ''}`);
-      if (fromEl) { const r = fromEl.getBoundingClientRect(); PZ.burst(r.left + r.width / 2, r.top + r.height / 3, ['star', 'pepperoni', 'basil', 'cheese'], { count: 5, power: 9 }); }
+      if (fromEl) { const r = fromEl.getBoundingClientRect(); PZ.burst(r.left + r.width / 2, r.top + r.height / 3, ['star', 'pepperoni', 'basil', 'cheese'], { count: 3, power: 8 }); }
     }
   }
 
@@ -464,9 +464,9 @@
         if (now - last < 700) return;
         last = now;
         const r = img.getBoundingClientRect();
-        PZ.burst(r.left + r.width / 2, r.top + r.height / 2, PZ.bitsFor(PRODUCTS[img.dataset.thing]), { count: 5, power: 9 });
+        PZ.burst(r.left + r.width / 2, r.top + r.height / 2, PZ.bitsFor(PRODUCTS[img.dataset.thing]), { count: 3, power: 8 });
       };
-      img.addEventListener('pointerenter', pop);
+      // plus d'ingrédients au survol : seulement quelques-uns au clic
       img.addEventListener('pointerdown', pop);
     });
   }
@@ -526,7 +526,7 @@
         hits.forEach(([, cp]) => $$(`.zone[data-cp="${cp}"]`).forEach(z => z.classList.add('is-match')));
         res.innerHTML = `<b>On vous livre !</b><span>${hits.map(h => h[0] + ' (' + h[1] + ')').join(', ')} : livraison gratuite en 40 minutes, dès ${euro(INFO.minimum)} de commande.</span>`;
         const r = input.getBoundingClientRect();
-        PZ.burst(r.left + r.width / 2, r.top, ['star', 'pepperoni', 'basil', 'olive', 'cheese'], { count: 8, power: 11 });
+        PZ.burst(r.left + r.width / 2, r.top, ['star', 'pepperoni', 'basil', 'olive', 'cheese'], { count: 3, power: 9 });
       } else if (/^\d{5}$/.test(v) || v.length > 2) {
         res.innerHTML = `<b>Hors zone…</b><span>Pas de livraison ici pour l'instant, mais votre commande peut être à emporter au ${INFO.address} : <a href="#emporter">1 pizza achetée = la 2e offerte</a>.</span>`;
       }
@@ -582,7 +582,7 @@
       status.innerHTML = `<b>${total} produit${total > 1 ? 's' : ''}</b> avec ${label.toLowerCase()} · <button type="button" id="enviesReset">tout afficher</button>`;
       $('#emptyMsg').classList.toggle('is-on', !total);
       try { history.replaceState(null, '', `?envie=${encodeURIComponent(label)}${location.hash}`); } catch (e) { /* file:// */ }
-      if (fromEl) { const r = fromEl.getBoundingClientRect(); PZ.burst(r.left + r.width / 2, r.top + r.height / 2, PZ.bitsFor({ n: label, d: label, cat: { pizza: true } }), { count: 7, power: 10 }); }
+      if (fromEl) { const r = fromEl.getBoundingClientRect(); PZ.burst(r.left + r.width / 2, r.top + r.height / 2, PZ.bitsFor({ n: label, d: label, cat: { pizza: true } }), { count: 3, power: 9 }); }
       if (scroll) setTimeout(() => wrap.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }), 250);
     };
     box.addEventListener('click', e => { const b = e.target.closest('[data-envie]'); if (b) apply(+b.dataset.envie === active ? -1 : +b.dataset.envie, true, b); });
@@ -590,6 +590,31 @@
     const q = new URLSearchParams(location.search).get('envie');
     apply(q ? ENVIES.findIndex(([l]) => norm(l) === norm(q)) : -1, false);
 
+    // flèches + petite barre de position pour parcourir les catégories sans scroller
+    const bar = $('#catbar'), track = $('#catTrack'), thumb = track && $('.catbar__thumb', track);
+    if (track) {
+      const max = () => Math.max(0, bar.scrollWidth - bar.clientWidth);
+      const sync = () => {
+        const w = Math.max(40, track.clientWidth * bar.clientWidth / Math.max(bar.clientWidth, bar.scrollWidth));
+        thumb.style.width = w + 'px';
+        thumb.style.transform = `translateX(${(max() ? bar.scrollLeft / max() : 0) * (track.clientWidth - w)}px)`;
+        $$('[data-catdir]').forEach(b => { b.disabled = +b.dataset.catdir < 0 ? bar.scrollLeft < 4 : bar.scrollLeft > max() - 4; });
+        track.hidden = !max();
+      };
+      bar.addEventListener('scroll', sync, { passive: true });
+      addEventListener('resize', sync);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(sync);
+      sync();
+      $$('[data-catdir]').forEach(b => b.addEventListener('click', () => bar.scrollBy({ left: +b.dataset.catdir * bar.clientWidth * .7 })));
+      track.addEventListener('pointerdown', e => {
+        e.preventDefault(); track.setPointerCapture(e.pointerId); track.classList.add('is-drag');
+        const tr = thumb.getBoundingClientRect(), grab = e.clientX >= tr.left && e.clientX <= tr.right ? e.clientX - tr.left : tr.width / 2;
+        const to = x => { const r = track.getBoundingClientRect(); bar.style.scrollBehavior = 'auto'; bar.scrollLeft = clamp((x - r.left - grab) / Math.max(1, r.width - tr.width)) * max(); };
+        to(e.clientX);
+        const mv = ev => to(ev.clientX), up = () => { track.classList.remove('is-drag'); bar.style.scrollBehavior = ''; track.removeEventListener('pointermove', mv); track.removeEventListener('pointerup', up); track.removeEventListener('pointercancel', up); };
+        track.addEventListener('pointermove', mv); track.addEventListener('pointerup', up); track.addEventListener('pointercancel', up);
+      });
+    }
     const links = $$('#catbar a');
     const spy = new IntersectionObserver(entries => entries.forEach(en => {
       if (!en.isIntersecting) return;
@@ -645,7 +670,7 @@
         if (!landed && t > 1.05) {
           landed = true;
           const r = wrap.getBoundingClientRect();
-          PZ.burst(r.left + r.width / 2, r.top + r.height * .55, ['cheese', 'pepperoni', 'basil', 'olive', 'star'], { count: 8, power: 12 });
+          PZ.burst(r.left + r.width / 2, r.top + r.height * .55, ['cheese', 'pepperoni', 'basil', 'olive', 'star'], { count: 4, power: 10 });
         }
         const r = wrap.getBoundingClientRect();
         const cx = r.left + r.width / 2, cy = r.top + r.height / 2, R = r.width / 2;

@@ -204,30 +204,56 @@
   const sel = (label, name, opts, val = '', extra = '') => `<div><label for="ac-${name}">${label}</label><div class="field"><select id="ac-${name}" name="${name}" ${extra}>${opts.map(o => `<option${o === val ? ' selected' : ''}>${A.esc(o)}</option>`).join('')}</select></div></div>`;
   const normTel = t => (t || '').replace(/\D/g, '');
 
+  // Adresse de livraison (mêmes champs que le site d'origine)
+  const ADDR = ['ville', 'numrue', 'adresse', 'bat', 'escalier', 'code', 'code2', 'interphone', 'etage', 'porte'];
+  function addrFields(v = {}, req = false) {
+    const { esc, ZONES } = A;
+    return `<div class="full"><label for="ac-ville">Ville${req ? ' *' : ''}</label><div class="field"><select id="ac-ville" name="ville"${req ? ' required' : ''}><option value="">Votre ville</option>${ZONES.map(([n, cp]) => `<option value="${esc(n)} ${cp}"${v.ville === n + ' ' + cp ? ' selected' : ''}>${esc(n)} ${cp}</option>`).join('')}</select></div></div>
+      ${fld('N° de la voie', 'numrue', v.numrue, 'text', 'autocomplete="address-line1"')}${fld('Adresse' + (req ? ' *' : ''), 'adresse', v.adresse, 'text', (req ? 'required ' : '') + 'autocomplete="street-address"')}
+      ${fld('Bâtiment', 'bat', v.bat)}${fld('Escalier', 'escalier', v.escalier)}${fld('Code 1', 'code', v.code)}${fld('Code 2', 'code2', v.code2)}
+      ${fld('Interphone', 'interphone', v.interphone)}${fld('Étage', 'etage', v.etage)}${fld('Porte', 'porte', v.porte)}${fld('Nom de l\'adresse', 'nomAdr', v.nomAdr, 'text', 'placeholder="Maison, travail…"')}`;
+  }
+  const pickAddr = o => { const a = {}; ADDR.concat('nomAdr').forEach(k => { if (o[k]) a[k] = String(o[k]).trim(); }); return a.adresse && a.ville ? a : null; };
+  const addrText = a => [[a.numrue, a.adresse].filter(Boolean).join(' '), a.ville].filter(Boolean).join(', ') + ['bat', 'escalier', 'etage', 'porte'].filter(k => a[k]).map(k => ` · ${{ bat: 'bât.', escalier: 'esc.', etage: 'étage', porte: 'porte' }[k]} ${a[k]}`).join('') + ((a.code || a.code2) ? ` · code ${[a.code, a.code2].filter(Boolean).join(' / ')}` : '') + (a.interphone ? ` · interphone ${a.interphone}` : '');
+  function saveAccount(acc) { const all = accounts(); all[acc.email] = acc; A.store.set('pf-accounts', all); }
+  // ancien format : une seule adresse à plat sur le compte
+  function addresses(acc) {
+    if (!acc) return [];
+    if (!acc.addresses) { const a = pickAddr(acc); acc.addresses = a ? [a] : []; }
+    return acc.addresses;
+  }
+
   let acAfter = null;
   function account(view = 'login', after) {
-    const { openModal, closeModal, $, esc, euro } = A;
+    const { openModal, closeModal, $, $$, esc, euro } = A;
     if (after !== undefined) acAfter = after;
     after = acAfter;
     const me = session();
-    if (me && view === 'login') view = 'me';
+    if (me && (view === 'login' || view === 'create')) view = 'me';
+    if (!me && /^(me|edit|addr)$/.test(view)) view = 'login';
+    const persoFields = (v = {}) => `${fld('Téléphone *', 'tel', v.tel, 'tel', 'required autocomplete="tel"')}${fld('Email *', 'email', v.email, 'email', 'required autocomplete="email"' + (v.email ? ' readonly' : ''))}
+        ${sel('Civilité', 'civ', ['Monsieur', 'Madame', 'Mademoiselle'], v.civ)}${fld('Société', 'societe', v.societe, 'text', 'autocomplete="organization"')}
+        ${fld('Nom *', 'nom', v.nom, 'text', 'required autocomplete="family-name"')}${fld('Prénom *', 'prenom', v.prenom, 'text', 'required autocomplete="given-name"')}
+        ${fld('Date de naissance', 'naiss', v.naiss, 'date')}`;
     if (view === 'create') {
       openModal('Nouveau compte', `<form class="form" id="acForm">
-        ${fld('Téléphone *', 'tel', '', 'tel', 'required autocomplete="tel"')}${fld('Email *', 'email', '', 'email', 'required autocomplete="email"')}
-        ${sel('Civilité', 'civ', ['Monsieur', 'Madame', 'Mademoiselle'])}${fld('Société', 'societe', '', 'text', 'autocomplete="organization"')}
-        ${fld('Nom *', 'nom', '', 'text', 'required autocomplete="family-name"')}${fld('Prénom *', 'prenom', '', 'text', 'required autocomplete="given-name"')}
-        ${fld('Date de naissance', 'naiss', '', 'date')}${sel('Vous nous avez connu par', 'source', ['—'].concat(SOURCES))}
-        <p class="form-note full">Votre compte est enregistré sur cet appareil. Il permet de retrouver vos coordonnées et vos commandes.</p>
+        ${persoFields()}${sel('Vous nous avez connu par', 'source', ['—'].concat(SOURCES))}
+        <h4 class="full">Adresse de livraison <small>(facultatif, utile pour commander en livraison)</small></h4>
+        ${addrFields()}
+        <p class="form-note full">Votre compte est enregistré sur cet appareil. Il permet de retrouver vos coordonnées, vos adresses et vos commandes.</p>
         <button class="btn btn--dark" type="submit" style="justify-self:start">Créer mon compte</button>
         <p class="full ac-switch">Déjà inscrit ? <button type="button" class="linkish" data-ac="login">Se connecter</button></p>
       </form>`);
       bindAcForm(f => {
-        const acc = Object.fromEntries(new FormData(f));
-        acc.email = acc.email.trim().toLowerCase();
-        const all = accounts();
-        if (all[acc.email]) return 'Un compte existe déjà avec cet email : connectez-vous.';
-        acc.orders = []; acc.points = 0;
-        all[acc.email] = acc; A.store.set('pf-accounts', all); A.store.set('pf-session', acc.email);
+        const data = Object.fromEntries(new FormData(f));
+        if ((data.adresse || data.ville) && !pickAddr(data)) return 'Pour enregistrer l\'adresse, indiquez la ville et l\'adresse.';
+        const acc = {};
+        ['tel', 'email', 'civ', 'societe', 'nom', 'prenom', 'naiss', 'source'].forEach(k => { acc[k] = (data[k] || '').trim(); });
+        acc.email = acc.email.toLowerCase();
+        if (accounts()[acc.email]) return 'Un compte existe déjà avec cet email : connectez-vous.';
+        const ad = pickAddr(data);
+        Object.assign(acc, { addresses: ad ? [ad] : [], orders: [], points: 0 });
+        saveAccount(acc); A.store.set('pf-session', acc.email);
         A.toast(`Bienvenue <b>${esc(acc.prenom)}</b> !`);
       }, after);
     } else if (view === 'login') {
@@ -242,13 +268,36 @@
         A.store.set('pf-session', email);
         A.toast(`Bon retour <b>${esc(acc.prenom)}</b> !`);
       }, after);
+    } else if (view === 'edit') {
+      openModal('Mes informations', `<form class="form" id="acForm">${persoFields(me)}
+        <button class="btn btn--dark" type="submit" style="justify-self:start">Enregistrer</button>
+        <p class="full ac-switch"><button type="button" class="linkish" data-ac="me">← Mon compte</button></p></form>`);
+      bindAcForm(f => {
+        const data = Object.fromEntries(new FormData(f));
+        ['tel', 'civ', 'societe', 'nom', 'prenom', 'naiss'].forEach(k => { me[k] = (data[k] || '').trim(); });
+        saveAccount(me); A.toast('Informations enregistrées');
+      }, after);
+    } else if (view === 'addr') {
+      openModal('Nouvelle adresse', `<form class="form" id="acForm">${addrFields({}, true)}
+        <button class="btn btn--dark" type="submit" style="justify-self:start">Enregistrer l'adresse</button>
+        <p class="full ac-switch"><button type="button" class="linkish" data-ac="me">← Mon compte</button></p></form>`);
+      bindAcForm(f => {
+        const ad = pickAddr(Object.fromEntries(new FormData(f)));
+        if (!ad) return 'Indiquez la ville et l\'adresse.';
+        addresses(me).push(ad); saveAccount(me); A.toast('Adresse enregistrée');
+      }, after);
     } else {
-      const orders = (me.orders || []).slice().reverse();
-      openModal('Mon compte', `<p><b>${esc(me.civ || '')} ${esc(me.prenom)} ${esc(me.nom)}</b><br>${esc(me.email)} · ${esc(me.tel)}${me.adresse ? `<br>${esc(me.numrue || '')} ${esc(me.adresse)}, ${esc(me.ville || '')}` : ''}</p>
+      const orders = (me.orders || []).slice().reverse(), ads = addresses(me);
+      openModal('Mon compte', `<p><b>${esc(me.civ || '')} ${esc(me.prenom)} ${esc(me.nom)}</b><br>${esc(me.email)} · ${esc(me.tel)}</p>
+        <p><button type="button" class="linkish" data-ac="edit">Modifier mes informations</button></p>
+        <h4>Mes adresses de livraison</h4>
+        ${ads.length ? `<ul class="ac-addrs">${ads.map((ad, i) => `<li><span>${ad.nomAdr ? `<b>${esc(ad.nomAdr)}</b> · ` : ''}${esc(addrText(ad))}</span><button type="button" class="linkish" data-deladdr="${i}">Supprimer</button></li>`).join('')}</ul>` : '<p>Aucune adresse enregistrée.</p>'}
+        <p><button type="button" class="btn btn--pill" data-ac="addr">+ Ajouter une adresse</button></p>
         <h4>Mes commandes</h4>
         ${orders.length ? `<ul class="ac-orders">${orders.map(o => `<li><b>${esc(o.no)}</b> · ${new Date(o.date).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })} · ${esc(o.mode)}<span>${euro(o.total)}</span><small>${o.items.map(i => `${i.qty} × ${esc(i.name)}`).join(', ')}</small></li>`).join('')}</ul>` : '<p>Aucune commande pour l\'instant.</p>'}
         <p style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn--dark" href="carte.html">Commander</a><button class="btn btn--ghost" type="button" id="acOut"><span>Se déconnecter</span></button></p>`);
       $('#acOut').addEventListener('click', () => { A.store.set('pf-session', ''); closeModal(); A.toast('Vous êtes déconnecté.'); if (after) after(); });
+      $$('[data-deladdr]').forEach(b => b.addEventListener('click', () => { ads.splice(+b.dataset.deladdr, 1); saveAccount(me); account('me'); if (after) after(); }));
     }
   }
   function bindAcForm(handler, after) {
@@ -268,30 +317,8 @@
      VISUEL 2D DE LA COMMANDE (planche en bois, profondeur)
      ======================================================= */
   function visual(el, items) {
-    const { esc, PRODUCTS, computeCart } = A;
-    const c = computeCart();
-    const lines = items.filter(i => PRODUCTS[i.id]);
-    if (!lines.length) { el.innerHTML = '<div class="v2d v2d--empty"><p>Ton plateau est vide…</p></div>'; return; }
-    const pz = lines.filter(i => PRODUCTS[i.id].cat.pizza), oth = lines.filter(i => !PRODUCTS[i.id].cat.pizza);
-    const SZ = { Junior: 36, Senior: 43, Mega: 50 };
-    const parts = [];
-    // pizzas au fond, en quinconce ; le reste devant, debout
-    pz.slice(0, 6).forEach((it, k) => {
-      const n = Math.min(pz.length, 6), row = n > 3 ? (k < Math.ceil(n / 2) ? 0 : 1) : 0, inRow = row ? n - Math.ceil(n / 2) : (n > 3 ? Math.ceil(n / 2) : n), idx = row ? k - Math.ceil(n / 2) : k;
-      const x = 50 + (idx - (inRow - 1) / 2) * (n > 3 ? 30 : n > 1 ? 36 : 0) + (row ? 8 : 0), y = (oth.length ? 34 : 48) + row * 24;
-      const w = (SZ[it.size] || 40) * (n > 4 ? .7 : n > 2 ? .78 : n > 1 ? .88 : 1);
-      parts.push(`<div class="v2d__pz" style="--x:${x}%;--y:${y}%;--w:${w}%;--d:${k * 120}ms;--r:${(k * 47) % 360}deg" title="${esc(PRODUCTS[it.id].n)}"><img src="${PRODUCTS[it.id].img}" alt="">${it.qty > 1 ? `<b class="v2d__qty">×${it.qty}</b>` : ''}${c.free[it.key] ? '<span class="v2d__free">Offerte</span>' : ''}<i class="v2d__steam"></i><i class="v2d__steam"></i></div>`);
-    });
-    oth.slice(0, 7).forEach((it, k) => {
-      const n = Math.min(oth.length, 7), off = (k - (n - 1) / 2) * Math.min(22, 84 / n), x = 50 + off, y = (pz.length ? 84 : 66) - off * off * .006, w = n > 4 ? 15 : 21;
-      parts.push(`<div class="v2d__thing" style="--x:${x}%;--y:${y}%;--w:${w}%;--d:${(pz.length + k) * 110}ms" title="${esc(PRODUCTS[it.id].n)}"><img src="${PRODUCTS[it.id].img}" alt="">${it.qty > 1 ? `<b class="v2d__qty">×${it.qty}</b>` : ''}</div>`);
-    });
-    el.innerHTML = `<div class="v2d"><div class="v2d__tilt"><div class="v2d__board">${parts.join('')}</div></div></div>`;
-    const v = el.firstChild, tilt = v.firstChild;
-    if (!A.reduceMotion) {
-      v.addEventListener('pointermove', e => { const r = v.getBoundingClientRect(); tilt.style.setProperty('--tx', ((e.clientX - r.left) / r.width - .5).toFixed(3)); tilt.style.setProperty('--ty', ((e.clientY - r.top) / r.height - .5).toFixed(3)); });
-      v.addEventListener('pointerleave', () => { tilt.style.setProperty('--tx', 0); tilt.style.setProperty('--ty', 0); });
-    }
+    if (!window.PF_TRAY) return;
+    window.PF_TRAY.render(el, items, { PRODUCTS: A.PRODUCTS, SHOP: window.PF_SHOP, esc: A.esc, freeKeys: A.computeCart().free, reduceMotion: A.reduceMotion });
   }
 
   /* =======================================================
@@ -316,7 +343,7 @@
   }
 
   function checkoutPage() {
-    const { $, $$, esc, euro, PRODUCTS, cart, INFO, ZONES, MODES } = A;
+    const { $, $$, esc, euro, PRODUCTS, cart, INFO, MODES } = A;
     const root = $('#coStep'), vis = $('#coVisual');
     if (!root) return;
     let step = 1, order = null;
@@ -412,7 +439,7 @@
       const now = new Date(), today = dayIso === now.toISOString().slice(0, 10);
       const lead = cart.mode === 'Livraison' ? 40 : 20, out = [];
       const open = now.getDay() !== 0 && now.getHours() >= 11 && now.getHours() < 23;
-      if (today && open) out.push(['asap', `Dès que possible (~${lead} min)`]);
+      if (today && open) { const t = new Date(now.getTime() + lead * 60000); out.push(['asap', `Dès que possible (vers ${t.getHours()}h${String(t.getMinutes()).padStart(2, '0')})`]); }
       for (let m = 11 * 60 + 30; m <= 22 * 60 + 45; m += 15) {
         if (today && m < now.getHours() * 60 + now.getMinutes() + lead) continue;
         const h = `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
@@ -421,10 +448,16 @@
       return out;
     }
     function stepPay() {
-      const me = session() || {}, saved = A.store.get('pf-checkout', {});
-      const v = k => saved[k] || me[k] || '';
+      const acc = session(), me = acc || {}, saved = A.store.get('pf-checkout', {});
+      const v = k => me[k] || saved[k] || '';
       const deliv = cart.mode === 'Livraison';
       const ds = days();
+      const ads = addresses(acc);
+      // adresse : celles du compte, ou une nouvelle pour cette commande
+      const addrBlock = !deliv ? `<p class="full co__where">${cart.mode === 'À emporter' ? 'À retirer' : 'Sur place'} au <b>${esc(INFO.address)}, ${esc(INFO.city)}</b>.</p>` : `<h3 class="full">Adresse de livraison</h3>
+          ${ads.length ? `<div class="full co__addrs" role="radiogroup" aria-label="Adresse de livraison">${ads.map((ad, i) => `<label class="co__addr"><input type="radio" name="addrPick" value="${i}"${i === 0 ? ' checked' : ''}><span><b>${esc(ad.nomAdr || 'Adresse enregistrée')}</b>${esc(addrText(ad))}</span></label>`).join('')}<label class="co__addr co__addr--new"><input type="radio" name="addrPick" value="new"><span><b>+ Nouvelle adresse</b>Pour cette commande</span></label></div>` : ''}
+          <div class="full co__newaddr" id="newAddr"${ads.length ? ' hidden' : ''}>${addrFields(ads.length ? {} : pickAddr(saved) || {}, true)}
+            ${acc ? `<label class="full co__cgv"><input type="checkbox" name="saveAddr" checked> <span>Enregistrer cette adresse sur mon compte</span></label>` : ''}</div>`;
       root.innerHTML = `${accBar()}
         <form class="form co__form" id="payForm" novalidate>
           <h3 class="full">Vos informations</h3>
@@ -432,11 +465,7 @@
           ${fld('Nom *', 'nom', v('nom'), 'text', 'required autocomplete="family-name"')}${fld('Prénom *', 'prenom', v('prenom'), 'text', 'required autocomplete="given-name"')}
           ${fld('Téléphone *', 'tel', v('tel'), 'tel', 'required autocomplete="tel" pattern="[0-9 +.]{10,}"')}${fld('Email *', 'email', v('email'), 'email', 'required autocomplete="email"')}
           ${fld('Date de naissance', 'naiss', v('naiss'), 'date')}
-          ${deliv ? `<h3 class="full">Adresse de livraison</h3>
-          <div class="full"><label for="ac-ville">Ville *</label><div class="field"><select id="ac-ville" name="ville" required><option value="">Votre ville</option>${ZONES.map(([n, cp]) => `<option value="${esc(n)} ${cp}"${v('ville') === n + ' ' + cp ? ' selected' : ''}>${esc(n)} ${cp}</option>`).join('')}</select></div></div>
-          ${fld('N° de la voie', 'numrue', v('numrue'), 'text', 'autocomplete="address-line1"')}${fld('Adresse *', 'adresse', v('adresse'), 'text', 'required autocomplete="street-address"')}
-          ${fld('Bâtiment', 'bat', v('bat'))}${fld('Escalier', 'escalier', v('escalier'))}${fld('Code 1', 'code', v('code'))}${fld('Code 2', 'code2', v('code2'))}
-          ${fld('Interphone', 'interphone', v('interphone'))}${fld('Étage', 'etage', v('etage'))}${fld('Porte', 'porte', v('porte'))}` : `<p class="full co__where">${cart.mode === 'À emporter' ? 'À retirer' : 'Sur place'} au <b>${esc(INFO.address)}, ${esc(INFO.city)}</b>.</p>`}
+          ${addrBlock}
           <div class="full"><label for="ac-rem">Remarques</label><div class="field"><textarea id="ac-rem" name="remarques" rows="3">${esc(saved.remarques || '')}</textarea></div></div>
           <h3 class="full">Mode de paiement</h3>
           <div class="full radios">${PAY.map((m, i) => `<label><input type="radio" name="paiement" value="${esc(m)}"${(saved.paiement ? saved.paiement === m : i === 0) ? ' checked' : ''}><span>${esc(m)}</span></label>`).join('')}</div>
@@ -445,6 +474,7 @@
           <div><label for="ac-jour">Jour</label><div class="field"><select id="ac-jour" name="jour">${ds.map(([iso, l]) => `<option value="${iso}">${esc(l)}</option>`).join('')}</select></div></div>
           <div><label for="ac-heure">Heure</label><div class="field"><select id="ac-heure" name="heure"></select></div></div>
           <div class="full"><label>Rappel par</label><div class="radios">${['Email', 'SMS'].map((m, i) => `<label><input type="radio" name="rappel" value="${m}"${(saved.rappel ? saved.rappel === m : i === 0) ? ' checked' : ''}><span>${m}</span></label>`).join('')}</div></div>
+          ${acc ? '' : `<label class="full co__cgv"><input type="checkbox" name="mkAcc"> <span>Créer mon compte avec ces informations (pour les retrouver à la prochaine commande)</span></label>`}
           <label class="full co__cgv"><input type="checkbox" name="cgv" required> <span>J'accepte les <button type="button" class="linkish" data-modal="cgv">conditions générales de vente</button></span></label>
           <p class="full ac-err" hidden></p>
           <div class="full co__btns"><button class="btn btn--ghost" type="button" id="coBack"><span>← Mon panier</span></button><button class="btn btn--dark" type="submit">Valider ma commande · ${euro(totals().grand)}</button></div>
@@ -452,6 +482,14 @@
       const f = $('#payForm'), jour = $('#ac-jour'), heure = $('#ac-heure');
       const fillH = () => { const hs = hours(jour.value); heure.innerHTML = hs.length ? hs.map(([k, l]) => `<option value="${k}">${l}</option>`).join('') : '<option value="">Plus de créneau ce jour</option>'; };
       jour.addEventListener('change', fillH); fillH();
+      const na = $('#newAddr');
+      const toggleNew = () => {
+        const pick = $('input[name="addrPick"]:checked', f), isNew = !pick || pick.value === 'new';
+        if (na) { na.hidden = !isNew; $$('input, select', na).forEach(i => { i.disabled = !isNew; }); }
+        $$('.co__addr', f).forEach(l => l.classList.toggle('is-on', $('input', l).checked));
+      };
+      f.addEventListener('change', e => { if (e.target.name === 'addrPick') toggleNew(); });
+      toggleNew();
       if (!hours(ds[0][0]).length && ds[1]) { jour.value = ds[1][0]; fillH(); }
       $('#coBack').addEventListener('click', () => go(1));
       f.addEventListener('submit', e => {
@@ -463,9 +501,25 @@
           return;
         }
         const data = Object.fromEntries(new FormData(f));
-        delete data.cgv;
-        A.store.set('pf-checkout', data);
-        placeOrder(data);
+        let ad = null;
+        if (deliv) {
+          ad = data.addrPick && data.addrPick !== 'new' ? ads[+data.addrPick] : pickAddr(data);
+          if (!ad) { err.hidden = false; err.textContent = 'Indiquez la ville et l\'adresse de livraison.'; return; }
+        }
+        const client = {};
+        ['civ', 'societe', 'nom', 'prenom', 'tel', 'email', 'naiss', 'remarques', 'paiement', 'jour', 'heure', 'rappel'].forEach(k => { client[k] = (data[k] || '').trim(); });
+        if (ad) Object.assign(client, ad);
+        // enregistrement sur le compte (nouvelle adresse) ou création du compte
+        if (acc && ad && data.saveAddr && !ads.some(x => addrText(x) === addrText(ad))) { ads.push(ad); saveAccount(acc); }
+        if (!acc && data.mkAcc) {
+          const email = client.email.toLowerCase();
+          if (!accounts()[email]) {
+            saveAccount({ tel: client.tel, email, civ: client.civ, societe: client.societe, nom: client.nom, prenom: client.prenom, naiss: client.naiss, addresses: ad ? [ad] : [], orders: [], points: 0 });
+            A.store.set('pf-session', email);
+          }
+        }
+        A.store.set('pf-checkout', Object.assign({ paiement: client.paiement, rappel: client.rappel, remarques: client.remarques }, acc ? {} : client));
+        placeOrder(client);
       });
     }
     function placeOrder(client) {
@@ -484,7 +538,7 @@
     function orderText(o) {
       const c = o.client, L = [];
       L.push(`Commande ${o.no} — ${o.mode}`, `${c.civ || ''} ${c.prenom} ${c.nom} · ${c.tel} · ${c.email}`);
-      if (c.adresse) L.push(`Adresse : ${c.numrue || ''} ${c.adresse}, ${c.ville}` + ['bat', 'escalier', 'code', 'code2', 'interphone', 'etage', 'porte'].filter(k => c[k]).map(k => ` · ${k} ${c[k]}`).join(''));
+      if (c.adresse) L.push(`Adresse : ${addrText(c)}`);
       L.push(`Quand : ${c.heure === 'asap' ? 'dès que possible' : c.jour + ' à ' + c.heure} · Paiement : ${c.paiement} · Rappel : ${c.rappel}`, '');
       o.items.forEach(i => { L.push(`${i.qty} × ${i.cat} : ${i.name} — ${euro(i.unit * i.qty)}`); i.lines.forEach(d => L.push(`   ${d.label} : ${d.text}`)); });
       L.push('', `Sous-total : ${euro(o.sub)}`);

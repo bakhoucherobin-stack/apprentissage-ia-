@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Bowlby+One+SC&family=Open+Sans:wght@400;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=8">
+  <link rel="stylesheet" href="css/style.css?v=9">
   <noscript><style>.curtain{display:none}</style></noscript>
 </head>
 <body data-page="carte">
@@ -48,17 +48,22 @@
       <p class="envies-status" id="enviesStatus" aria-live="polite"></p>
     </section>
 
-    <nav class="catbar" aria-label="Catégories de la carte"><div class="catbar__inner" id="catbar"></div></nav>
+    <nav class="catbar" aria-label="Catégories de la carte">
+      <button class="catbar__arrow" type="button" data-catdir="-1" aria-label="Catégories précédentes">←</button>
+      <div class="catbar__inner" id="catbar"></div>
+      <button class="catbar__arrow" type="button" data-catdir="1" aria-label="Catégories suivantes">→</button>
+      <div class="catbar__track" id="catTrack" aria-hidden="true"><i class="catbar__thumb"></i></div>
+    </nav>
 
     <div id="menu"></div>
   </main>
 
-  <script>window.PF_VERSION = "8 (15/10)";</script>
-  <script src="js/config.js?v=8"></script>
-  <script src="js/data.js?v=8"></script>
-  <script src="js/options.js?v=8"></script>
-  <script src="js/pizza.js?v=8"></script>
-  <script src="js/shop.js?v=8"></script>
-  <script src="js/main.js?v=8"></script>
+  <script>window.PF_VERSION = "9 (15/10)";</script>
+  <script src="js/config.js?v=9"></script>
+  <script src="js/data.js?v=9"></script>
+  <script src="js/options.js?v=9"></script>
+  <script src="js/pizza.js?v=9"></script>
+  <script src="js/shop.js?v=9"></script>
+  <script src="js/main.js?v=9"></script>
 </body>
 </html>

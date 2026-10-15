@@ -9,14 +9,13 @@ Décompressez le dossier puis double-cliquez sur `index.html`. Pas d'installatio
 ## Pages
 
 - `index.html` : accueil (héros, mode de commande, offres, pizzas stars, rangée de catégories pilotée par une barre, Vos envies, chiffres, infos)
-- `carte.html` : les 190 produits des 21 catégories, filtre « Vos envies », barre de catégories
+- `carte.html` : les 190 produits des 21 catégories, filtre « Vos envies », barre de catégories avec flèches et barre de position (glissable)
 - `livraison.html` : vérificateur de code postal, 11 villes, engagement 40 min, offres, à emporter
 - `commande.html` : la commande en 3 étapes (Mon panier, Authentification et paiement, Confirmation)
 
 ## Animations et interactions
 
-- Pizzas (photos réelles) découpées en 8 parts : quand le curseur approche, la pizza bouge et se découpe, la part la plus proche sort ; au survol les ingrédients de la recette s'envolent ; au clic, explosion.
-- Les autres produits projettent aussi leurs ingrédients (frites, salade, cheddar, chocolat…).
+- Pizzas (photos réelles) découpées en 8 parts : quand le curseur approche, la pizza bouge et se découpe, la part la plus proche sort. Au clic, quelques ingrédients s'échappent (rien au survol, pour garder le site fluide).
 - Chargement avec pizza qui tourne, rideau entre les pages, lettres qui tombent, bandeaux défilants à vitesse constante, rangée de catégories avec barre de défilement (ou glisser les cartes), pizza vitrine qui tourne et s'ouvre au survol avec ingrédients poussés par le curseur, texte qui s'allume, compteurs, curseur personnalisé, boutons magnétiques, pluie d'ingrédients au clic dans le vide.
 
 ## Composer un produit (comme sur le site d'origine)
@@ -35,11 +34,15 @@ Les 4 menus du midi ne sont proposés par le site d'origine qu'à midi : leurs c
 
 ## La commande en 3 étapes (`commande.html`)
 
-1. **Mon panier** : tableau produit / prix unité / quantité / prix total avec la composition de chaque article, « Modifier » et « Supprimer », type de commande, code promo, offres, total, suggestions (boissons, desserts, glaces), visuel 2D du plateau à gauche (planche en bois en perspective, pizzas qui tournent, vapeur, produits debout, léger relief qui suit la souris).
-2. **Authentification et paiement** : créer un compte ou se connecter, coordonnées et adresse de livraison (11 villes), remarques, mode de paiement (carte bancaire sur terminal, espèces, tickets restaurant, comme dans les CGV), jour et heure (dès que possible ou créneau, fermé le dimanche), rappel par email ou SMS, acceptation des CGV.
+1. **Mon panier** : tableau produit / prix unité / quantité / prix total avec la composition de chaque article, « Modifier » et « Supprimer », type de commande, code promo, offres, total, suggestions (boissons, desserts, glaces), plateau de la commande à gauche.
+2. **Authentification et paiement** : créer un compte ou se connecter, coordonnées ; adresse de livraison : choisir une adresse enregistrée sur le compte ou saisir une nouvelle adresse pour cette commande (avec la case « Enregistrer cette adresse sur mon compte ») ; sans compte, une case permet de le créer avec ces informations ; remarques, mode de paiement (carte bancaire sur terminal, espèces, tickets restaurant, comme dans les CGV), jour et heure (dès que possible ou créneau, fermé le dimanche), rappel par email ou SMS, acceptation des CGV.
 3. **Confirmation** : numéro de commande, récapitulatif, bouton « Envoyer ma commande » (e-mail pré-rempli vers contact@pizza-food.fr) et « Appeler ».
 
-Compte client : création (téléphone, email, civilité, nom, prénom, date de naissance, société, « vous nous avez connu par »), connexion par email + téléphone comme sur le site d'origine, historique des commandes. Accessible aussi depuis le pied de page et le menu mobile.
+Compte client : création (téléphone, email, civilité, nom, prénom, date de naissance, société, « vous nous avez connu par » et adresse de livraison : ville, n°, adresse, bâtiment, escalier, codes, interphone, étage, porte), connexion par email + téléphone comme sur le site d'origine, « Mon compte » : modifier ses informations, ajouter / supprimer des adresses, historique des commandes. Accessible aussi depuis le pied de page et le menu mobile.
+
+### Le plateau (`js/tray.js`)
+
+Planche en bois en perspective, avec un léger relief qui suit la souris. Chaque article y est dessiné comme un objet en volume : canettes et bouteilles aux couleurs de chaque boisson (bouteille ronde pour l'Orangina, bouteille verte pour le Perrier, bouteilles plastique pour les 1,25 L / 1,5 L / 2 L, Capri-Sun), tacos coupé avec sa garniture, burgers, sandwichs, paninis, assiettes, boîtes de tex-mex (nuggets, wings, onion rings…), riz crousty, salades, pâtes et lasagnes, tiramisus, tartes, brownies, fondants, glaces. Les pizzas utilisent leur vraie photo, avec l'épaisseur de la pâte. Les menus sont décomposés (pizzas, tex-mex et boisson choisis) et les boissons choisies dans un tacos, un burger ou une pizza sont posées à côté.
 
 Codes promo : à déclarer dans `js/config.js` (`promoCodes`, exemples en commentaire). Aucun code n'est fourni par défaut.
 
@@ -47,7 +50,8 @@ Codes promo : à déclarer dans `js/config.js` (`promoCodes`, exemples en commen
 
 - `js/data.js` : carte, allergènes, mentions légales et CGV (repris de pizza-food.fr)
 - `js/options.js` : options de composition de chaque produit (relevées sur pizza-food.fr)
-- `js/shop.js` : fenêtre de composition, page commande, compte client, code promo, plateau 2D
+- `js/shop.js` : fenêtre de composition, page commande, compte client, adresses, code promo
+- `js/tray.js` : dessins des articles et mise en place du plateau
 - `img/produits/` : photos des produits en WebP, ravivées (couleurs, contraste, netteté)
 - `img/bandeaux/` : bandeaux du site actuel, recadrés sans le texte incrusté
 
