@@ -37,15 +37,14 @@
           <p class="hero__hours"><span class="dot"></span> Ouvert 6j/7 · 11h → 23h</p>
         </div>
 
-        <div class="hero__pizza-wrap" id="heroPizzaWrap">
-          <div class="floaty floaty--1" data-depth="0.6" aria-hidden="true"><svg viewBox="-30 -30 60 60"><path d="M0-26C16-18 18 8 0 26-18 8-16-18 0-26z" fill="#1f8a4c" stroke="#292a2c" stroke-width="3"/><path d="M0-20V22" stroke="#292a2c" stroke-width="2.5"/></svg></div>
-          <div class="floaty floaty--2" data-depth="-0.8" aria-hidden="true"><svg viewBox="-30 -30 60 60"><circle r="26" fill="#e8240b" stroke="#292a2c" stroke-width="3"/><circle r="17" fill="#ff6a3d"/><circle cx="-7" cy="-4" r="3" fill="#ffc700"/><circle cx="7" cy="-4" r="3" fill="#ffc700"/><circle cy="8" r="3" fill="#ffc700"/></svg></div>
-          <div class="floaty floaty--3" data-depth="1" aria-hidden="true"><svg viewBox="-30 -30 60 60"><path d="M-26 18L26 18 26-6-26-20z" fill="#ffc700" stroke="#292a2c" stroke-width="3" stroke-linejoin="round"/><circle cx="-8" cy="4" r="5" fill="#e9a800"/><circle cx="12" cy="9" r="3.5" fill="#e9a800"/></svg></div>
-          <div class="floaty floaty--4" data-depth="-0.5" aria-hidden="true"><svg viewBox="-30 -30 60 60"><ellipse rx="20" ry="16" fill="#292a2c"/><ellipse rx="7" ry="5" fill="#ff4100"/></svg></div>
-          <div class="floaty floaty--5" data-depth="0.9" aria-hidden="true"><svg viewBox="-30 -30 60 60"><path d="M-22 10C-10 18 14 10 22-12L16-16C8 2-8 6-20 2z" fill="#e8240b" stroke="#292a2c" stroke-width="3" stroke-linejoin="round"/><path d="M16-16L22-26M18-14L26-14" stroke="#1f8a4c" stroke-width="4" stroke-linecap="round" fill="none"/></svg></div>
-
-          <div class="pz pz--svg" data-svgpizza="" data-label="Pizza qui tourne" data-cursor="Croque !"></div>
-
+        <div class="hero__pizza-wrap showcase" id="heroPizzaWrap">
+          <div class="showcase__shadow" aria-hidden="true"></div>
+          <div class="showcase__drop">
+            <div class="showcase__tilt" id="heroTilt">
+              <div class="pz pz--svg" data-svgpizza="" data-nosats="1" data-label="Pizza qui tourne" data-cursor="Croque !"></div>
+            </div>
+          </div>
+          <div class="showcase__ings" id="heroIngs" aria-hidden="true"></div>
           <div class="burst-badge hero__badge" data-burst="22" data-cursor="Offerte !"><span>En livraison<b>3e offerte</b></span></div>
         </div>
 
@@ -68,8 +67,14 @@
 
     <!-- ============ MARQUEES ============ -->
     <section class="marquees" aria-label="Nos spécialités">
-      <div class="marquee marquee--yellow" data-marquee="1"><div class="marquee__track">
-        <span>Pizzas</span><i>✺</i><span>Burgers</span><i>✺</i><span>Tacos</span><i>✺</i><span>Paninis</span><i>✺</i><span>Tex-Mex</span><i>✺</i><span>Riz crousty</span><i>✺</i><span>Salades</span><i>✺</i><span>Desserts</span><i>✺</i>
+      <div class="marquee marquee--yellow marquee--chips" data-marquee="1"><div class="marquee__track">
+        <a href="carte.html#cat-pizzas_tomate" tabindex="-1"><img src="img/produits/p85.webp" alt="" class="is-pizza">Pizzas</a><i>✺</i>
+        <a href="carte.html#cat-burgergourmands" tabindex="-1"><img src="img/produits/p343.webp" alt="">Burgers</a><i>✺</i>
+        <a href="carte.html#cat-tacos" tabindex="-1"><img src="img/produits/p247.webp" alt="">Tacos</a><i>✺</i>
+        <a href="carte.html#cat-paninis" tabindex="-1"><img src="img/produits/p329.webp" alt="">Paninis</a><i>✺</i>
+        <a href="carte.html#cat-tex_mex" tabindex="-1"><img src="img/produits/p328.webp" alt="">Tex-Mex</a><i>✺</i>
+        <a href="carte.html#cat-salades" tabindex="-1"><img src="img/produits/p322.webp" alt="">Salades</a><i>✺</i>
+        <a href="carte.html#cat-desserts" tabindex="-1"><img src="img/produits/p196.webp" alt="">Desserts</a><i>✺</i>
       </div></div>
       <div class="marquee marquee--pink" data-marquee="-1"><div class="marquee__track">
         <span>Livraison gratuite</span><i>★</i><span>40 minutes</span><i>★</i><span>2 achetées = la 3e offerte</span><i>★</i><span>Junior · Senior · Mega</span><i>★</i><span>Tiramisus faits maison</span><i>★</i>
@@ -123,13 +128,13 @@
           <div class="burst-badge burst-badge--orange" data-burst="18"><span>Livraison<b>gratuite</b></span></div>
           <span class="offer__tag">En livraison</span>
           <p class="offer__big"><small>2 pizzas achetées =</small>la 3e offerte*</p>
-          <div class="offer__img"><img src="img/bandeaux/livraison.webp" alt="Deux pizzas sur fond de bois" loading="lazy"></div>
+          <div class="offer__img" data-sfx><img src="img/bandeaux/livraison.webp" alt="Deux pizzas sur fond de bois" loading="lazy"></div>
         </article>
         <article class="offer" data-reveal="right">
           <div class="burst-badge" data-burst="18"><span>À emporter<b>1 + 1</b></span></div>
           <span class="offer__tag">À emporter</span>
           <p class="offer__big"><small>1 pizza achetée =</small>la 2e offerte*</p>
-          <div class="offer__img"><img src="img/bandeaux/emporter.webp" alt="Une pizza sur fond de bois" loading="lazy"></div>
+          <div class="offer__img" data-sfx><img src="img/bandeaux/emporter.webp" alt="Une pizza sur fond de bois" loading="lazy"></div>
         </article>
       </div>
       <p class="offers__note">* Valable sur les pizzas Senior et Mega, sauf Marguerita. La remise se calcule toute seule dans le panier.</p>
@@ -138,7 +143,7 @@
     <div class="tent" style="--from: var(--yellow); --to: var(--orange)" aria-hidden="true"></div>
 
     <!-- ============ STARS ============ -->
-    <section class="stars band band--orange" id="stars">
+    <section class="stars band band--orange" id="stars" data-sfx>
       <div class="section-head">
         <p class="eyebrow eyebrow--yellow" data-reveal="up">Le hall of fame</p>
         <h2 class="title-3d">Les stars de la maison</h2>
@@ -149,35 +154,16 @@
     </section>
 
     <!-- ============ PAS QUE DES PIZZAS ============ -->
-    <section class="hscroll" aria-label="Pas que des pizzas">
-      <div class="hscroll__sticky"><div class="hscroll__track">
-        <div class="hpanel hpanel--intro"><h2 class="hpanel__title">Pas que<br>des<br>pizzas<span class="arrow">→</span></h2></div>
-        <div class="hpanel hpanel--pink">
-          <div class="frame"><img src="img/bandeaux/assiettes.webp" alt="Assiette grecque avec frites et crudités" loading="lazy"></div>
-          <div class="hpanel__copy"><p class="hpanel__eyebrow">Riches et variées</p><h3>Assiettes</h3>
-            <p>Grec, chicken, steak, omelette, wings ou mixte, servies avec salade verte, tomates, oignons, blé et frites.</p>
-            <p class="hpanel__price"><small>dès</small> 12,50€ <a href="carte.html#cat-assiettes" class="btn btn--dark" data-cursor="Voir">Voir</a></p></div>
-        </div>
-        <div class="hpanel hpanel--lemon">
-          <div class="frame"><img src="img/bandeaux/tacos.webp" alt="Tacos grillé et canette" loading="lazy"></div>
-          <div class="hpanel__copy"><p class="hpanel__eyebrow">Savoureux et bien garnis</p><h3>Tacos</h3>
-            <p>Garnis de frites et de sauce fromagère, avec 1 à 4 viandes au choix.</p>
-            <p class="hpanel__price"><small>dès</small> 8€ <a href="carte.html#cat-tacos" class="btn btn--dark" data-cursor="Voir">Voir</a></p></div>
-        </div>
-        <div class="hpanel hpanel--cream">
-          <div class="frame"><img src="img/bandeaux/sandwichs.webp" alt="Sandwich grec garni" loading="lazy"></div>
-          <div class="hpanel__copy"><p class="hpanel__eyebrow">Riches en saveurs</p><h3>Sandwichs</h3>
-            <p>Grec, chicken jaune ou rouge, Radical, Nevada, Savoyard… 19 sandwichs servis avec des frites.</p>
-            <p class="hpanel__price"><small>dès</small> 7,50€ <a href="carte.html#cat-sandwichs" class="btn btn--dark" data-cursor="Voir">Voir</a></p></div>
-        </div>
-        <div class="hpanel hpanel--orange">
-          <div class="frame"><img src="img/bandeaux/desserts.webp" alt="Brownie au chocolat et menthe" loading="lazy"></div>
-          <div class="hpanel__copy"><p class="hpanel__eyebrow">Faits maison</p><h3>Desserts</h3>
-            <p>Brownie, fondant, tartes et sept tiramisus faits maison : Kinder, Oreo, M&amp;M's, caramel, spéculoos, Nutella, Daim.</p>
-            <p class="hpanel__price"><small>dès</small> 2,50€ <a href="carte.html#cat-desserts" class="btn btn--dark" data-cursor="Voir">Voir</a></p></div>
-        </div>
-      </div></div>
+    <div class="tent" style="--from: var(--orange); --to: var(--yellow)" aria-hidden="true"></div>
+    <section class="band band--yellow rail-sec" aria-label="Pas que des pizzas">
+      <div class="section-head rail-sec__head" data-sfx>
+        <p class="eyebrow" data-reveal="up">Le reste de la carte</p>
+        <h2 class="title-3d">Pas que des pizzas</h2>
+        <p class="lede" data-reveal="up">Burgers, tacos, sandwichs, tex-mex, desserts… faites défiler, tout arrive.</p>
+      </div>
+      <div class="rail" id="rail"><div class="rail__track" id="railTrack"></div></div>
     </section>
+    <div class="tent" style="--from: var(--yellow); --to: var(--cream)" aria-hidden="true"></div>
 
     <!-- ============ VOS ENVIES ============ -->
     <section class="band band--cream" id="envies">

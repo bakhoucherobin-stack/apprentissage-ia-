@@ -648,6 +648,123 @@
   }
 
   /* =======================================================
+     VITRINE : la pizza tombe, tourne, et ses ingrédients
+     gravitent autour d'elle (ressorts + fuite du curseur)
+     ======================================================= */
+  function heroShowcase() {
+    const wrap = $('#heroPizzaWrap'), box = $('#heroIngs'), tilt = $('#heroTilt');
+    if (!wrap || !box) return null;
+    const pzEl = $('.pz', tilt);
+    const TYPES = ['pepperoni', 'basil', 'olive', 'mushroom', 'tomato', 'pepper', 'pepperoni', 'basil', 'olive', 'egg', 'tomato', 'mushroom', 'basil', 'pepperoni'];
+    const ings = TYPES.map((t, i) => {
+      const el = document.createElement('span');
+      el.className = 'ing';
+      el.innerHTML = PZ.svgTop(t);
+      box.appendChild(el);
+      return {
+        el, a0: (i / TYPES.length) * Math.PI * 2 + (i % 2) * .2, rr: .66 + (i % 4) * .1, depth: .4 + (i % 5) * .3,
+        size: 50 + (i % 3) * 16, x: 0, y: 0, vx: 0, vy: 0, rot: Math.random() * 360, vr: 0, sc: 0
+      };
+    });
+    let landed = false, kick = 0;
+    const st = { t0: 0, theta: 0, spin: 9, hover: 0 };
+    wrap.addEventListener('pointerdown', () => {
+      ings.forEach(g => { const d = Math.hypot(g.x, g.y) || 1; g.vx += g.x / d * 26; g.vy += g.y / d * 26; g.vr += (Math.random() - .5) * 40; });
+      kick = 1;
+    });
+    return {
+      start(now) { st.t0 = now; wrap.classList.add('is-dropping'); },
+      frame(now, mouse, scrollP) {
+        if (!st.t0) return;
+        const t = (now - st.t0) / 1000;
+        if (!landed && t > 1.05) {
+          landed = true;
+          const r = wrap.getBoundingClientRect();
+          PZ.burst(r.left + r.width / 2, r.top + r.height * .55, ['cheese', 'pepperoni', 'basil', 'olive', 'star'], { count: 26, power: 12 });
+        }
+        const r = wrap.getBoundingClientRect();
+        const cx = r.left + r.width / 2, cy = r.top + r.height / 2, R = r.width / 2;
+        const mx = mouse.x - cx, my = mouse.y - cy, md = Math.hypot(mx, my);
+        const inside = md < R * .95;
+        st.hover = lerp(st.hover, inside ? 1 : 0, .08);
+        st.spin = lerp(st.spin, inside ? 60 : 9, .05);
+        st.theta += st.spin / 60;
+        const svg = $('svg', pzEl);
+        if (svg) svg.style.transform = `rotate(${(st.theta + scrollP * 160).toFixed(2)}deg)`;
+        // la pizza s'incline vers le curseur
+        const tx = clamp(mx / (R * 3), -1, 1), ty = clamp(my / (R * 3), -1, 1);
+        tilt.style.transform = `perspective(900px) rotateX(${(-ty * 16).toFixed(2)}deg) rotateY(${(tx * 16).toFixed(2)}deg) scale(${(1 + st.hover * .05).toFixed(3)})`;
+        kick *= .9;
+        ings.forEach((g, i) => {
+          if (!landed) { g.el.style.transform = 'translate(-50%,-50%) scale(0)'; return; }
+          g.sc = lerp(g.sc, 1, .08 + i * .002);
+          const ang = g.a0 + (st.theta * Math.PI / 180) * .85;
+          const rad = R * g.rr * (1 + st.hover * .16 + scrollP * 1.4);
+          let hx = Math.cos(ang) * rad + tx * g.depth * 26, hy = Math.sin(ang) * rad + ty * g.depth * 26 + Math.sin(t * 1.6 + i) * 6;
+          g.vx += (hx - g.x) * .06; g.vy += (hy - g.y) * .06;
+          // fuite du curseur
+          const dx = g.x - mx, dy = g.y - my, d = Math.hypot(dx, dy);
+          if (d < 120) { g.vx += dx / (d || 1) * (120 - d) * .09; g.vy += dy / (d || 1) * (120 - d) * .09; g.vr += (dx > 0 ? 1 : -1) * 1.5; }
+          g.vx *= .82; g.vy *= .82; g.vr *= .9;
+          g.x += g.vx; g.y += g.vy; g.rot += g.vr + .4 + st.hover * 1.5;
+          g.el.style.transform = `translate(calc(${g.x.toFixed(1)}px - 50%), calc(${g.y.toFixed(1)}px - 50%)) rotate(${g.rot.toFixed(1)}deg) scale(${(g.sc * g.size / 30).toFixed(3)})`;
+        });
+      }
+    };
+  }
+
+  // Les lettres du grand titre s'écartent du curseur
+  function heroLetters() {
+    const chars = $$('.hero__title .char');
+    const st = chars.map(c => ({ c, x: 0, y: 0, r: 0 }));
+    return (mouse) => {
+      st.forEach(o => {
+        const rc = o.c.getBoundingClientRect();
+        const cx = rc.left + rc.width / 2 - o.x, cy = rc.top + rc.height / 2 - o.y;
+        const dx = cx - mouse.x, dy = cy - mouse.y, d = Math.hypot(dx, dy);
+        const f = d < 160 ? (160 - d) / 160 : 0;
+        o.x = lerp(o.x, dx / (d || 1) * f * 40, .15);
+        o.y = lerp(o.y, dy / (d || 1) * f * 40, .15);
+        o.r = lerp(o.r, f * (dx > 0 ? 12 : -12), .15);
+        o.c.style.transform = Math.abs(o.x) + Math.abs(o.y) > .2 ? `translate(${o.x.toFixed(1)}px, ${o.y.toFixed(1)}px) rotate(${o.r.toFixed(1)}deg)` : '';
+      });
+    };
+  }
+
+  /* =======================================================
+     PAS QUE DES PIZZAS : rangée de catégories au scroll
+     ======================================================= */
+  function renderRail() {
+    const track = $('#railTrack');
+    if (!track) return;
+    const picks = [['burgergourmands', '343'], ['burgers', '342'], ['tacos', '247'], ['sandwichs', '217'], ['assiettes', '157'], ['paninis', '329'], ['tex_mex', '328'], ['riz_crousty', '393'], ['pates', '311'], ['salades', '322'], ['menus', '264'], ['menuenfants', '362'], ['desserts', '196'], ['glaces', '2'], ['boissons', '82']];
+    const bgs = ['var(--cream)', 'var(--pink)', 'var(--orange)', 'var(--lemon)'];
+    track.innerHTML = picks.map(([cid, pid], i) => {
+      const c = DATA.cats.find(x => x.id === cid), p = PRODUCTS[pid];
+      if (!c || !p) return '';
+      const min = Math.min(...c.items.map(it => it.p || Math.min(...Object.values(it.s || { a: 99 }))));
+      return `<a class="rcard" href="carte.html#cat-${cid}" style="--bg:${bgs[i % bgs.length]}" data-cursor="Voir">
+        <span class="rcard__inner">
+          <span class="rcard__num">${String(i + 1).padStart(2, '0')}</span>
+          <span class="rcard__media"><img src="${p.img}" alt="" loading="lazy" data-thing="${pid}"></span>
+          <span class="rcard__name">${esc(c.label)}</span>
+          <span class="rcard__meta">${c.items.length} produits · dès ${euro(min).replace(/\s/g, '')}</span>
+          <span class="rcard__go" aria-hidden="true">→</span>
+        </span></a>`;
+    }).join('');
+  }
+
+  /* ---------- Cartes de la carte : apparition au scroll ---------- */
+  function revealCards() {
+    const cards = $$('.card');
+    if (!cards.length) return;
+    if (reduceMotion || !('IntersectionObserver' in window)) return;
+    cards.forEach((c, i) => { c.classList.add('rv'); c.style.setProperty('--rd', ((i % 4) * 90) + 'ms'); });
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
+    cards.forEach(c => io.observe(c));
+  }
+
+  /* =======================================================
      AVIS GOOGLE
      Avec une clé (js/config.js) : avis importés en direct via
      Google Maps JavaScript API (Places). Sans clé : lien vers
@@ -862,6 +979,11 @@
     const floaties = $$('.floaty'), speedEls = $$('[data-speed]');
     const hSec = $('.hscroll'), hTrack = $('.hscroll__track'), hPanels = hTrack ? $$('.hpanel', hTrack) : [];
     const mani = $('#manifesto');
+    const showcase = heroShowcase(), letters = $('.hero__title') ? heroLetters() : null;
+    const sfx = $$('[data-sfx]');
+    const railSec = $('.rail-sec'), railTrack = $('#railTrack'), railCards = railTrack ? $$('.rcard', railTrack) : [];
+    let railX = innerWidth * .35;
+    loop.showcase = showcase;
     let maniWords = [];
     if (mani) {
       const HL = /^(fromage|gratuite|Mega)/i;
@@ -898,8 +1020,29 @@
       if (!reduceMotion) {
         if (heroWrap && hero && y < vh * 1.5) {
           const hp = clamp(y / hero.offsetHeight);
-          heroWrap.style.transform = `rotate(${y * .2}deg) scale(${1 + hp * .25})`;
           heroWrap.style.setProperty('--scut', (hp * 40).toFixed(1));
+          if (showcase) showcase.frame(performance.now(), mouse, hp);
+          if (letters && finePointer) letters(mouse);
+        }
+        sfx.forEach(el => {
+          const r = el.getBoundingClientRect();
+          if (r.bottom < -100 || r.top > vh + 100) return;
+          el.style.setProperty('--sp', clamp((vh - r.top) / (vh + r.height)).toFixed(3));
+        });
+        if (railSec) {
+          const r = railSec.getBoundingClientRect();
+          if (r.top < vh && r.bottom > 0) {
+            const p = clamp((vh - r.top) / (vh + r.height));
+            const max = Math.max(0, railTrack.scrollWidth - innerWidth + 40);
+            railX = lerp(railX, innerWidth * .35 - p * (max + innerWidth * .35), .12);
+            railTrack.style.transform = `translate3d(${railX.toFixed(1)}px,0,0)`;
+            railCards.forEach(c => {
+              const cr = c.getBoundingClientRect();
+              const d = clamp((cr.left + cr.width / 2 - innerWidth / 2) / (innerWidth / 2), -1.4, 1.4);
+              c.style.transform = `translateY(${(d * d * 70).toFixed(1)}px) rotate(${(d * 9).toFixed(2)}deg) scale(${(1 - Math.min(Math.abs(d), 1) * .14).toFixed(3)})`;
+              c.style.setProperty('--d', d.toFixed(3));
+            });
+          }
         }
         floaties.forEach(el => { const d = +el.dataset.depth; el.style.translate = `${mouse.nx * d * 30}px ${mouse.ny * d * 30 - y * d * .35}px`; });
         speedEls.forEach(el => { const r = el.parentElement.getBoundingClientRect(); el.style.translate = `0 ${((r.top + r.height / 2 - vh / 2) * +el.dataset.speed).toFixed(1)}px`; });
@@ -983,10 +1126,12 @@
   renderEnvieLinks();
   renderZones();
   renderCarte();
+  renderRail();
   heroPizza();
   activate();
   renderCart();
   renderReviews();
+  revealCards();
   updateOpen();
   setInterval(updateOpen, 60000);
   hydrate();
@@ -995,6 +1140,7 @@
   const cursorEl = setupPointer();
   curtain().then(() => {
     startReveals();
+    if (loop.showcase) loop.showcase.start(performance.now());
     if (location.hash) { const t = document.getElementById(location.hash.slice(1)); if (t) setTimeout(() => t.scrollIntoView({ block: 'start' }), 60); }
   });
   loop(marquees, cursorEl);

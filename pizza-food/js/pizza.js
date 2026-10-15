@@ -134,7 +134,7 @@
   }
   function burst(x, y, types, opts = {}) {
     if (reduceMotion || !types || !types.length) return;
-    if (!canvas.isConnected) { document.body.appendChild(canvas); sizeCanvas(); addEventListener('resize', sizeCanvas); }
+    ensureCanvas();
     const n = opts.count || 18, power = opts.power || 9, spread = opts.radius || 0;
     for (let i = 0; i < n && parts.length < 420; i++) {
       const a = Math.random() * Math.PI * 2, sp = power * (.45 + Math.random() * .8);
@@ -148,9 +148,62 @@
     }
     if (!running) { running = true; requestAnimationFrame(tick); }
   }
-  function tick() {
+  // Ingrédients « satellites » : ils tournent autour de la pizza survolée,
+  // la suivent quand elle bouge, fuient le curseur, puis s'envolent.
+  let sats = [];
+  function ensureCanvas() {
+    if (!canvas.isConnected) { document.body.appendChild(canvas); sizeCanvas(); addEventListener('resize', sizeCanvas); }
+  }
+  function attach(el) {
+    if (reduceMotion || el._sats || !el._bits) return;
+    ensureCanvas();
+    const r = el.getBoundingClientRect(), n = 9;
+    el._sats = [];
+    for (let i = 0; i < n; i++) {
+      const s = {
+        el, t: el._bits[i % el._bits.length], a: (i / n) * Math.PI * 2, rr: .6 + (i % 3) * .1,
+        x: r.left + r.width / 2, y: r.top + r.height / 2, vx: 0, vy: 0, r: Math.random() * 6.28, vr: (Math.random() - .5) * .1,
+        s: 1.1 + Math.random() * .6, born: performance.now() + i * 35
+      };
+      el._sats.push(s); sats.push(s);
+    }
+    if (!running) { running = true; requestAnimationFrame(tick); }
+  }
+  function release(el) {
+    if (!el._sats) return;
+    el._sats.forEach(s => {
+      const r = el.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const dx = s.x - cx, dy = s.y - cy, d = Math.hypot(dx, dy) || 1;
+      parts.push({ t: s.t, x: s.x, y: s.y, vx: s.vx + dx / d * 6 - dy / d * 4, vy: s.vy + dy / d * 6 + dx / d * 4 - 4, r: s.r, vr: s.vr * 3, s: s.s, life: 1, decay: .015 });
+    });
+    sats = sats.filter(s => s.el !== el);
+    el._sats = null;
+  }
+  function tickSats(now) {
+    const rects = new Map();
+    for (const s of sats) {
+      let r = rects.get(s.el);
+      if (!r) { r = s.el.getBoundingClientRect(); rects.set(s.el, r); }
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2, R = r.width / 2;
+      const grow = clamp((now - s.born) / 450);
+      s.a += .022;
+      const tx = cx + Math.cos(s.a) * R * s.rr * (.2 + grow * .8 + .55), ty = cy + Math.sin(s.a) * R * s.rr * (.2 + grow * .8 + .55) + Math.sin(now / 300 + s.a * 3) * 4;
+      s.vx += (tx - s.x) * .14; s.vy += (ty - s.y) * .14;
+      if (mouse.active) {
+        const mx = s.x - mouse.x, my = s.y - mouse.y, md = Math.hypot(mx, my);
+        if (md < 70) { s.vx += mx / (md || 1) * (70 - md) * .09; s.vy += my / (md || 1) * (70 - md) * .09; }
+      }
+      s.vx *= .72; s.vy *= .72; s.x += s.vx; s.y += s.vy; s.r += s.vr + s.vx * .01;
+      ctx.setTransform(dpr * s.s * (.3 + grow * .7), 0, 0, dpr * s.s * (.3 + grow * .7), s.x * dpr, s.y * dpr);
+      ctx.rotate(s.r);
+      ctx.globalAlpha = 1;
+      (DRAW[s.t] || DRAW.cheese)(ctx);
+    }
+  }
+  function tick(now) {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (sats.length) tickSats(now || performance.now());
     parts = parts.filter(p => p.life > 0 && p.y < innerHeight + 60);
     for (const p of parts) {
       p.vy += .34; p.vx *= .985; p.vy *= .985;
@@ -161,7 +214,7 @@
       (DRAW[p.t] || DRAW.cheese)(ctx);
     }
     ctx.globalAlpha = 1;
-    if (parts.length) requestAnimationFrame(tick); else { running = false; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    if (parts.length || sats.length) requestAnimationFrame(tick); else { running = false; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); }
   }
 
   /* ---------- Pizza SVG (héros, chargement) ---------- */
@@ -267,8 +320,9 @@
       if (inside && !el._hover) {
         el._hover = true;
         const now = performance.now();
-        if (now - el._last > 700) { el._last = now; burst(cx, cy, el._bits, { count: 22, power: 10, radius: r.width * .25 }); }
-      } else if (!inside && el._hover) el._hover = false;
+        if (now - el._last > 700) { el._last = now; burst(cx, cy, el._bits, { count: el.dataset.nosats ? 22 : 12, power: 10, radius: r.width * .25 }); }
+        if (!el.dataset.nosats) attach(el);
+      } else if (!inside && el._hover) { el._hover = false; release(el); }
       const scale = r.width / 260;
       const cut = (k * 7 + (inside ? 9 : 0)) * scale;
       // La pizza fuit légèrement le curseur et tourne vers lui
@@ -285,5 +339,6 @@
   }
   if (!reduceMotion) requestAnimationFrame(proximityFrame);
 
-  window.PF_PIZZA = { recipe, bitsFor, burst, svgPizza, photoPizza, register, DRAW, SAUCES, norm };
+  const svgTop = t => SVGTOP[t] ? `<svg viewBox="-15 -15 30 30" aria-hidden="true">${SVGTOP[t]()}</svg>` : '';
+  window.PF_PIZZA = { recipe, bitsFor, burst, svgPizza, photoPizza, register, svgTop, DRAW, SAUCES, norm, mouse };
 })();
