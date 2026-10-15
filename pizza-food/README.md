@@ -2,6 +2,12 @@
 
 Refonte du site de Pizza Food (34 rue du Général de Gaulle, 94430 Chennevières-sur-Marne), dans le style « néon de cirque » inspiré de Lamanna : orange `#ff4100`, jaune `#ffc700`, rose `#fdbeba`, titres en blocs avec ombre 3D (Bowlby One SC), étoiles, zigzags, bords de chapiteau.
 
+## Thème « raffiné » (version 10)
+
+`css/raffine.css` applique le design de la maquette 01 par-dessus `css/style.css` : fonds crème et blancs, titres à plat (orange et anthracite), cartes arrondies à ombre douce, police Inter, héros avec le texte à gauche et la pizza sur un disque jaune à droite, manifeste et pied de page sombres. Toutes les fonctionnalités restent identiques.
+
+Pour revenir à l'ancien style « néon circus », il suffit de supprimer la ligne `<link rel="stylesheet" href="css/raffine.css…">` dans les 4 pages HTML.
+
 ## Ouvrir le site
 
 Décompressez le dossier puis double-cliquez sur `index.html`. Pas d'installation. Une connexion Internet est nécessaire pour les polices.
