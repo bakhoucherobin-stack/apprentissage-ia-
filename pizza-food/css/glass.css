@@ -150,3 +150,19 @@ body[data-page="carte"] .card { -webkit-backdrop-filter: none; backdrop-filter: 
 .no-motion body::before, .no-motion .hero__pizza-wrap::before { animation: none; }
 .card__media::before { scale: .86; }
 .card:hover .card__media::before { scale: 1; }
+
+/* ---------- Lisibilité : aucun texte clair sur fond clair ---------- */
+/* les sections sombres gardent leur fond sombre malgré le verre */
+section.manifesto.band--orange:not(.hero):not(.phero):not(.co-hero), footer.footer { background: #292a2c !important; }
+section.manifesto::after, footer.footer::after { display: none; }
+/* les anciennes bandes orange / roses sont maintenant claires : texte foncé */
+.band--orange:not(.manifesto), .band--pink { color: var(--ink); }
+.chip, .chip small, .chip b { color: var(--ink); }
+.chip:hover, .chip:hover small, .chip:hover b { color: var(--yellow); }
+/* orange un peu plus foncé pour les petits textes sur fond clair */
+.catbar a sup, .opt__price, .co__pname small, .panel__kicker, .cart__hint b, .rcard__num, .co__tot, .co__sug span, .co__det em, .card__price, .line--disc { color: #d63800 !important; }
+.catbar a.is-active sup { color: var(--yellow) !important; }
+/* pastilles orange : texte blanc (le jaune se lisait mal sur l'orange) */
+.burst-badge--orange > span, .burst-badge--orange b { color: #fff; }
+/* petits textes blancs sur orange : orange un peu plus profond */
+.mode__offer:not(.mode__offer--muted), .envie small, .co__bar:not(.co__bar--promo), .nav__cart-count, .footer .btn--dark, .citem__free, .co__total { background: #e03800 !important; }
