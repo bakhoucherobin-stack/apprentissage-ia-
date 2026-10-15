@@ -304,7 +304,7 @@
     // Toucher / clic : explosion d'ingrédients
     el.addEventListener('pointerdown', e => {
       const r = el.getBoundingClientRect();
-      burst(r.left + r.width / 2, r.top + r.height / 2, el._bits, { count: 34, power: 12, radius: r.width * .2 });
+      burst(r.left + r.width / 2, r.top + r.height / 2, el._bits, { count: 9, power: 12, radius: r.width * .2 });
       el.classList.remove('is-boom'); void el.offsetWidth; el.classList.add('is-boom');
     });
   }
@@ -321,7 +321,7 @@
       if (inside && !el._hover) {
         el._hover = true;
         const now = performance.now();
-        if (now - el._last > 700) { el._last = now; burst(cx, cy, el._bits, { count: el.dataset.nosats ? 22 : 12, power: 10, radius: r.width * .25 }); }
+        if (now - el._last > 700) { el._last = now; burst(cx, cy, el._bits, { count: el.dataset.nosats ? 6 : 3, power: 10, radius: r.width * .25 }); }
         if (!el.dataset.nosats) attach(el);
       } else if (!inside && el._hover) { el._hover = false; release(el); }
       const scale = r.width / 260;

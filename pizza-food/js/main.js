@@ -200,7 +200,7 @@
     saveCart();
     const p = PRODUCTS[id];
     const r = fromEl.getBoundingClientRect();
-    PZ.burst(r.left + r.width / 2, r.top + r.height / 2, PZ.bitsFor(p), { count: 16, power: 8 });
+    PZ.burst(r.left + r.width / 2, r.top + r.height / 2, PZ.bitsFor(p), { count: 5, power: 8 });
     flyToCart(fromEl, p).then(() => {
       renderCart();
       const b = $('#cartBtn'); b.classList.remove('is-bump'); void b.offsetWidth; b.classList.add('is-bump');
@@ -249,7 +249,7 @@
     if (announce) {
       const o = OFFERS[mode];
       toast(`Mode : <b>${mode}</b>${o ? ' · ' + o.label : ''}`);
-      if (fromEl) { const r = fromEl.getBoundingClientRect(); PZ.burst(r.left + r.width / 2, r.top + r.height / 3, ['star', 'pepperoni', 'basil', 'cheese'], { count: 18, power: 9 }); }
+      if (fromEl) { const r = fromEl.getBoundingClientRect(); PZ.burst(r.left + r.width / 2, r.top + r.height / 3, ['star', 'pepperoni', 'basil', 'cheese'], { count: 5, power: 9 }); }
     }
   }
 
@@ -502,7 +502,7 @@
         if (now - last < 700) return;
         last = now;
         const r = img.getBoundingClientRect();
-        PZ.burst(r.left + r.width / 2, r.top + r.height / 2, PZ.bitsFor(PRODUCTS[img.dataset.thing]), { count: 18, power: 9 });
+        PZ.burst(r.left + r.width / 2, r.top + r.height / 2, PZ.bitsFor(PRODUCTS[img.dataset.thing]), { count: 5, power: 9 });
       };
       img.addEventListener('pointerenter', pop);
       img.addEventListener('pointerdown', pop);
@@ -564,7 +564,7 @@
         hits.forEach(([, cp]) => $$(`.zone[data-cp="${cp}"]`).forEach(z => z.classList.add('is-match')));
         res.innerHTML = `<b>On vous livre !</b><span>${hits.map(h => h[0] + ' (' + h[1] + ')').join(', ')} : livraison gratuite en 40 minutes, dès ${euro(INFO.minimum)} de commande.</span>`;
         const r = input.getBoundingClientRect();
-        PZ.burst(r.left + r.width / 2, r.top, ['star', 'pepperoni', 'basil', 'olive', 'cheese'], { count: 30, power: 11 });
+        PZ.burst(r.left + r.width / 2, r.top, ['star', 'pepperoni', 'basil', 'olive', 'cheese'], { count: 8, power: 11 });
       } else if (/^\d{5}$/.test(v) || v.length > 2) {
         res.innerHTML = `<b>Hors zone…</b><span>Pas de livraison ici pour l'instant, mais votre commande peut être à emporter au ${INFO.address} : <a href="#emporter">1 pizza achetée = la 2e offerte</a>.</span>`;
       }
@@ -620,7 +620,7 @@
       status.innerHTML = `<b>${total} produit${total > 1 ? 's' : ''}</b> avec ${label.toLowerCase()} · <button type="button" id="enviesReset">tout afficher</button>`;
       $('#emptyMsg').classList.toggle('is-on', !total);
       try { history.replaceState(null, '', `?envie=${encodeURIComponent(label)}${location.hash}`); } catch (e) { /* file:// */ }
-      if (fromEl) { const r = fromEl.getBoundingClientRect(); PZ.burst(r.left + r.width / 2, r.top + r.height / 2, PZ.bitsFor({ n: label, d: label, cat: { pizza: true } }), { count: 24, power: 10 }); }
+      if (fromEl) { const r = fromEl.getBoundingClientRect(); PZ.burst(r.left + r.width / 2, r.top + r.height / 2, PZ.bitsFor({ n: label, d: label, cat: { pizza: true } }), { count: 7, power: 10 }); }
       if (scroll) setTimeout(() => wrap.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }), 250);
     };
     box.addEventListener('click', e => { const b = e.target.closest('[data-envie]'); if (b) apply(+b.dataset.envie === active ? -1 : +b.dataset.envie, true, b); });
@@ -683,7 +683,7 @@
         if (!landed && t > 1.05) {
           landed = true;
           const r = wrap.getBoundingClientRect();
-          PZ.burst(r.left + r.width / 2, r.top + r.height * .55, ['cheese', 'pepperoni', 'basil', 'olive', 'star'], { count: 26, power: 12 });
+          PZ.burst(r.left + r.width / 2, r.top + r.height * .55, ['cheese', 'pepperoni', 'basil', 'olive', 'star'], { count: 8, power: 12 });
         }
         const r = wrap.getBoundingClientRect();
         const cx = r.left + r.width / 2, cy = r.top + r.height / 2, R = r.width / 2;
@@ -954,11 +954,10 @@
   function setupPointer() {
     if (!finePointer || reduceMotion) return null;
     document.documentElement.classList.add('has-cursor');
-    const el = $('#cursor'), lbl = $('#cursorLabel');
+    const el = $('#cursor');
     document.addEventListener('pointerover', e => {
-      const t = e.target.closest('[data-cursor], a, button, label');
-      el.classList.toggle('is-big', !!t);
-      lbl.textContent = t ? (t.dataset.cursor || 'Clic') : '';
+      // le curseur reste un petit rond jaune : il grossit à peine sur les éléments cliquables
+      el.classList.toggle('is-hover', !!e.target.closest('[data-cursor], a, button, label, .pz'));
     });
     document.addEventListener('pointerdown', () => el.classList.add('is-down'));
     document.addEventListener('pointerup', () => el.classList.remove('is-down'));
@@ -971,7 +970,7 @@
     // Clic dans le vide : petite pluie d'ingrédients
     document.addEventListener('pointerdown', e => {
       if (e.target.closest('a, button, input, textarea, label, .pz, img, .cart, .modal, .o3d')) return;
-      PZ.burst(e.clientX, e.clientY, ['pepperoni', 'basil', 'olive', 'cheese', 'tomato', 'mushroom'], { count: 10, power: 7 });
+      PZ.burst(e.clientX, e.clientY, ['pepperoni', 'basil', 'olive', 'cheese', 'tomato', 'mushroom'], { count: 3, power: 7 });
     });
     return el;
   }

@@ -138,9 +138,8 @@ button { cursor: pointer; }
 /* ---------- Curseur, progression, particules ---------- */
 .cursor { position: fixed; top: 0; left: 0; z-index: 1000; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: var(--yellow); border: 2px solid var(--charcoal); pointer-events: none; display: none; place-items: center; transition: width .35s var(--ease-pop), height .35s var(--ease-pop), margin .35s var(--ease-pop), background .2s; }
 .has-cursor .cursor { display: grid; }
-.cursor span { font-family: var(--cta); font-weight: 700; font-size: 16px; text-transform: uppercase; color: var(--yellow); opacity: 0; transform: scale(.4); white-space: nowrap; transition: opacity .2s, transform .35s var(--ease-pop); }
-.cursor.is-big { width: 96px; height: 96px; margin: -48px 0 0 -48px; background: var(--charcoal); }
-.cursor.is-big span { opacity: 1; transform: scale(1) rotate(-10deg); }
+.cursor span { display: none; }
+.cursor.is-hover { width: 30px; height: 30px; margin: -15px 0 0 -15px; }
 .cursor.is-down { scale: .8; }
 @media (hover: hover) and (pointer: fine) { .has-cursor, .has-cursor a, .has-cursor button, .has-cursor label { cursor: none; } }
 .progress { position: fixed; top: 0; left: 0; right: 0; z-index: 120; height: 6px; pointer-events: none; }
@@ -680,7 +679,15 @@ button { cursor: pointer; }
 .o3d__title { position: absolute; left: clamp(16px, 3vw, 40px); top: clamp(16px, 3vw, 34px); margin: 0; pointer-events: none; font-family: var(--display); line-height: .85; text-transform: uppercase; color: var(--yellow); text-shadow: 3px 3px 0 var(--charcoal), 6px 6px 0 var(--charcoal); }
 .o3d__title span { display: block; font-size: clamp(30px, 4vw, 64px); }
 .o3d__title b { display: block; font-weight: 400; font-size: clamp(54px, 8vw, 130px); color: var(--cream); }
-.o3d__hint { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); margin: 0; padding: 8px 16px; border-radius: 999px; background: var(--charcoal); color: var(--yellow); font-family: var(--cta); font-weight: 600; font-size: 14px; text-transform: uppercase; white-space: nowrap; pointer-events: none; }
+.o3d__tools { position: absolute; left: 50%; bottom: 58px; transform: translateX(-50%); z-index: 2; display: flex; gap: 6px; padding: 6px; border-radius: 999px; background: linear-gradient(180deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, 0) 55%), rgba(41, 42, 44, .7); -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4); box-shadow: 0 14px 34px rgba(41, 42, 44, .35), inset 0 1px 0 rgba(255, 255, 255, .22), inset 0 0 0 1px rgba(255, 255, 255, .08); }
+.o3d__tools button { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border: 0; border-radius: 999px; background: transparent; color: var(--cream); font-family: var(--cta); font-weight: 600; font-size: 14px; letter-spacing: .02em; text-transform: uppercase; white-space: nowrap; cursor: pointer; transition: background .25s, color .25s, transform .35s var(--ease-pop); }
+.o3d__tools button:hover { background: rgba(255, 255, 255, .1); transform: translateY(-2px); }
+.o3d__tools button[aria-pressed="true"] { background: var(--yellow); color: var(--charcoal); }
+.o3d__tools svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.o3d__oven { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 2; margin: 0; display: flex; align-items: center; gap: 12px; padding: 12px 22px; border-radius: 999px; background: var(--charcoal); color: var(--yellow); font-family: var(--cta); font-weight: 600; font-size: 16px; text-transform: uppercase; pointer-events: none; transition: opacity .5s, transform .5s var(--ease-pop); }
+.o3d__oven i { width: 18px; height: 18px; border-radius: 50%; border: 3px solid var(--yellow); border-right-color: transparent; animation: spin .8s linear infinite; }
+.o3d__oven.is-done { opacity: 0; transform: translate(-50%, -50%) scale(.8); }
+.o3d__hint { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); margin: 0; padding: 6px 14px; border-radius: 999px; background: rgba(41, 42, 44, .55); color: var(--cream); font-family: var(--cta); font-weight: 500; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; pointer-events: none; }
 .o3d__close { position: absolute; top: 18px; right: calc(min(430px, 38vw) + 18px); z-index: 2; width: 54px; height: 54px; border: 3px solid var(--charcoal); border-radius: 50%; background: var(--yellow); font-size: 32px; line-height: 1; transition: transform .4s var(--ease-pop); }
 .o3d__close:hover { transform: rotate(90deg) scale(1.1); }
 .o3d__ticket { position: relative; overflow-y: auto; padding: 34px 28px; background: var(--cream); border-left: 4px solid var(--charcoal); }
@@ -690,7 +697,10 @@ button { cursor: pointer; }
 .ticket__list { list-style: none; margin: 0; padding: 0; border-top: 2px dashed var(--charcoal); }
 .ticket__list li { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 10px 6px; border-bottom: 2px dashed var(--charcoal); transition: background .2s, transform .3s var(--ease-pop); opacity: 0; animation: tick-in .5s var(--ease-pop) forwards; animation-delay: calc(.6s + var(--i) * .08s); }
 @keyframes tick-in { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: none; } }
-.ticket__list li[data-o3d]:hover { background: var(--yellow); transform: translateX(-6px); }
+.ticket__list li[data-o3d] { position: relative; isolation: isolate; }
+.ticket__list li[data-o3d]::before { content: ''; position: absolute; inset: 0; z-index: -1; opacity: 0; background: radial-gradient(180px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 199, 0, .95), rgba(255, 199, 0, .35) 45%, transparent 75%); transition: opacity .25s; }
+.ticket__list li[data-o3d]:hover { transform: translateX(-6px); }
+.ticket__list li[data-o3d]:hover::before { opacity: 1; }
 .ticket__list img { width: 42px; height: 42px; object-fit: contain; }
 .ticket__list img.is-pizza { object-fit: cover; border-radius: 50%; border: 3px solid #d98a2b; }
 .ticket__list b { display: block; font-family: var(--display); font-weight: 400; font-size: 16px; line-height: 1; text-transform: uppercase; }
@@ -700,6 +710,9 @@ button { cursor: pointer; }
 .ticket__totals { margin: 16px 0 18px; }
 .ticket__msg { margin: 0 0 16px; font-size: 15px; }
 .ticket__ctas { display: grid; gap: 10px; }
+.ticket__ctas .btn--dark { position: relative; overflow: hidden; isolation: isolate; }
+.ticket__ctas .btn--dark::after { content: ''; position: absolute; inset: -2px; z-index: 1; pointer-events: none; background: linear-gradient(105deg, transparent 35%, rgba(255, 236, 170, .38) 50%, transparent 65%); transform: translateX(-120%); animation: shimmer 3.2s 1.4s ease-in-out infinite; }
+@keyframes shimmer { 0% { transform: translateX(-120%); } 45%, 100% { transform: translateX(120%); } }
 
 /* =========================================================
    RESPONSIVE
@@ -756,7 +769,11 @@ button { cursor: pointer; }
   .o3d__ticket { border-left: 0; border-top: 4px solid var(--charcoal); padding: 24px 18px; }
   .o3d__ticket::before { display: none; }
   .o3d__close { right: 14px; top: 14px; }
-  .o3d__hint { font-size: 12px; bottom: 10px; }
+  .o3d__hint { font-size: 11px; bottom: 8px; }
+  .o3d__tools { bottom: 40px; }
+  .o3d__tools button { padding: 8px 11px; font-size: 12px; }
+  .o3d__tools button span { display: none; }
+  .o3d__tools button[data-act="cut"] span { display: inline; }
   .o3d__hint-long { display: none; }
 }
 @media (max-width: 520px) {

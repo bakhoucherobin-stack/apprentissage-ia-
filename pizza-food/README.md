@@ -20,7 +20,13 @@ Décompressez le dossier puis double-cliquez sur `index.html`. Pas d'installatio
 
 ## Fin de commande : aperçu 3D
 
-« Valider ma commande » ouvre une scène 3D (Three.js) : chaque pizza est construite en 3D à partir de la vraie photo du produit (pâte, bord, 8 parts), à la bonne taille (Junior / Senior / Mega), posée sur une planche en bois ; les autres produits sont placés autour. On peut tourner la scène, zoomer, cliquer une pizza pour la découper ; survoler une ligne du ticket fait sauter le produit correspondant. Le ticket (offres, total, appel) est à côté.
+« Valider ma commande » ouvre une scène 3D (Three.js) : chaque pizza est modelée en relief à partir de la vraie photo du produit, à la bonne taille (Junior / Senior / Mega), sur une planche en bois farinée.
+
+- Bord gonflé et irrégulier, doré avec des taches de cuisson ; fromage bombé dont le relief suit la photo (le fromage clair ressort, la sauce se creuse) ; textures de relief et de brillance (le fromage luit, la pâte reste mate).
+- 8 parts : sur les coupes on voit le dessous cuit, la mie alvéolée, le filet de sauce et le fromage.
+- Cliquer une pizza : la caméra s'approche, une part se soulève et des filaments de fromage s'étirent puis coulent en gouttes.
+- Boutons « Découper » (toutes les parts s'écartent), « Vue du dessus », « Recentrer » ; glisser pour tourner, molette pour zoomer ; vapeur qui monte des pizzas.
+- Survoler une ligne du ticket fait sauter le produit correspondant. Le ticket (offres, total, appel) est à côté.
 
 Les pizzas 3D sont générées par le code à partir des photos et des recettes, pas par un modèle d'IA d'images.
 
