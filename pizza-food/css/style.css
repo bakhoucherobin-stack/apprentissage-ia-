@@ -773,12 +773,14 @@ button { cursor: pointer; }
   .title-3d { overflow-wrap: anywhere; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; transition-delay: 0s !important; }
-  .split .char { opacity: 1; }
-  .js [data-reveal], .zone, .js .card.rv { opacity: 1; transform: none; translate: none; rotate: none; scale: none; }
-  .js .showcase__drop { transform: none; }
-  .ing { display: none; }
-  .manifesto__text .w { opacity: 1; }
-  .ticket__list li { opacity: 1; }
-}
+/* Animations coupées via le bouton du pied de page */
+.no-motion *, .no-motion *::before, .no-motion *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; transition-delay: 0s !important; }
+.no-motion .split .char { opacity: 1; }
+.no-motion.js [data-reveal], .no-motion .zone, .no-motion.js .card.rv { opacity: 1; transform: none; translate: none; rotate: none; scale: none; }
+.no-motion.js .showcase__drop { transform: none; }
+.no-motion .ing { display: none; }
+.no-motion .manifesto__text .w { opacity: 1; }
+.no-motion .ticket__list li { opacity: 1; }
+.footer__meta { display: inline-flex; gap: 6px; align-items: center; }
+.motion-toggle { padding: 4px 12px; border: 2px solid var(--charcoal); border-radius: 999px; background: var(--cream); font-family: var(--cta); font-weight: 600; font-size: 13px; text-transform: uppercase; }
+.motion-toggle:hover { background: var(--charcoal); color: var(--yellow); }

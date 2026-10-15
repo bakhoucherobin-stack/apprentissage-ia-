@@ -11,7 +11,8 @@
 
   const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Animations actives par défaut ; un bouton du pied de page permet de les couper
+  const reduceMotion = (() => { try { return localStorage.getItem('pf-motion') === 'off'; } catch (e) { return false; } })();
   const CH = '#292a2c';
 
   /* ---------- Recettes ---------- */

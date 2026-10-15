@@ -12,7 +12,8 @@
   const $$ = (s, c = document) => [...c.querySelectorAll(s)];
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const lerp = (a, b, t) => a + (b - a) * t;
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Animations actives par défaut ; un bouton du pied de page permet de les couper
+  const reduceMotion = (() => { try { return localStorage.getItem('pf-motion') === 'off'; } catch (e) { return false; } })();
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const euro = n => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
   const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -30,6 +31,7 @@
   const page = document.body.dataset.page;
   const PZ = window.PF_PIZZA;
   document.documentElement.classList.add('js');
+  if (reduceMotion) document.documentElement.classList.add('no-motion');
 
   /* =======================================================
      DONNÉES
@@ -138,7 +140,8 @@
           </div>
         </div>
         <p class="footer__giant" id="giant" data-split>Pizza Food</p>
-        <div class="footer__bottom"><span>© ${new Date().getFullYear()} Pizza Food — ${INFO.address}, ${INFO.city}</span><span>${INFO.tel1} · ${INFO.tel2}</span></div>
+        <div class="footer__bottom"><span>© ${new Date().getFullYear()} Pizza Food — ${INFO.address}, ${INFO.city}</span><span>${INFO.tel1} · ${INFO.tel2}</span>
+          <span class="footer__meta"><button type="button" class="motion-toggle" id="motionToggle" aria-pressed="${!reduceMotion}">Animations : ${reduceMotion ? 'désactivées' : 'activées'}</button> · version ${window.PF_VERSION || ''}</span></div>
       </footer>
 
       <div class="overlay" id="overlay"></div>
@@ -303,7 +306,7 @@
      ======================================================= */
   function loadScript(src) {
     return new Promise((res, rej) => {
-      if ([...document.scripts].some(s => s.src && s.src.endsWith(src.split('/').pop())) && (src.includes('three') ? window.THREE : src.includes('photos') ? window.PF_PHOTOS : window.PF_ORDER3D)) return res();
+      if ([...document.scripts].some(s => s.src && s.src.split('?')[0].endsWith(src.split('?')[0].split('/').pop())) && (src.includes('three') ? window.THREE : src.includes('photos') ? window.PF_PHOTOS : window.PF_ORDER3D)) return res();
       const s = document.createElement('script');
       s.src = src; s.onload = res; s.onerror = rej;
       document.head.appendChild(s);
@@ -341,8 +344,8 @@
     btn.textContent = 'Le four chauffe…';
     try {
       await loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js');
-      await loadScript('js/photos3d.js');
-      await loadScript('js/order3d.js');
+      await loadScript('js/photos3d.js?v=' + (window.PF_VERSION || ''));
+      await loadScript('js/order3d.js?v=' + (window.PF_VERSION || ''));
       bindCart.close();
       const items = cart.items.slice(0, 14).map((i, idx) => {
         const p = PRODUCTS[i.id];
@@ -1120,6 +1123,10 @@
   bindCart();
   bindModals();
   $('#burger').addEventListener('click', () => toggleMenu());
+  $('#motionToggle').addEventListener('click', () => {
+    try { localStorage.setItem('pf-motion', reduceMotion ? 'on' : 'off'); } catch (e) { /* noop */ }
+    location.reload();
+  });
   $$('#mmenu a').forEach(a => a.addEventListener('click', () => toggleMenu(false)));
 
   renderStars();
