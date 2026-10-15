@@ -2,8 +2,8 @@
    PIZZA FOOD — site, panier, offres, animations
    Dépend de js/data.js (carte, allergènes, textes légaux)
    et js/pizza.js (pizzas interactives, particules).
-   L'aperçu 3D (js/order3d.js + Three.js) est chargé à la
-   validation de la commande.
+   La composition des produits et la page de commande sont
+   dans js/shop.js (options reprises du site d'origine).
    ========================================================= */
 (() => {
   'use strict';
@@ -104,7 +104,7 @@
         </div>
       </header>
       <div class="mobile-menu" id="mmenu" aria-hidden="true">
-        <nav aria-label="Menu mobile"><a href="index.html">Accueil</a><a href="carte.html">La carte</a><a href="livraison.html">Livraison</a><a href="carte.html#envies">Vos envies</a></nav>
+        <nav aria-label="Menu mobile"><a href="index.html">Accueil</a><a href="carte.html">La carte</a><a href="livraison.html">Livraison</a><a href="carte.html#envies">Vos envies</a><a href="commande.html">Ma commande</a><button type="button" data-ac="login">Mon compte</button></nav>
         <a href="${INFO.tel1Href}" class="mobile-menu__tel">${INFO.tel1}</a>
       </div>`);
 
@@ -123,7 +123,7 @@
             </form>
           </div>
           <div><h3>Commander</h3><ul class="flinks">
-            ${fl('Zones de livraison', 'href="livraison.html#zones"')}${fl('À emporter', 'href="livraison.html#emporter"')}${fl('Commander en ligne', 'href="carte.html"')}${fl('Mobile', 'data-modal="mobile"')}
+            ${fl('Zones de livraison', 'href="livraison.html#zones"')}${fl('À emporter', 'href="livraison.html#emporter"')}${fl('Commander en ligne', 'href="carte.html"')}${fl('Mon panier', 'href="commande.html"')}${fl('Mon compte', 'data-ac="login"')}${fl('Mobile', 'data-modal="mobile"')}
           </ul></div>
           <div><h3>La maison</h3><ul class="flinks">
             ${fl('Charte qualité', 'data-modal="charte"')}${fl('Programme de fidélité', 'data-modal="fidelite"')}${fl('Votre appréciation', 'data-modal="appreciation"')}${fl('Recrutement', 'data-modal="recrutement"')}
@@ -175,7 +175,10 @@
   if (!MODES.includes(cart.mode)) cart.mode = 'Livraison';
   cart.items = (cart.items || []).filter(i => PRODUCTS[i.id]);
   const saveCart = () => store.set('pf-cart-v2', cart);
-  const unitPrice = it => { const p = PRODUCTS[it.id]; return p.s ? p.s[it.size] : p.p; };
+  const SHOP = window.PF_SHOP;
+  const basePrice = it => { const p = PRODUCTS[it.id]; return p.s ? p.s[it.size] : p.p; };
+  // prix unitaire = prix du produit + options choisies (pâte cheesy, suppléments…)
+  const unitPrice = it => basePrice(it) + (SHOP && it.opt ? SHOP.optPrice(it) : 0);
   // Offre : pizzas Senior et Mega, sauf la Marguerita
   const isEligible = it => { const p = PRODUCTS[it.id]; return p.cat.pizza && (it.size === 'Senior' || it.size === 'Mega') && norm(p.n) !== 'marguerita'; };
 
@@ -185,7 +188,8 @@
     let disc = 0, eligibleCount = 0;
     if (offer) {
       const units = [];
-      cart.items.forEach(i => { if (isEligible(i)) for (let k = 0; k < i.qty; k++) units.push({ key: i.key, price: unitPrice(i) }); });
+      // la pizza offerte est remboursée au prix de la pizza (les suppléments restent dus)
+      cart.items.forEach(i => { if (isEligible(i)) for (let k = 0; k < i.qty; k++) units.push({ key: i.key, price: basePrice(i) }); });
       eligibleCount = units.length;
       units.sort((a, b) => b.price - a.price); // les pizzas offertes sont les moins chères de chaque groupe
       units.forEach((u, idx) => { if ((idx + 1) % offer.every === 0) { disc += u.price; free[u.key] = (free[u.key] || 0) + 1; } });
@@ -193,10 +197,11 @@
     return { sub, disc, total: sub - disc, free, count: cart.items.reduce((s, i) => s + i.qty, 0), offer, eligibleCount };
   }
 
-  function addToCart(id, size, fromEl) {
-    const key = id + '|' + (size || '');
+  const itemKey = (id, size, opt) => id + '|' + (size || '') + (opt && SHOP ? '|' + SHOP.optKey(opt) : '');
+  function addToCart(id, size, fromEl, opt, qty = 1) {
+    const key = itemKey(id, size, opt);
     const found = cart.items.find(i => i.key === key);
-    if (found) found.qty++; else cart.items.push({ key, id, size: size || '', qty: 1 });
+    if (found) found.qty += qty; else cart.items.push(Object.assign({ key, id, size: size || '', qty }, opt ? { opt } : {}));
     saveCart();
     const p = PRODUCTS[id];
     const r = fromEl.getBoundingClientRect();
@@ -206,9 +211,20 @@
       const b = $('#cartBtn'); b.classList.remove('is-bump'); void b.offsetWidth; b.classList.add('is-bump');
     });
     const c = computeCart();
-    let msg = `+1 <b>${esc(p.n)}</b>${size ? ' ' + size : ''}`;
+    let msg = `+${qty} <b>${esc(p.n)}</b>${size ? ' ' + size : ''}`;
     if (c.offer && isEligible({ id, size }) && c.eligibleCount % c.offer.every === 0) msg += ' · <b>pizza offerte !</b>';
     toast(msg);
+  }
+
+  // Modification d'un article du panier depuis la fenêtre de composition
+  function replaceItem(old, { id, size, qty, opt }) {
+    const idx = cart.items.indexOf(old);
+    const key = itemKey(id, size, opt);
+    const twin = cart.items.find(i => i.key === key && i !== old);
+    if (twin) { twin.qty += qty; if (idx > -1) cart.items.splice(idx, 1); }
+    else Object.assign(old, { key, id, size: size || '', qty, opt });
+    saveCart(); renderCart();
+    toast(`<b>${esc(PRODUCTS[id].n)}</b> modifiée`);
   }
 
   function renderCart() {
@@ -221,7 +237,7 @@
     $('#cartList').innerHTML = cart.items.map((it, idx) => {
       const p = PRODUCTS[it.id], free = c.free[it.key];
       return `<li class="citem"><img src="${p.img}" alt="" class="${p.cat.pizza ? 'is-pizza' : ''}" loading="lazy">
-        <div><div class="citem__name">${esc(p.n)}</div><div class="citem__meta">${it.size ? it.size + ' · ' : ''}${euro(unitPrice(it))}</div>${free ? `<span class="citem__free">${free > 1 ? free + ' offertes' : 'Offerte !'}</span>` : ''}</div>
+        <div><div class="citem__name">${esc(p.n)}</div><div class="citem__meta">${it.size ? it.size + ' · ' : ''}${euro(unitPrice(it))}</div>${SHOP ? SHOP.describe(it).map(d => `<div class="citem__opt">${esc(d.label)} : ${esc(d.text)}</div>`).join('') : ''}${free ? `<span class="citem__free">${free > 1 ? free + ' offertes' : 'Offerte !'}</span>` : ''}${SHOP && SHOP.hasOptions(it.id) ? `<button type="button" class="citem__edit" data-edit="${idx}">Modifier</button>` : ''}</div>
         <div class="citem__right"><span class="citem__price">${euro(unitPrice(it) * it.qty)}</span>
         <span class="qty"><button data-qty="-1" data-idx="${idx}" aria-label="Retirer un ${esc(p.n)}">−</button><span>${it.qty}</span><button data-qty="1" data-idx="${idx}" aria-label="Ajouter un ${esc(p.n)}">+</button></span></div></li>`;
     }).join('');
@@ -241,6 +257,7 @@
     $('#cartWarn').hidden = !below;
     if (below) $('#cartWarn').textContent = `Minimum de commande en livraison : ${euro(INFO.minimum)}. Il manque ${euro(INFO.minimum - c.total)}.`;
     $('#checkout').disabled = !!below;
+    document.dispatchEvent(new CustomEvent('pf:cart'));
   }
 
   function setMode(mode, announce, fromEl) {
@@ -285,6 +302,8 @@
     $('#cartClose').addEventListener('click', close);
     overlay.addEventListener('click', close);
     $('#cartList').addEventListener('click', e => {
+      const ed = e.target.closest('[data-edit]');
+      if (ed && SHOP) { const it = cart.items[+ed.dataset.edit]; SHOP.compose({ id: it.id, size: it.size, edit: it }); return; }
       const b = e.target.closest('[data-qty]');
       if (!b) return;
       const it = cart.items[+b.dataset.idx];
@@ -294,75 +313,18 @@
     });
     document.addEventListener('click', e => {
       const add = e.target.closest('[data-add]');
-      if (add) { addToCart(add.dataset.add, add.dataset.size, add); add.classList.remove('is-added'); void add.offsetWidth; add.classList.add('is-added'); }
+      if (add) {
+        // produit avec options (pizzas, menus, tacos…) : on le compose d'abord, comme sur le site d'origine
+        if (SHOP && SHOP.hasOptions(add.dataset.add)) SHOP.compose({ id: add.dataset.add, size: add.dataset.size, fromEl: add });
+        else addToCart(add.dataset.add, add.dataset.size, add);
+        add.classList.remove('is-added'); void add.offsetWidth; add.classList.add('is-added');
+      }
+      const ac = e.target.closest('[data-ac]');
+      if (ac && SHOP && !ac.closest('#modal')) { toggleMenu(false); SHOP.account(ac.dataset.ac, null); }
       const m = e.target.closest('[data-setmode], .mode__card[data-mode]');
       if (m) setMode(m.dataset.setmode || m.dataset.mode, true, m);
     });
-    $('#checkout').addEventListener('click', checkout);
-  }
-
-  /* =======================================================
-     FIN DE COMMANDE : aperçu 3D
-     ======================================================= */
-  function loadScript(src) {
-    return new Promise((res, rej) => {
-      if ([...document.scripts].some(s => s.src && s.src.split('?')[0].endsWith(src.split('?')[0].split('/').pop())) && (src.includes('three') ? window.THREE : src.includes('photos') ? window.PF_PHOTOS : window.PF_ORDER3D)) return res();
-      const s = document.createElement('script');
-      s.src = src; s.onload = res; s.onerror = rej;
-      document.head.appendChild(s);
-      setTimeout(() => rej(new Error('timeout')), 12000);
-    });
-  }
-
-  function ticketHTML() {
-    const c = computeCart();
-    const now = new Date().toLocaleString('fr-FR', { weekday: 'long', hour: '2-digit', minute: '2-digit' });
-    return `<p class="ticket__brand">Pizza Food</p>
-      <p class="ticket__meta">${cart.mode} · ${now}</p>
-      <ul class="ticket__list">${cart.items.map((i, idx) => {
-        const p = PRODUCTS[i.id], free = c.free[i.key];
-        return `<li data-o3d="${idx}" style="--i:${idx}"><img src="${p.img}" alt="" class="${p.cat.pizza ? 'is-pizza' : ''}"><span><b>${i.qty} × ${esc(p.n)}</b><small>${i.size ? i.size + ' · ' : ''}${esc(p.cat.label)}</small>${free ? `<span class="ticket__free">${free} offerte${free > 1 ? 's' : ''}</span>` : ''}</span><span class="p">${euro(unitPrice(i) * i.qty)}</span></li>`;
-      }).join('')}</ul>
-      <div class="ticket__totals">
-        <p class="line"><span>Sous-total</span><span>${euro(c.sub)}</span></p>
-        ${c.disc ? `<p class="line line--disc"><span>${c.offer.label}</span><span>− ${euro(c.disc)}</span></p>` : ''}
-        <p class="line"><span>Livraison</span><span>${cart.mode === 'Livraison' ? 'Gratuite · 40 min' : '—'}</span></p>
-        <p class="line line--total"><span>Total</span><span>${euro(c.total)}</span></p>
-      </div>
-      <p class="ticket__msg">Votre commande est prête à partir au four. Elle est préparée à votre appel${cart.mode === 'Livraison' ? ', puis livrée en 40 minutes environ' : ''} : appelez le restaurant pour la confirmer.</p>
-      <div class="ticket__ctas">
-        <a class="btn btn--dark btn--full" href="${INFO.tel1Href}">Appeler le ${INFO.tel1}</a>
-        <a class="btn btn--pill btn--full" href="${INFO.tel2Href}">${INFO.tel2}</a>
-        <button class="btn btn--ghost" type="button" id="o3dEdit"><span>Modifier ma commande</span></button>
-      </div>`;
-  }
-
-  async function checkout() {
-    const btn = $('#checkout');
-    btn.disabled = true;
-    const label = btn.innerHTML;
-    btn.textContent = 'Le four chauffe…';
-    try {
-      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js');
-      await loadScript('js/photos3d.js?v=' + (window.PF_VERSION || ''));
-      await loadScript('js/order3d.js?v=' + (window.PF_VERSION || ''));
-      bindCart.close();
-      const items = cart.items.slice(0, 14).map((i, idx) => {
-        const p = PRODUCTS[i.id];
-        return { index: idx, product: p, size: i.size, qty: i.qty, pizza: p.cat.pizza, free: !!computeCart().free[i.key] };
-      });
-      window.PF_ORDER3D.open({ items, ticketHTML: ticketHTML() });
-      const edit = $('#o3dEdit');
-      if (edit) edit.addEventListener('click', () => { window.PF_ORDER3D.close(); setTimeout(bindCart.open, 500); });
-    } catch (e) {
-      // Sans connexion (Three.js indisponible) : récapitulatif simple
-      openModal('Votre commande', `<div class="o3d__ticket" style="border:0;padding:0">${ticketHTML()}</div>`);
-      const edit = $('#o3dEdit');
-      if (edit) edit.addEventListener('click', () => { closeModal(); bindCart.open(); });
-    } finally {
-      btn.innerHTML = label;
-      renderCart();
-    }
+    $('#checkout').addEventListener('click', () => { location.href = 'commande.html'; });
   }
 
   /* =======================================================
@@ -1190,6 +1152,7 @@
   renderRail();
   heroPizza();
   activate();
+  if (SHOP) SHOP.init({ $, $$, esc, euro, norm, store, page, PRODUCTS, INFO, ZONES, MODES, ARROW, cart, saveCart, renderCart, computeCart, unitPrice, setMode, toast, openModal, closeModal, addToCart, replaceItem, reduceMotion });
   renderCart();
   renderReviews();
   revealCards();

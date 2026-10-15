@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ma commande — Pizza Food</title>
+  <meta name="description" content="Votre panier Pizza Food : composition, code promo, coordonnées, paiement et confirmation de la commande.">
+  <meta name="theme-color" content="#ff4100">
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Bowlby+One+SC&family=Open+Sans:wght@400;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=8">
+  <noscript><style>.curtain{display:none}</style></noscript>
+</head>
+<body data-page="commande">
+  <div class="curtain" id="curtain" aria-hidden="true">
+    <div class="curtain__pizza pz pz--svg" data-svgpizza="" data-interactive="off"></div>
+    <p class="curtain__word">Commande</p>
+    <p class="curtain__count"><span id="curtainCount">0</span>%</p>
+  </div>
+
+  <main>
+    <section class="co-hero band--orange">
+      <h1 class="co-hero__title" data-split>Ma commande</h1>
+      <nav class="co__steps" aria-label="Étapes de la commande">
+        <button type="button" data-step="1" class="is-current"><b>1</b> Mon panier</button>
+        <button type="button" data-step="2" disabled><b>2</b> Authentification et paiement</button>
+        <button type="button" data-step="3" disabled><b>3</b> Confirmation</button>
+      </nav>
+    </section>
+
+    <section class="band band--cream co">
+      <div class="co__grid">
+        <aside class="co__visual" aria-label="Votre plateau">
+          <p class="eyebrow">Ton plateau</p>
+          <div id="coVisual"></div>
+        </aside>
+        <div class="co__panel" id="coStep" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>window.PF_VERSION = "8 (15/10)";</script>
+  <script src="js/config.js?v=8"></script>
+  <script src="js/data.js?v=8"></script>
+  <script src="js/options.js?v=8"></script>
+  <script src="js/pizza.js?v=8"></script>
+  <script src="js/shop.js?v=8"></script>
+  <script src="js/main.js?v=8"></script>
+</body>
+</html>
