@@ -35,6 +35,16 @@ Les pizzas 3D sont générées par le code à partir des photos et des recettes,
 
 En livraison 2 pizzas achetées = la 3e offerte, à emporter 1 achetée = la 2e offerte, sur les pizzas Senior et Mega sauf Marguerita. Minimum de 15 € en livraison.
 
+## Avis Google
+
+Le bloc « Avis Google » de l'accueil importe les avis en direct depuis la fiche Google de la pizzeria dès qu'une clé est renseignée dans `js/config.js` :
+
+1. Sur Google Cloud (compte de la pizzeria), créer un projet et activer « Maps JavaScript API » et « Places API (New) » (facturation à activer).
+2. Créer une clé d'API et la restreindre au domaine du site.
+3. Coller la clé dans `googleMapsKey`. L'identifiant de la fiche (`googlePlaceId`) est facultatif : sinon la fiche est cherchée par son adresse.
+
+Google renvoie jusqu'à 5 avis, affichés en carrousel avec la note moyenne et le nombre d'avis. Sans clé, le bloc propose « Voir les avis » et « Laisser un avis » vers la fiche Google : aucun avis n'est inventé.
+
 ## À brancher avant la mise en ligne
 
 - Paiement / envoi de la commande : le ticket invite à appeler le restaurant.

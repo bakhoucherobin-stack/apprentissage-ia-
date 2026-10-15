@@ -648,6 +648,97 @@
   }
 
   /* =======================================================
+     AVIS GOOGLE
+     Avec une clé (js/config.js) : avis importés en direct via
+     Google Maps JavaScript API (Places). Sans clé : lien vers
+     la fiche Google, aucun avis n'est inventé.
+     ======================================================= */
+  const MAPS_URL = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Pizza Food 34 Rue du Général de Gaulle 94430 Chennevières-sur-Marne');
+  const starsTxt = n => '★★★★★'.slice(0, Math.round(n)) + '☆☆☆☆☆'.slice(0, 5 - Math.round(n));
+
+  function reviewsFallback(body, reason) {
+    body.innerHTML = `<div class="reviews__empty">
+      <p>Retrouvez les avis de nos clients et donnez le vôtre directement sur notre fiche Google.</p>
+      <div class="reviews__btns">
+        <a class="btn btn--dark" href="${MAPS_URL}" target="_blank" rel="noopener" data-cursor="Avis">Voir les avis</a>
+        <a class="btn btn--pill" href="${MAPS_URL}" target="_blank" rel="noopener" data-cursor="Merci !">Laisser un avis</a>
+      </div>
+      ${reason ? `<p class="reviews__source">${reason}</p>` : ''}
+    </div>`;
+  }
+
+  function reviewsCarousel(body, place) {
+    const reviews = (place.reviews || []).filter(r => r.text);
+    $('#reviewsSummary').innerHTML = place.rating
+      ? `<b>${place.rating.toFixed(1).replace('.', ',')}</b><span class="stars" aria-hidden="true">${starsTxt(place.rating)}</span><span>${place.userRatingCount || ''} avis</span>`
+      : 'Ce que nos clients disent de nous';
+    if (!reviews.length) { reviewsFallback(body); return; }
+    body.innerHTML = `<div class="reviews__viewport"><div class="reviews__track">${reviews.map(r => {
+      const who = r.authorAttribution || {};
+      const name = esc(who.displayName || 'Client Google');
+      const avatar = who.photoURI ? `<img src="${esc(who.photoURI)}" alt="" referrerpolicy="no-referrer" loading="lazy">` : `<span class="review__avatar">${name.charAt(0)}</span>`;
+      return `<figure class="review">
+        <figcaption class="review__who">${avatar}<span><span class="review__name">${name}</span><br><span class="review__when">${esc(r.relativePublishTimeDescription || '')}</span></span></figcaption>
+        <span class="stars" aria-label="${r.rating} sur 5">${starsTxt(r.rating || 5)}</span>
+        <blockquote class="review__text">${esc(r.text)}</blockquote>
+      </figure>`;
+    }).join('')}</div></div>
+    <div class="reviews__nav">
+      <div class="reviews__dots">${reviews.map((_, i) => `<button type="button" aria-label="Avis ${i + 1}" data-rv="${i}"></button>`).join('')}</div>
+      <a class="reviews__source" href="${esc(place.googleMapsURI || MAPS_URL)}" target="_blank" rel="noopener">Avis publiés sur Google</a>
+      <div class="reviews__arrows"><button type="button" data-rvstep="-1" aria-label="Avis précédent">←</button><button type="button" data-rvstep="1" aria-label="Avis suivant">→</button></div>
+    </div>`;
+    const track = $('.reviews__track', body), dots = $$('[data-rv]', body);
+    let i = 0, timer;
+    const go = n => {
+      i = (n + reviews.length) % reviews.length;
+      track.style.transform = `translateX(${-i * 100}%)`;
+      dots.forEach((d, k) => d.setAttribute('aria-current', k === i));
+    };
+    const auto = () => { clearInterval(timer); if (!reduceMotion) timer = setInterval(() => go(i + 1), 6000); };
+    body.addEventListener('click', e => {
+      const d = e.target.closest('[data-rv]'), st = e.target.closest('[data-rvstep]');
+      if (d) { go(+d.dataset.rv); auto(); }
+      if (st) { go(i + +st.dataset.rvstep); auto(); }
+    });
+    body.addEventListener('pointerenter', () => clearInterval(timer));
+    body.addEventListener('pointerleave', auto);
+    go(0); auto();
+  }
+
+  async function renderReviews() {
+    const body = $('#reviewsBody');
+    if (!body) return;
+    const cfg = window.PF_CONFIG || {};
+    if (!cfg.googleMapsKey) { reviewsFallback(body); return; }
+    body.innerHTML = '<p class="reviews__source">Chargement des avis Google…</p>';
+    try {
+      if (!(window.google && google.maps && google.maps.importLibrary)) {
+        await new Promise((res, rej) => {
+          window.__pfMaps = res;
+          const sc = document.createElement('script');
+          sc.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(cfg.googleMapsKey)}&v=weekly&loading=async&language=fr&callback=__pfMaps`;
+          sc.async = true; sc.onerror = rej;
+          document.head.appendChild(sc);
+          setTimeout(() => rej(new Error('timeout')), 10000);
+        });
+      }
+      const { Place } = await google.maps.importLibrary('places');
+      let id = cfg.googlePlaceId;
+      if (!id) {
+        const { places } = await Place.searchByText({ textQuery: cfg.googlePlaceQuery, fields: ['id'], maxResultCount: 1, language: 'fr' });
+        if (!places || !places.length) throw new Error('fiche introuvable');
+        id = places[0].id;
+      }
+      const place = new Place({ id, requestedLanguage: 'fr' });
+      await place.fetchFields({ fields: ['rating', 'userRatingCount', 'reviews', 'googleMapsURI'] });
+      reviewsCarousel(body, place);
+    } catch (e) {
+      reviewsFallback(body, 'Les avis n’ont pas pu être chargés depuis Google.');
+    }
+  }
+
+  /* =======================================================
      OUVERT / FERMÉ
      ======================================================= */
   function updateOpen() {
@@ -773,7 +864,7 @@
     const mani = $('#manifesto');
     let maniWords = [];
     if (mani) {
-      const HL = /^(fromage|file,|débordent,|trois|gratuite|Mega)/i;
+      const HL = /^(fromage|gratuite|Mega)/i;
       const words = mani.textContent.trim().split(/\s+/);
       mani.setAttribute('aria-label', mani.textContent.trim());
       mani.innerHTML = '<span aria-hidden="true">' + words.map(w => `<span class="w${HL.test(w) ? ' hl' : ''}">${w}</span>`).join(' ') + '</span>';
@@ -895,6 +986,7 @@
   heroPizza();
   activate();
   renderCart();
+  renderReviews();
   updateOpen();
   setInterval(updateOpen, 60000);
   hydrate();

@@ -191,25 +191,41 @@
 
     <!-- ============ MANIFESTE ============ -->
     <section class="manifesto band band--orange">
-      <svg class="zigzag zigzag--r" data-speed="-0.2" viewBox="0 0 40 400" aria-hidden="true"><polyline data-zigzag="40,400,14"/></svg>
-      <p class="manifesto__text" id="manifesto">Ici, pas de demi-mesure. Du fromage qui file, des recettes qui débordent, trois tailles pour toutes les faims et une livraison gratuite jusqu'à votre porte. Junior, Senior ou Mega&nbsp;: à vous de voir jusqu'où vous êtes prêts à aller.</p>
+      <div class="manifesto__inner">
+        <div class="manifesto__side">
+          <p class="eyebrow eyebrow--yellow">Notre philosophie</p>
+          <p class="manifesto__sign">Pizza Food<br><span>Chennevières-sur-Marne</span></p>
+        </div>
+        <p class="manifesto__text" id="manifesto">Ici, pas de demi-mesure. Du fromage qui file, des recettes qui débordent, trois tailles pour toutes les faims et une livraison gratuite jusqu'à votre porte. Junior, Senior ou Mega&nbsp;: à vous de voir jusqu'où vous êtes prêts à aller.</p>
+      </div>
     </section>
 
-    <!-- ============ CHIFFRES + FIDÉLITÉ ============ -->
-    <section class="band band--yellow">
-      <div class="numbers__grid">
-        <div class="number"><span class="number__val" data-count="190">0</span><span class="number__label">produits à la carte</span></div>
-        <div class="number"><span class="number__val" data-count="21">0</span><span class="number__label">catégories</span></div>
-        <div class="number"><span class="number__val" data-count="11">0</span><span class="number__label">villes livrées</span></div>
-        <div class="number"><span class="number__val"><span data-count="40">0</span>'</span><span class="number__label">de livraison</span></div>
+    <!-- ============ CHIFFRES + FIDÉLITÉ + AVIS ============ -->
+    <section class="band band--yellow trust">
+      <div class="stats-bar" data-reveal="up">
+        <div class="stat"><span class="stat__val" data-count="190">0</span><span class="stat__label">produits à la carte</span></div>
+        <div class="stat"><span class="stat__val" data-count="21">0</span><span class="stat__label">catégories</span></div>
+        <div class="stat"><span class="stat__val" data-count="11">0</span><span class="stat__label">villes livrées</span></div>
+        <div class="stat"><span class="stat__val"><span data-count="40">0</span> min</span><span class="stat__label">de livraison</span></div>
       </div>
-      <div class="fidelite">
-        <div class="burst-badge burst-badge--orange" data-burst="16" data-cursor="Merci !"><span>Programme<b>fidélité</b></span></div>
-        <div class="fidelite__copy text-left">
-          <h2 class="title-3d title-3d--sm">On récompense les fidèles</h2>
-          <p>Votre fidélité chez nous est récompensée : transformez vos points en cadeaux !</p>
+      <div class="trust__grid">
+        <article class="panel loyalty" data-reveal="left">
+          <div class="burst-badge burst-badge--orange loyalty__badge" data-burst="16" data-cursor="Merci !"><span>Fidélité<b>★</b></span></div>
+          <p class="panel__kicker">Programme de fidélité</p>
+          <h2 class="panel__title">On récompense les fidèles</h2>
+          <p>Votre fidélité chez nous est récompensée : chaque commande vous rapporte des points, transformez-les en cadeaux.</p>
           <button class="btn btn--dark" type="button" data-modal="fidelite" data-cursor="Points">En savoir plus</button>
-        </div>
+        </article>
+        <article class="panel reviews" id="reviews" data-reveal="right" aria-live="polite">
+          <div class="reviews__head">
+            <span class="reviews__g" aria-hidden="true">G</span>
+            <div>
+              <p class="panel__kicker">Avis Google</p>
+              <p class="reviews__summary" id="reviewsSummary">Ce que nos clients disent de nous</p>
+            </div>
+          </div>
+          <div class="reviews__body" id="reviewsBody"></div>
+        </article>
       </div>
     </section>
 
@@ -238,6 +254,7 @@
     </section>
   </main>
 
+  <script src="js/config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/pizza.js"></script>
   <script src="js/main.js"></script>
