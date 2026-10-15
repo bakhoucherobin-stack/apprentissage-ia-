@@ -4,443 +4,242 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Pizza Food — Pizzas, burgers & tacos à Chennevières-sur-Marne</title>
-  <meta name="description" content="Pizza Food : pizzas, burgers, tacos et tex-mex livrés gratuitement à Chennevières-sur-Marne et dans 10 villes autour. Ouvert 6j/7 de 11h à 23h. 01 45 94 29 50.">
-  <meta name="theme-color" content="#ff4100">
+  <meta name="description" content="Pizza Food : pizzas, burgers, tacos, tex-mex. Livraison gratuite en 40 min dans 11 villes du Val-de-Marne. En livraison 2 pizzas achetées = la 3e offerte, à emporter 1 achetée = la 2e offerte. 01 45 94 29 50.">
+  <meta name="theme-color" content="#292622">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Bowlby+One+SC&family=Open+Sans:wght@400;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bowlby+One+SC&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <noscript><style>.curtain{display:none}</style></noscript>
 </head>
-<body class="is-loading">
-
-  <!-- ============ PRELOADER ============ -->
-  <div class="loader" id="loader" aria-hidden="true">
-    <div class="loader__pizza pizza" data-recipe="marguerita"></div>
-    <p class="loader__text">Chaud devant<span class="loader__dots">…</span></p>
-    <p class="loader__count"><span id="loaderCount">0</span>%</p>
-  </div>
-
-  <!-- ============ CURSEUR ============ -->
-  <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor__label" id="cursorLabel">Miam</span></div>
-
-  <!-- ============ PROGRESSION ============ -->
-  <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
-
-  <!-- ============ NAVIGATION ============ -->
-  <header class="nav" id="nav">
-    <div class="nav__side nav__left">
-      <button class="nav__burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobileMenu">
-        <span></span><span></span><span></span>
-      </button>
-      <nav class="nav__links" aria-label="Navigation principale">
-        <a href="#carte" class="nav__link" data-cursor="La carte"><span data-text="La carte">La carte</span></a>
-        <a href="#zones" class="nav__link" data-cursor="On arrive"><span data-text="Livraison">Livraison</span></a>
-        <a href="#infos" class="nav__link" data-cursor="Viens"><span data-text="Infos">Infos</span></a>
-      </nav>
-    </div>
-
-    <a href="#top" class="logo" aria-label="Pizza Food — retour en haut" data-cursor="Top">
-      <svg class="logo__burst" viewBox="-50 -50 100 100" aria-hidden="true"><path data-burst="18,50,40"/></svg>
-      <span class="logo__text"><span>Pizza</span><span>Food</span></span>
-    </a>
-
-    <div class="nav__side nav__right">
-      <a href="tel:0145942950" class="nav__link nav__tel" data-cursor="Allô ?"><span data-text="01 45 94 29 50">01 45 94 29 50</span></a>
-      <button class="nav__cart" id="cartBtn" aria-label="Ouvrir mon panier" data-cursor="Panier">
-        <span class="nav__cart-ring">
-          <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 11h18l-2 15H9z" /><path d="M12 11V8a4 4 0 0 1 8 0v3" /></svg>
-          <span class="nav__cart-count" id="cartCount">0</span>
-        </span>
-        <span class="nav__cart-label">Commander</span>
-      </button>
-    </div>
-  </header>
-
-  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-    <nav aria-label="Menu mobile">
-      <a href="#commander">Commander</a>
-      <a href="#stars">Nos stars</a>
-      <a href="#carte">La carte</a>
-      <a href="#zones">Livraison</a>
-      <a href="#infos">Infos</a>
-    </nav>
-    <a href="tel:0145942950" class="mobile-menu__tel">01 45 94 29 50</a>
+<body data-page="home">
+  <div class="curtain" id="curtain" aria-hidden="true">
+    <div class="curtain__word"><span>Pizza Food</span></div>
+    <div class="curtain__line"><i></i></div>
   </div>
 
   <main>
+    <!-- ============ HÉROS ============ -->
+    <section class="hero">
+      <div class="hero__media"><img src="img/bandeaux/livraison.webp" alt="" fetchpriority="high"></div>
+      <div class="hero__meta"><span>Chennevières-sur-Marne · 94430</span><span>Ouvert 6j/7 · 11h — 23h</span></div>
 
-    <!-- ============ HERO ============ -->
-    <section class="hero band band--orange" id="top">
-      <svg class="zigzag zigzag--hero-l" data-speed="-0.25" viewBox="0 0 40 400" aria-hidden="true"><polyline data-zigzag="40,400,14"/></svg>
-      <svg class="zigzag zigzag--hero-r" data-speed="0.2" viewBox="0 0 40 400" aria-hidden="true"><polyline data-zigzag="40,400,14"/></svg>
+      <div class="hero__center">
+        <p class="eyebrow">Pizzas · Burgers · Tacos · Tex-Mex</p>
+        <h1 class="wordmark split-me">Pizza Food</h1>
+      </div>
 
-      <p class="hero__kicker" data-reveal="up">Pizzas · Burgers · Tacos — Chennevières-sur-Marne</p>
-
-      <h1 class="hero__title" aria-label="Chaud devant !">
-        <span class="hero__line" data-split>Chaud</span>
-        <span class="hero__line" data-split>devant&nbsp;!</span>
-      </h1>
-
-      <div class="hero__stage">
-        <div class="hero__text" data-reveal="left">
-          <p>Des pizzas généreuses, des burgers, des tacos et du tex-mex livrés chez vous <strong>gratuitement</strong> à Chennevières-sur-Marne et dans 10 villes autour.</p>
-          <p class="hero__hours"><span class="dot"></span> Ouvert 6j/7 · 11h → 23h</p>
-        </div>
-
-        <div class="hero__pizza-wrap" id="heroPizzaWrap">
-          <div class="floaty floaty--basil" data-depth="0.6" aria-hidden="true">
-            <svg viewBox="-30 -30 60 60"><path d="M0-26C16-18 18 8 0 26-18 8-16-18 0-26z" class="leaf"/><path d="M0-20V22" class="leaf-vein"/></svg>
-          </div>
-          <div class="floaty floaty--tomato" data-depth="-0.8" aria-hidden="true">
-            <svg viewBox="-30 -30 60 60"><circle r="26" class="tomato"/><circle r="17" class="tomato-in"/><circle cx="-7" cy="-4" r="3" class="seed"/><circle cx="7" cy="-4" r="3" class="seed"/><circle cx="0" cy="8" r="3" class="seed"/></svg>
-          </div>
-          <div class="floaty floaty--cheese" data-depth="1" aria-hidden="true">
-            <svg viewBox="-30 -30 60 60"><path d="M-26 18L26 18 26-6-26-20z" class="cheese"/><circle cx="-8" cy="4" r="5" class="hole"/><circle cx="12" cy="9" r="3.5" class="hole"/><circle cx="10" cy="-3" r="2.5" class="hole"/></svg>
-          </div>
-          <div class="floaty floaty--olive" data-depth="-0.5" aria-hidden="true">
-            <svg viewBox="-30 -30 60 60"><ellipse rx="20" ry="16" class="olive"/><ellipse rx="7" ry="5" class="olive-in"/></svg>
-          </div>
-          <div class="floaty floaty--chili" data-depth="0.9" aria-hidden="true">
-            <svg viewBox="-30 -30 60 60"><path d="M-22 10C-10 18 14 10 22-12L16-16C8 2-8 6-20 2z" class="chili"/><path d="M16-16L22-26M18-14L26-14" class="chili-stem"/></svg>
-          </div>
-
-          <div class="hero__pizza pizza" id="heroPizza" data-recipe="hero" data-cursor="Croque !"></div>
-
-          <div class="burst-badge hero__badge" data-cursor="Gratuit !">
-            <svg viewBox="-50 -50 100 100" aria-hidden="true"><path data-burst="22,50,41"/></svg>
-            <span>Livraison<br><b>gratuite</b></span>
-          </div>
-        </div>
-
-        <div class="hero__ctas" data-reveal="right">
-          <a href="#commander" class="btn btn--pill magnetic" data-cursor="Go !"><span>Je commande</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
-          <a href="#carte" class="btn btn--ghost magnetic" data-cursor="Miam"><span>Voir la carte</span></a>
-          <a href="tel:0145942950" class="hero__phone">ou appelez le <b>01 45 94 29 50</b></a>
+      <div class="hero__bottom">
+        <p class="lede" data-reveal>Des pizzas généreuses, des burgers, des tacos et du tex-mex. Livrés gratuitement en 40 minutes dans 11 villes du Val-de-Marne, ou à emporter au 34 rue du Général de Gaulle.</p>
+        <div class="hero__ctas" data-reveal style="--d:150ms">
+          <a class="btn btn--light magnetic" href="carte.html" data-cursor="La carte">Voir la carte <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h17M14 6l6 6-6 6"/></svg></a>
+          <a class="btn btn--light btn--hot magnetic" href="#commander" data-cursor="Go">Commander</a>
         </div>
       </div>
 
-      <a href="#marquee" class="scroll-hint" aria-label="Défiler vers le bas">
-        <svg viewBox="-50 -50 100 100" aria-hidden="true">
-          <defs><path id="circlePath" d="M0,-36 a36,36 0 1,1 0,72 a36,36 0 1,1 0,-72"/></defs>
-          <text><textPath href="#circlePath">SCROLLE · SCROLLE · SCROLLE · SCROLLE ·</textPath></text>
-          <path d="M0-12V12M-8 4L0 12 8 4" class="scroll-hint__arrow"/>
-        </svg>
-      </a>
+      <div class="burst hero__badge" data-burst="20" data-cursor="Offerte !"><span>En livraison<b>3e pizza offerte</b></span></div>
+      <span class="scrollcue" aria-hidden="true"></span>
     </section>
 
-    <!-- ============ MARQUEES ============ -->
-    <section class="marquees" id="marquee" aria-label="Nos spécialités">
-      <div class="marquee marquee--yellow" data-marquee="1">
+    <!-- ============ MARQUEES CROISÉS ============ -->
+    <div class="marquees">
+      <div class="marquee marquee--serif" data-marquee="1">
         <div class="marquee__track">
-          <span>Pizzas</span><i>✺</i><span>Burgers</span><i>✺</i><span>Tacos</span><i>✺</i><span>Paninis</span><i>✺</i><span>Tex-Mex</span><i>✺</i><span>Riz crousty</span><i>✺</i><span>Salades</span><i>✺</i><span>Desserts</span><i>✺</i>
+          <span>Reine</span><i></i><span>Chèvre miel</span><i></i><span>Tartoffu</span><i></i><span>Le Big Mokh</span><i></i><span>Tacos 3 viandes</span><i></i><span>Indienne</span><i></i><span>Tiramisu Kinder</span><i></i><span>Le Magistral</span><i></i>
         </div>
       </div>
-      <div class="marquee marquee--pink" data-marquee="-1">
+      <div class="marquee marquee--block" data-marquee="-1">
         <div class="marquee__track">
-          <span>Livraison gratuite</span><i>★</i><span>Ouvert 6j/7</span><i>★</i><span>11h → 23h</span><i>★</i><span>Tiramisu fait maison</span><i>★</i><span>Junior · Senior · Mega</span><i>★</i>
+          <span>Livraison gratuite</span><i></i><span>40 minutes</span><i></i><span>2 achetées = la 3e offerte</span><i></i><span>Junior · Senior · Mega</span><i></i><span>6j/7 · 11h-23h</span><i></i>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- ============ MODE DE COMMANDE ============ -->
-    <section class="mode band band--pink" id="commander">
-      <svg class="zigzag zigzag--mode" data-speed="0.15" viewBox="0 0 400 40" aria-hidden="true"><polyline data-zigzag-h="400,40,16"/></svg>
-      <div class="section-head">
-        <p class="eyebrow" data-reveal="up">Étape 1 — on commence par là</p>
-        <h2 class="title-3d title-3d--orange" data-split>Comment tu la veux&nbsp;?</h2>
-      </div>
-
-      <div class="mode__grid" role="radiogroup" aria-label="Type de commande">
-        <button class="mode__card" role="radio" aria-checked="true" data-mode="Livraison" data-reveal="pop" data-cursor="Vroum">
-          <span class="mode__icon">
-            <svg viewBox="0 0 120 90" aria-hidden="true">
-              <g class="scooter">
-                <path d="M30 62h48l10-22h14" class="ln"/>
-                <rect x="30" y="26" width="34" height="26" class="box"/>
-                <path d="M38 34h18M38 42h12" class="ln thin"/>
-                <path d="M96 40l-6-16h-10" class="ln"/>
-                <circle cx="28" cy="68" r="12" class="wheel"/>
-                <circle cx="94" cy="68" r="12" class="wheel"/>
-              </g>
-              <path d="M2 50h14M6 60h10M0 70h12" class="speed"/>
-            </svg>
-          </span>
-          <span class="mode__label">En livraison</span>
-          <span class="mode__sub">Gratuite · 11 villes</span>
-          <span class="mode__check" aria-hidden="true">✓</span>
-        </button>
-        <button class="mode__card" role="radio" aria-checked="false" data-mode="À emporter" data-reveal="pop" data-cursor="Hop">
-          <span class="mode__icon">
-            <svg viewBox="0 0 120 90" aria-hidden="true">
-              <g class="bag">
-                <path d="M30 30h60l-6 56H36z" class="box"/>
-                <path d="M46 30v-8a14 14 0 0 1 28 0v8" class="ln"/>
-                <circle cx="60" cy="58" r="12" class="stamp"/>
-                <path d="M54 58l4 4 8-8" class="ln thin"/>
-              </g>
-            </svg>
-          </span>
-          <span class="mode__label">À emporter</span>
-          <span class="mode__sub">Passez la récupérer</span>
-          <span class="mode__check" aria-hidden="true">✓</span>
-        </button>
-        <button class="mode__card" role="radio" aria-checked="false" data-mode="Sur place" data-reveal="pop" data-cursor="Assis !">
-          <span class="mode__icon">
-            <svg viewBox="0 0 120 90" aria-hidden="true">
-              <g class="plate">
-                <ellipse cx="60" cy="60" rx="46" ry="16" class="box"/>
-                <path d="M30 56L60 22 90 56" class="slice-ico"/>
-                <circle cx="54" cy="44" r="4" class="pep"/><circle cx="66" cy="48" r="4" class="pep"/>
-              </g>
-              <path d="M6 20v30M2 20v10M10 20v10M114 20c-8 6-8 20 0 22v18" class="ln thin"/>
-            </svg>
-          </span>
-          <span class="mode__label">Sur place</span>
-          <span class="mode__sub">34 rue du Gal de Gaulle</span>
-          <span class="mode__check" aria-hidden="true">✓</span>
-        </button>
-      </div>
-
-      <p class="mode__status" aria-live="polite">Mode choisi : <b id="modeStatus">Livraison</b></p>
-      <a href="#carte" class="btn btn--pill magnetic" data-cursor="Let's go">Choisir mes pizzas</a>
-    </section>
-
-    <div class="tent" style="--from: var(--color-blush-peach); --to: var(--color-anger-orange)" aria-hidden="true"></div>
-
-    <!-- ============ STARS ============ -->
-    <section class="stars band band--orange" id="stars">
-      <div class="section-head">
-        <p class="eyebrow eyebrow--yellow" data-reveal="up">Le hall of fame</p>
-        <h2 class="title-3d" data-split>Les stars de la maison</h2>
-        <div class="hand" data-reveal="left" aria-hidden="true">
-          <svg viewBox="0 0 160 90">
-            <path d="M8 30h26v40H8z" class="cuff"/>
-            <path d="M34 28c10-6 24-10 34-8h70a10 10 0 0 1 0 20H86c4 2 6 6 6 10a8 8 0 0 1-2 6 9 9 0 0 1-2 12 9 9 0 0 1-8 10H48c-8 0-14-4-14-10z" class="palm"/>
-            <path d="M86 40H70M88 56H72M84 68H70" class="finger-lines"/>
-          </svg>
+    <!-- ============ COMMANDER ============ -->
+    <section class="sec" id="commander">
+      <div class="head">
+        <div>
+          <p class="eyebrow">01 — Commander</p>
+          <h2 class="display">Comment la <em>voulez</em>-vous ?</h2>
         </div>
+        <p class="lede" data-reveal>Choisissez votre mode de commande : l'offre correspondante s'applique toute seule dans votre panier.</p>
       </div>
 
-      <div class="stars__grid" id="starsGrid"><!-- rendu en JS --></div>
+      <div class="modes" role="radiogroup" aria-label="Type de commande">
+        <button class="mode" type="button" role="radio" aria-checked="true" data-mode="Livraison" data-reveal data-cursor="Vroum">
+          <span class="mode__num">A</span>
+          <span class="mode__ico"><svg viewBox="0 0 64 48"><path d="M10 34h26l6-14h8M18 18h16v10H18z"/><circle cx="12" cy="38" r="6"/><circle cx="48" cy="38" r="6"/><path d="M50 20l-4-10h-6M0 24h7M2 30h6"/></svg></span>
+          <span class="mode__name">En livraison</span>
+          <p class="mode__info">Gratuite en 40 minutes · minimum 15 € · 11 villes</p>
+          <span class="mode__offer">2 achetées = la 3e offerte</span>
+          <span class="mode__check" aria-hidden="true">✓</span>
+        </button>
+        <button class="mode" type="button" role="radio" aria-checked="false" data-mode="À emporter" data-reveal style="--d:100ms" data-cursor="Hop">
+          <span class="mode__num">B</span>
+          <span class="mode__ico"><svg viewBox="0 0 64 48"><path d="M14 14h36l-4 32H18zM24 14v-4a8 8 0 0 1 16 0v4M26 30l5 5 8-9"/></svg></span>
+          <span class="mode__name">À emporter</span>
+          <p class="mode__info">34 rue du Général de Gaulle, Chennevières</p>
+          <span class="mode__offer">1 achetée = la 2e offerte</span>
+          <span class="mode__check" aria-hidden="true">✓</span>
+        </button>
+        <button class="mode" type="button" role="radio" aria-checked="false" data-mode="Sur place" data-reveal style="--d:200ms" data-cursor="À table">
+          <span class="mode__num">C</span>
+          <span class="mode__ico"><svg viewBox="0 0 64 48"><ellipse cx="32" cy="34" rx="24" ry="8"/><path d="M18 32L32 12l14 20M4 8v18M1 8v7M7 8v7M60 8c-5 3-5 12 0 13v13"/></svg></span>
+          <span class="mode__name">Sur place</span>
+          <p class="mode__info">Ouvert du lundi au samedi, de 11h à 23h</p>
+          <span class="mode__offer mode__offer--muted">Fermé le dimanche</span>
+          <span class="mode__check" aria-hidden="true">✓</span>
+        </button>
+      </div>
+      <div class="modes-foot">
+        <p>Mode choisi : <b data-modelabel>Livraison</b></p>
+        <a class="btn btn--hot magnetic" href="carte.html" data-cursor="Miam">Choisir mes produits <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h17M14 6l6 6-6 6"/></svg></a>
+      </div>
     </section>
 
-    <!-- ============ PAS QUE DES PIZZAS (scroll horizontal) ============ -->
-    <section class="hscroll" id="plus" aria-label="Pas que des pizzas">
+    <!-- ============ OFFRES ============ -->
+    <section class="sec sec--orange" id="offres">
+      <div class="head">
+        <div>
+          <p class="eyebrow">02 — Les offres</p>
+          <h2 class="display">Une pizza <em>offerte</em></h2>
+        </div>
+        <p class="lede" data-reveal style="color:var(--onyx)">En livraison comme à emporter, la pizza offerte est déduite automatiquement de votre panier.</p>
+      </div>
+      <div class="offers">
+        <article class="offer" data-reveal>
+          <span class="offer__tag">En livraison</span>
+          <p class="offer__big"><small>2 pizzas achetées =</small>la 3e offerte*</p>
+          <div class="offer__img" data-reveal="img"><img src="img/bandeaux/livraison.webp" alt="Deux pizzas sur fond de bois sombre" loading="lazy"></div>
+        </article>
+        <article class="offer" data-reveal style="--d:120ms">
+          <span class="offer__tag">À emporter</span>
+          <p class="offer__big"><small>1 pizza achetée =</small>la 2e offerte*</p>
+          <div class="offer__img" data-reveal="img"><img src="img/bandeaux/emporter.webp" alt="Une pizza sur fond de bois sombre" loading="lazy"></div>
+        </article>
+      </div>
+      <p class="offers__note">* Valable sur les pizzas Senior et Mega, sauf Marguerita.</p>
+    </section>
+
+    <!-- ============ SIGNATURES ============ -->
+    <section class="sec sec--linen" id="signatures">
+      <div class="head">
+        <div>
+          <p class="eyebrow">03 — Nos signatures</p>
+          <h2 class="display">Les <em>incontournables</em></h2>
+        </div>
+        <a class="btn magnetic" href="carte.html#cat-pizzas_tomate" data-cursor="Toutes">Toutes les pizzas <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h17M14 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="sig-grid" id="sigGrid"></div>
+    </section>
+
+    <!-- ============ PAS QUE DES PIZZAS ============ -->
+    <section class="hscroll" aria-label="Pas que des pizzas">
       <div class="hscroll__sticky">
-        <div class="hscroll__track" id="hTrack">
+        <div class="hscroll__track">
           <div class="hpanel hpanel--intro">
-            <h2 class="hpanel__title">Pas que<br>des<br>pizzas<span class="arrow">→</span></h2>
-          </div>
-
-          <div class="hpanel hpanel--pink">
-            <div class="hpanel__art" data-cursor="Smash">
-              <svg viewBox="0 0 200 200" class="art-burger" aria-hidden="true">
-                <path d="M30 92c0-40 30-62 70-62s70 22 70 62z" class="bun"/>
-                <g class="sesame"><ellipse cx="70" cy="58" rx="5" ry="3"/><ellipse cx="100" cy="46" rx="5" ry="3"/><ellipse cx="130" cy="60" rx="5" ry="3"/><ellipse cx="88" cy="74" rx="5" ry="3"/><ellipse cx="118" cy="78" rx="5" ry="3"/></g>
-                <path d="M24 96c20 10 30-6 46 4s26-6 40 2 30-6 40 0 20 0 26-6v10H24z" class="salad"/>
-                <path d="M26 104l20 18 18-16 18 16 18-16 18 16 18-16 18 16 20-18z" class="cheddar"/>
-                <rect x="24" y="112" width="152" height="26" rx="10" class="patty"/>
-                <rect x="24" y="142" width="152" height="12" rx="6" class="patty"/>
-                <path d="M30 158h140c0 18-20 26-70 26s-70-8-70-26z" class="bun"/>
-              </svg>
-            </div>
             <div class="hpanel__copy">
-              <p class="hpanel__eyebrow">Classiques &amp; gourmands</p>
-              <h3>Burgers</h3>
-              <p>Du Cheese au Mastoc (3 steaks de 180g&nbsp;!), servis avec leurs frites.</p>
-              <p class="hpanel__price"><span>dès</span> 5€</p>
+              <p class="eyebrow">04 — Le reste de la carte</p>
+              <h2 class="display">Pas que des <em>pizzas</em></h2>
+              <p class="body-copy" style="margin-top:24px">190 produits dans 21 catégories : assiettes, sandwichs, burgers, tacos, paninis, tex-mex, salades, desserts, glaces et boissons.</p>
             </div>
           </div>
-
-          <div class="hpanel hpanel--yellow">
-            <div class="hpanel__art" data-cursor="Olé">
-              <svg viewBox="0 0 200 200" class="art-tacos" aria-hidden="true">
-                <path d="M30 150L100 30 170 150z" class="tortilla"/>
-                <path d="M54 120l20-34M86 132l14-60M118 128l-6-42M140 124l-14-24" class="grill"/>
-                <path d="M30 150L100 30 170 150c-20 16-120 16-140 0z" class="tortilla-edge"/>
-                <path d="M44 150c10 14 22 16 30 10s20 8 30 2 20 8 30 0 22-2 26-12" class="sauce-drip"/>
-                <rect x="62" y="150" width="10" height="34" class="fry" transform="rotate(-12 67 167)"/>
-                <rect x="128" y="150" width="10" height="34" class="fry" transform="rotate(14 133 167)"/>
-              </svg>
-            </div>
+          <div class="hpanel">
+            <div class="hpanel__img"><img src="img/bandeaux/assiettes.webp" alt="" loading="lazy"></div>
+            <span class="hpanel__num">01</span>
             <div class="hpanel__copy">
-              <p class="hpanel__eyebrow">Frites + sauce fromagère</p>
+              <h3>Assiettes</h3>
+              <p>Grec, chicken, steak, omelette, wings ou mixte, servies avec salade verte, tomates, oignons, blé et frites. Riches et variées.</p>
+              <a class="btn btn--light" href="carte.html#cat-assiettes" data-cursor="Voir">Dès 12,50 €</a>
+            </div>
+          </div>
+          <div class="hpanel">
+            <div class="hpanel__img"><img src="img/bandeaux/tacos.webp" alt="" loading="lazy"></div>
+            <span class="hpanel__num">02</span>
+            <div class="hpanel__copy">
               <h3>Tacos</h3>
-              <p>1, 2, 3 ou 4 viandes au choix. Pliés, grillés, généreux.</p>
-              <p class="hpanel__price"><span>dès</span> 8€</p>
+              <p>Garnis de frites et de sauce fromagère, avec 1 à 4 viandes au choix. Savoureux et bien garnis.</p>
+              <a class="btn btn--light" href="carte.html#cat-tacos" data-cursor="Voir">Dès 8 €</a>
             </div>
           </div>
-
-          <div class="hpanel hpanel--cream">
-            <div class="hpanel__art" data-cursor="Partage">
-              <svg viewBox="0 0 200 200" class="art-box" aria-hidden="true">
-                <g class="box-lid"><path d="M30 70L100 40 170 70 100 100z" class="lid"/><text x="100" y="76" class="lid-text">PIZZA FOOD</text></g>
-                <path d="M30 70v60l70 30v-60z" class="box-side"/>
-                <path d="M170 70v60l-70 30v-60z" class="box-front"/>
-                <path d="M118 112l36-16M118 124l36-16" class="box-lines"/>
-              </svg>
-            </div>
+          <div class="hpanel">
+            <div class="hpanel__img"><img src="img/bandeaux/sandwichs.webp" alt="" loading="lazy"></div>
+            <span class="hpanel__num">03</span>
             <div class="hpanel__copy">
-              <p class="hpanel__eyebrow">Solo · Duo · Triple</p>
-              <h3>Menus</h3>
-              <p>Pizzas + wings ou nuggets + boisson. Pour un, pour deux, pour toute la bande.</p>
-              <p class="hpanel__price"><span>dès</span> 14,50€</p>
+              <h3>Sandwichs</h3>
+              <p>Grec, chicken jaune ou rouge, Radical, Nevada, Savoyard… 19 sandwichs servis avec des frites. Riches en saveurs et en parfums.</p>
+              <a class="btn btn--light" href="carte.html#cat-sandwichs" data-cursor="Voir">Dès 7,50 €</a>
             </div>
           </div>
-
-          <div class="hpanel hpanel--orange">
-            <div class="hpanel__art" data-cursor="Fondant">
-              <svg viewBox="0 0 200 200" class="art-tiramisu" aria-hidden="true">
-                <path d="M40 70h120v90H40z" class="cup"/>
-                <path d="M40 70h120v22H40z" class="cocoa"/>
-                <path d="M40 92h120v22H40z" class="cream"/>
-                <path d="M40 114h120v20H40z" class="biscuit"/>
-                <path d="M40 134h120v26H40z" class="cream"/>
-                <path d="M60 70c0-30 80-30 80 0" class="swirl"/>
-                <circle cx="100" cy="42" r="10" class="cherry"/>
-              </svg>
-            </div>
+          <div class="hpanel">
+            <div class="hpanel__img"><img src="img/bandeaux/desserts.webp" alt="" loading="lazy"></div>
+            <span class="hpanel__num">04</span>
             <div class="hpanel__copy">
-              <p class="hpanel__eyebrow">Fait maison</p>
-              <h3>Tiramisus</h3>
-              <p>Kinder, Oreo, M&amp;M's, caramel, spéculoos, Nutella, Daim… impossible de choisir.</p>
-              <p class="hpanel__price">3,50€</p>
+              <h3>Desserts</h3>
+              <p>Brownie, fondant, tartes et sept tiramisus faits maison : Kinder, Oreo, M&amp;M's, caramel, spéculoos, Nutella, Daim.</p>
+              <a class="btn btn--light" href="carte.html#cat-desserts" data-cursor="Voir">Dès 2,50 €</a>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ============ LA CARTE ============ -->
-    <section class="carte band band--cream" id="carte">
-      <div class="section-head">
-        <p class="eyebrow" data-reveal="up">Étape 2 — remplissez le panier</p>
-        <h2 class="title-3d title-3d--orange" data-split>La carte</h2>
-      </div>
-
-      <div class="tabs" role="tablist" aria-label="Catégories de la carte" id="tabs"><!-- rendu en JS --></div>
-      <p class="carte__note" id="carteNote"></p>
-      <ul class="menu-list" id="menuList" aria-live="polite"><!-- rendu en JS --></ul>
-    </section>
-
-    <!-- ============ MANIFESTE (texte au scroll) ============ -->
-    <section class="manifesto band band--orange" id="manifeste">
-      <svg class="zigzag zigzag--mani" data-speed="-0.2" viewBox="0 0 40 400" aria-hidden="true"><polyline data-zigzag="40,400,14"/></svg>
-      <p class="manifesto__text" id="manifesto">Ici, pas de demi-mesure. Du fromage qui file, des recettes qui débordent, trois tailles pour toutes les faims et une livraison gratuite jusqu'à votre porte. Junior, Senior ou Mega&nbsp;: à vous de voir jusqu'où vous êtes prêts à aller.</p>
-    </section>
-
-    <!-- ============ FIDÉLITÉ + CHIFFRES ============ -->
-    <section class="numbers band band--yellow" id="fidelite">
-      <div class="numbers__grid">
-        <div class="number" data-reveal="pop"><span class="number__val" data-count="11">0</span><span class="number__label">villes livrées</span></div>
-        <div class="number" data-reveal="pop"><span class="number__val"><span data-count="6">0</span>/7</span><span class="number__label">jours d'ouverture</span></div>
-        <div class="number" data-reveal="pop"><span class="number__val" data-count="12" data-suffix="h">0</span><span class="number__label">de service par jour</span></div>
-        <div class="number" data-reveal="pop"><span class="number__val" data-count="3">0</span><span class="number__label">tailles : junior, senior, mega</span></div>
-      </div>
-
-      <div class="fidelite">
-        <div class="fidelite__burst burst-badge" data-cursor="Merci !">
-          <svg viewBox="-50 -50 100 100" aria-hidden="true"><path data-burst="16,50,38"/></svg>
-          <span>Programme<br><b>fidélité</b></span>
+    <!-- ============ VOS ENVIES ============ -->
+    <section class="sec" id="envies">
+      <div class="head">
+        <div>
+          <p class="eyebrow">05 — Vos envies</p>
+          <h2 class="display">Une envie <em>précise</em> ?</h2>
         </div>
-        <div class="fidelite__copy" data-reveal="up">
-          <h2 class="title-3d title-3d--small" data-split>On récompense les fidèles</h2>
-          <p>Chaque commande compte. Créez votre compte, commandez, cumulez&nbsp;: Pizza Food récompense votre fidélité.</p>
-        </div>
+        <p class="lede" data-reveal>Choisissez un ingrédient : on vous montre tous les produits de la carte qui en contiennent.</p>
       </div>
+      <div class="envies" data-envies-links data-reveal></div>
     </section>
 
-    <div class="tent" style="--from: var(--color-sun-yellow); --to: var(--color-blush-peach)" aria-hidden="true"></div>
-
-    <!-- ============ ZONES DE LIVRAISON ============ -->
-    <section class="zones band band--pink" id="zones">
-      <div class="section-head">
-        <p class="eyebrow" data-reveal="up">Livraison gratuite</p>
-        <h2 class="title-3d title-3d--orange" data-split>On débarque chez vous</h2>
+    <!-- ============ CHIFFRES ============ -->
+    <section class="sec sec--linen" style="padding-block:clamp(70px,8vw,120px)">
+      <div class="stats">
+        <div class="stat" data-reveal><span class="stat__val"><span data-count="190">190</span></span><span class="stat__lbl">produits à la carte</span></div>
+        <div class="stat" data-reveal style="--d:100ms"><span class="stat__val"><span data-count="21">21</span></span><span class="stat__lbl">catégories</span></div>
+        <div class="stat" data-reveal style="--d:200ms"><span class="stat__val"><span data-count="11">11</span></span><span class="stat__lbl">villes livrées gratuitement</span></div>
+        <div class="stat" data-reveal style="--d:300ms"><span class="stat__val"><span data-count="40">40</span><sup>min</sup></span><span class="stat__lbl">de délai de livraison</span></div>
       </div>
-      <ul class="zones__list" id="zonesList"><!-- rendu en JS --></ul>
+      <div class="modes-foot">
+        <p class="quote" data-reveal>Votre fidélité chez nous est récompensée…</p>
+        <button class="btn magnetic" type="button" data-modal="fidelite" data-cursor="Points">Programme de fidélité</button>
+      </div>
     </section>
 
     <!-- ============ INFOS ============ -->
-    <section class="infos band band--orange" id="infos">
-      <div class="infos__grid">
-        <div class="infos__col" data-reveal="up">
-          <h3 class="infos__title">Adresse</h3>
-          <p class="infos__big">34 rue du Général de Gaulle<br>94430 Chennevières-sur-Marne</p>
-          <a class="btn btn--ghost btn--light magnetic" href="https://www.google.com/maps/search/?api=1&amp;query=34+Rue+du+General+de+Gaulle+94430+Chennevieres-sur-Marne" target="_blank" rel="noopener" data-cursor="Go">Itinéraire</a>
+    <section class="sec sec--dark" id="infos">
+      <div class="head">
+        <div>
+          <p class="eyebrow">06 — Nous trouver</p>
+          <h2 class="display">Notre <em>adresse</em></h2>
         </div>
-        <div class="infos__col" data-reveal="up">
-          <h3 class="infos__title">Horaires</h3>
-          <p class="infos__big">Lundi → samedi<br>11h00 – 23h00</p>
-          <p class="infos__small">Fermé le dimanche</p>
-          <p class="open-badge" id="openBadge"><span class="dot"></span><span id="openText">…</span></p>
+        <p class="open" data-open></p>
+      </div>
+      <div class="infos">
+        <div class="info" data-reveal>
+          <h3>Adresse</h3>
+          <p class="info__big">34 rue du Général de Gaulle<br>94430 Chennevières</p>
+          <a class="btn btn--light" href="https://www.google.com/maps/search/?api=1&amp;query=34+Rue+du+General+de+Gaulle+94430+Chennevieres-sur-Marne" target="_blank" rel="noopener" data-cursor="Go">Itinéraire</a>
         </div>
-        <div class="infos__col" data-reveal="up">
-          <h3 class="infos__title">Téléphone</h3>
-          <p class="infos__big"><a href="tel:0145942950" data-cursor="Allô ?">01 45 94 29 50</a><br><a href="tel:0749458955" data-cursor="Allô ?">07 49 45 89 55</a></p>
-          <div class="socials">
-            <a href="https://www.facebook.com/Pizza-Food-1682159702074299" target="_blank" rel="noopener" aria-label="Facebook">Fb</a>
-            <a href="https://www.instagram.com/pizzafood94430/" target="_blank" rel="noopener" aria-label="Instagram">Ig</a>
-            <a href="https://twitter.com/pizzafood94430" target="_blank" rel="noopener" aria-label="Twitter">X</a>
-            <a href="https://www.youtube.com/channel/UCCv9ak1TfnuyedFZNZe30Tw" target="_blank" rel="noopener" aria-label="YouTube">Yt</a>
-          </div>
+        <div class="info" data-reveal style="--d:100ms">
+          <h3>Horaires</h3>
+          <p class="info__big">Lundi — samedi<br>11h00 — 23h00</p>
+          <p class="body-copy">Fermé le dimanche.</p>
+        </div>
+        <div class="info" data-reveal style="--d:200ms">
+          <h3>Téléphone</h3>
+          <p class="info__big"><a href="tel:0145942950" data-cursor="Appeler">01 45 94 29 50</a><br><a href="tel:0749458955" data-cursor="Appeler">07 49 45 89 55</a></p>
+          <a class="btn btn--light" href="livraison.html" data-cursor="Zones">Zones de livraison</a>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- ============ FOOTER ============ -->
-  <footer class="footer band band--yellow">
-    <p class="footer__giant" id="footerGiant" data-split>Pizza Food</p>
-    <div class="footer__bottom">
-      <nav class="footer__links" aria-label="Liens légaux">
-        <a href="#zones">Zones de livraison</a>
-        <a href="#infos">Contact</a>
-        <a href="#">Allergènes</a>
-        <a href="#">Recrutement</a>
-        <a href="#">Mentions légales</a>
-        <a href="#">CGV</a>
-      </nav>
-      <p>© <span id="year"></span> Pizza Food — Chennevières-sur-Marne</p>
-    </div>
-  </footer>
-
-  <!-- ============ PANIER ============ -->
-  <div class="overlay" id="overlay"></div>
-  <aside class="cart" id="cart" aria-hidden="true" aria-label="Mon panier">
-    <div class="cart__head">
-      <h2>Mon panier</h2>
-      <button class="cart__close" id="cartClose" aria-label="Fermer le panier">×</button>
-    </div>
-    <p class="cart__mode">Mode : <b id="cartMode">Livraison</b> <a href="#commander" id="cartModeChange">changer</a></p>
-    <ul class="cart__list" id="cartList"></ul>
-    <div class="cart__empty" id="cartEmpty">
-      <div class="pizza cart__empty-pizza" data-recipe="marguerita"></div>
-      <p>Panier vide&nbsp;!<br>Votre estomac mérite mieux.</p>
-    </div>
-    <div class="cart__foot">
-      <p class="cart__total">Total <span id="cartTotal">0,00 €</span></p>
-      <button class="btn btn--pill btn--full" id="checkout" data-cursor="Miam">Valider ma commande</button>
-    </div>
-  </aside>
-
-  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
-    <div class="modal__box">
-      <svg class="modal__burst" viewBox="-50 -50 100 100" aria-hidden="true"><path data-burst="20,50,40"/></svg>
-      <h2 id="modalTitle">C'est presque prêt&nbsp;!</h2>
-      <div id="modalRecap" class="modal__recap"></div>
-      <p>Confirmez votre commande par téléphone, on lance le four&nbsp;:</p>
-      <a href="tel:0145942950" class="btn btn--pill btn--full">Appeler le 01 45 94 29 50</a>
-      <button class="modal__close" id="modalClose">Continuer mes achats</button>
-    </div>
-  </div>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <button class="to-top" id="toTop" aria-label="Revenir en haut">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
-  </button>
-
-  <script src="js/main.js" defer></script>
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>

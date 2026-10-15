@@ -1,6 +1,7 @@
 /* =========================================================
-   PIZZA FOOD — interactions, animations au scroll & panier
-   Vanilla JS, aucune dépendance.
+   PIZZA FOOD — interactions, animations, panier & offres
+   Vanilla JS, aucune dépendance. Les données (carte,
+   allergènes, textes légaux) sont dans js/data.js.
    ========================================================= */
 (() => {
   'use strict';
@@ -12,960 +13,953 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const euro = n => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
-
+  const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const escapeHTML = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  // Surligne un terme trouvé dans le texte normalisé (sans accents) en gardant le texte d'origine
+  const markTerm = (text, re) => {
+    const m = new RegExp(re.source, 'g'), n = norm(text);
+    let out = '', last = 0, r;
+    while ((r = m.exec(n))) { out += escapeHTML(text.slice(last, r.index)) + '<mark>' + escapeHTML(text.slice(r.index, r.index + r[0].length)) + '</mark>'; last = r.index + r[0].length; }
+    return out + escapeHTML(text.slice(last));
+  };
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* stockage indisponible */ } }
+  };
+  const page = document.body.dataset.page;
   document.documentElement.classList.add('js');
 
   /* =======================================================
-     DONNÉES — reprises du site pizza-food.fr
+     DONNÉES
      ======================================================= */
-  const P_STD = { Junior: 11, Senior: 17, Mega: 23 };
-  const P_PREM = { Junior: 11, Senior: 18, Mega: 25 };
-  const P_MARG = { Junior: 8, Senior: 12, Mega: 16 };
+  const DATA = window.PF_DATA || { cats: [], allergens: { cols: [], rows: [] }, legal: {} };
+  const PRODUCTS = {};
+  DATA.cats.forEach(cat => cat.items.forEach(it => { PRODUCTS[it.id] = Object.assign({ cat }, it); }));
 
-  const MENU = [
-    {
-      id: 'tomate', label: 'Pizzas tomate', kind: 'pizza', sauce: 'tomato',
-      note: 'Base sauce tomate · Junior, Senior ou Mega',
-      items: [
-        ['Marguerita', 'Sauce tomate, fromage, olives.', P_MARG],
-        ['Reine', 'Sauce tomate, fromage, jambon, champignons.', P_STD],
-        ['Napolitaine', 'Sauce tomate, fromage, anchois, câpres, olives.', P_STD],
-        ['Végétarienne', 'Sauce tomate, fromage, champignons, tomates fraîches, poivrons, oignons, olives.', P_STD],
-        ['Paysanne', 'Sauce tomate, fromage, lardons, œuf.', P_STD],
-        ['Texas', 'Sauce tomate, fromage, pepperoni, viande hachée, oignons.', P_STD],
-        ['Campione', 'Sauce tomate, fromage, viande hachée, champignons, œuf.', P_STD],
-        ['Neptune', 'Sauce tomate, fromage, thon, poivrons, œuf, olives.', P_STD],
-        ['Buffalo', 'Sauce tomate, mozzarella, viande hachée, poivrons, oignons rouges, sauce barbecue.', P_STD],
-        ['Bolognaise', 'Sauce tomate, fromage, viande hachée, pommes de terre, oignons.', P_STD],
-        ['Orientale', 'Sauce tomate, fromage, merguez, poivrons, œuf, olives.', P_STD],
-        ['4 Saisons', 'Sauce tomate, fromage, jambon, artichauts, champignons, poivrons.', P_STD],
-        ['Chicken', 'Sauce tomate, fromage, poulet, pommes de terre, poivrons, fromage à raclette.', P_STD],
-        ['Boursin', 'Sauce tomate, fromage, viande hachée, oignons, boursin.', P_STD],
-        ['Kebab', 'Sauce tomate, fromage, viande de kebab, tomates fraîches, œuf, origan.', P_STD],
-        ['Mexicaine', 'Sauce tomate, fromage, poulet paprika, poivrons, oignons, tomates fraîches.', P_STD],
-        ['4 Fromages', 'Sauce tomate, fromage, assortiment de 4 fromages.', P_STD],
-        ['3 Jambons', 'Sauce tomate, fromage, jambon, chorizo, lardons.', P_STD]
-      ]
-    },
-    {
-      id: 'creme', label: 'Pizzas crème fraîche', kind: 'pizza', sauce: 'cream',
-      note: 'Base crème fraîche · Junior, Senior ou Mega',
-      items: [
-        ['Fermière', 'Crème fraîche, fromage, poulet, pommes de terre.', P_STD],
-        ['Milano', 'Crème fraîche, fromage, lardons, raclette, pommes de terre, oignons.', P_STD],
-        ['Tartiflette', 'Crème fraîche, fromage, lardons, reblochon, pommes de terre, oignons.', P_STD],
-        ['Capricieuse', 'Crème fraîche, fromage, jambon, pommes de terre, oignons.', P_STD],
-        ['Spéciale', 'Crème fraîche, fromage, viande hachée, pommes de terre, reblochon, oignons.', P_STD],
-        ['Casanova', 'Crème fraîche, fromage, bacon, reblochon, pommes de terre.', P_STD],
-        ['Chèvre miel', 'Crème fraîche, fromage, chèvre, miel.', P_PREM],
-        ['Hawaïenne poulet', 'Crème fraîche, fromage, poulet, ananas.', P_PREM],
-        ['Hawaïenne jambon', 'Crème fraîche, fromage, jambon, ananas.', P_PREM],
-        ['Pacifico', 'Crème fraîche, fromage, saumon fumé.', P_PREM],
-        ['Tartoffu', 'Crème fraîche, mozzarella, crème de truffe, champignons.', P_PREM],
-        ['Toscane', 'Crème fraîche, mozzarella, poulet, chèvre, miel, noix.', P_PREM]
-      ]
-    },
-    {
-      id: 'bbq', label: 'Pizzas barbecue', kind: 'pizza', sauce: 'bbq',
-      note: 'Base sauce barbecue · Junior, Senior ou Mega',
-      items: [
-        ['Miami', 'Sauce barbecue, fromage, poulet, viande hachée, oignons.', P_STD],
-        ['Latina', 'Sauce barbecue, fromage, jambon, poulet, champignons.', P_STD],
-        ['Playa', 'Sauce barbecue, fromage, poulet rôti, bacon, poivrons, oignons rouges.', P_STD],
-        ['Crousty', 'Sauce barbecue, mozzarella, cheddar, tenders crispy, olives, poivrons, oignons rouges.', P_STD],
-        ['Indienne', 'Sauce curry, chicken curry, chicken tandoori, cheddar, tenders crispy, olives, poivrons, oignons rouges.', P_PREM]
-      ]
-    },
-    {
-      id: 'burgers', label: 'Burgers', kind: 'single', art: '.art-burger',
-      note: 'Tous les burgers sont servis avec des frites',
-      items: [
-        ['Cheese', '1 steak 45g, cheddar + frites.', 5],
-        ['Double cheese', '2 steaks 45g, double cheddar + frites.', 6.5],
-        ['Royal cheese', 'Steak 90g, double cheddar, crudités + frites.', 6.5],
-        ['Chicken burger', 'Poulet pané, cheddar + frites.', 6.5],
-        ['Double royal', '2 steaks 90g, cheddar, crudités + frites.', 7.5],
-        ['Triple cheese', '3 steaks 45g, triple cheddar + frites.', 7.5],
-        ['Double chicken', 'Double poulet pané, double cheddar + frites.', 8],
-        ['Fish', 'Poisson pané, cheddar + frites.', 8],
-        ['Double fish', 'Double poisson pané, double cheddar + frites.', 8],
-        ['Le 180', '1 steak 180g, cheddar, crudités + frites.', 9],
-        ['Le 360', '2 steaks 180g, double cheddar, crudités + frites.', 11],
-        ['Le Mastoc', '3 steaks 180g, triple cheddar, crudités + frites.', 13]
-      ]
-    },
-    {
-      id: 'tacos', label: 'Tacos', kind: 'single', art: '.art-tacos',
-      note: 'Garnis de frites + sauce fromagère',
-      items: [
-        ['Tacos 1 viande', 'Frites, sauce fromagère + 1 viande au choix.', 8],
-        ['Tacos 2 viandes', 'Frites, sauce fromagère + 2 viandes au choix.', 9],
-        ['Tacos 3 viandes', 'Frites, sauce fromagère + 3 viandes au choix.', 11],
-        ['Tacos 4 viandes', 'Frites, sauce fromagère + 4 viandes au choix.', 13]
-      ]
-    },
-    {
-      id: 'menus', label: 'Menus', kind: 'single', art: '.art-box',
-      note: 'Pour un, pour deux ou pour toute la bande',
-      items: [
-        ['Menu Solo', '1 pizza Junior au choix + 6 wings ou 6 nuggets + 1 boisson 33cl au choix.', 14.5],
-        ['Menu Triple', '3 pizzas Junior au choix + 1 boisson maxi 1,5L.', 26],
-        ['Menu Duo', '2 pizzas Senior au choix + 10 wings ou 10 nuggets + 1 boisson maxi 1,5L.', 29]
-      ]
-    },
-    {
-      id: 'desserts', label: 'Desserts', kind: 'single', art: '.art-tiramisu',
-      note: 'Les tiramisus sont faits maison',
-      items: [
-        ['Salade de fruits', 'Fraîcheur garantie.', 2.5],
-        ['Brownie', 'Chocolat, fondant au cœur.', 3.5],
-        ['Fondant au chocolat', 'Pour les vrais gourmands.', 3.5],
-        ['Tarte au citron', 'Acidulée juste comme il faut.', 3.5],
-        ['Tarte aux pommes', 'Le classique.', 3.5],
-        ['Tarte aux poires', 'Tout en douceur.', 3.5],
-        ['Tarte aux Daim', 'Caramel croquant.', 3.5],
-        ['Tiramisu Kinder', 'Fait maison.', 3.5],
-        ['Tiramisu Oreo', 'Fait maison.', 3.5],
-        ['Tiramisu M&M\'s', 'Fait maison.', 3.5],
-        ['Tiramisu caramel', 'Fait maison.', 3.5],
-        ['Tiramisu spéculoos', 'Fait maison.', 3.5],
-        ['Tiramisu Nutella', 'Fait maison.', 3.5],
-        ['Tiramisu Daim', 'Fait maison.', 3.5]
-      ]
-    }
-  ];
-
-  const slug = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
-  // Index des pizzas par slug (pour les recettes SVG)
-  const PIZZAS = {};
-  MENU.filter(c => c.kind === 'pizza').forEach(cat => {
-    cat.items.forEach(([name, desc, prices]) => {
-      PIZZAS[slug(name)] = { name, desc, prices, sauce: /curry/i.test(desc) ? 'curry' : cat.sauce };
-    });
-  });
-
-  const STARS = [
-    { id: 'reine', tag: 'La classique' },
-    { id: 'chevre-miel', tag: 'Sucré-salé' },
-    { id: 'texas', tag: 'Pepperoni' },
-    { id: 'tartoffu', tag: 'Truffe' },
-    { id: 'indienne', tag: 'Curry' },
-    { id: 'toscane', tag: 'Noix & miel' }
-  ];
+  const INFO = {
+    tel1: '01 45 94 29 50', tel1Href: 'tel:0145942950',
+    tel2: '07 49 45 89 55', tel2Href: 'tel:0749458955',
+    email: 'contact@pizza-food.fr',
+    address: '34 rue du Général de Gaulle', city: '94430 Chennevières-sur-Marne',
+    maps: 'https://www.google.com/maps/search/?api=1&query=34+Rue+du+General+de+Gaulle+94430+Chennevieres-sur-Marne',
+    minimum: 15
+  };
 
   const ZONES = [
-    'Chennevières-sur-Marne', 'Ormesson-sur-Marne', 'Sucy-en-Brie', 'Champigny-sur-Marne',
-    'La Queue-en-Brie', 'Le Plessis-Trévise', 'Saint-Maur-des-Fossés', 'La Varenne Saint-Hilaire',
-    'Bonneuil-sur-Marne', 'Villiers-sur-Marne', 'Noiseau'
+    ['Chennevières-sur-Marne', '94430'], ['Bonneuil-sur-Marne', '94380'], ['Champigny-sur-Marne', '94500'],
+    ['La Queue-en-Brie', '94510'], ['La Varenne Saint-Hilaire', '94210'], ['Le Plessis-Trévise', '94420'],
+    ['Noiseau', '94880'], ['Ormesson-sur-Marne', '94490'], ['Saint-Maur-des-Fossés', '94100'],
+    ['Sucy-en-Brie', '94370'], ['Villiers-sur-Marne', '94350']
   ];
 
-  /* =======================================================
-     GÉNÉRATEUR DE PIZZAS SVG
-     Chaque pizza est dessinée à partir de sa liste
-     d'ingrédients, puis découpée en 8 parts animables.
-     ======================================================= */
-  const CH = '#292a2c';
-  const SAUCES = {
-    tomato: { sauce: '#e8300c', cheese: '#ffc700' },
-    cream: { sauce: '#fff1d6', cheese: '#f6e653' },
-    bbq: { sauce: '#7a2410', cheese: '#ffc700' },
-    curry: { sauce: '#f29a00', cheese: '#ffe27a' }
-  };
-
-  const TOPPINGS = {
-    olive: () => `<circle r="6.5" fill="${CH}"/><circle r="2.6" fill="#ff4100"/>`,
-    basil: () => `<path d="M0-11C8-6 8 6 0 11-8 6-8-6 0-11z" fill="#1f8a4c" stroke="${CH}" stroke-width="1.6"/><path d="M0-8V9" stroke="${CH}" stroke-width="1.2"/>`,
-    ham: () => `<rect x="-8" y="-6.5" width="16" height="13" rx="3" fill="#fdbeba" stroke="#e07c7c" stroke-width="1.6"/>`,
-    mushroom: () => `<path d="M-9 1a9 8 0 0 1 18 0z" fill="#fee3c1" stroke="${CH}" stroke-width="1.6"/><path d="M-3 1h6v7h-6z" fill="#fee3c1" stroke="${CH}" stroke-width="1.6"/>`,
-    anchovy: () => `<path d="M-11 0q11-6 22 0q-11 6-22 0z" fill="#8a7b6e" stroke="${CH}" stroke-width="1.2"/>`,
-    caper: () => `<circle r="3.2" fill="#6f8f2c" stroke="${CH}" stroke-width="1"/>`,
-    tomato: () => `<circle r="9" fill="#e8240b" stroke="${CH}" stroke-width="1.5"/><circle r="5.8" fill="#ff6a3d"/><circle cx="-2.5" cy="-1" r="1.3" fill="#ffc700"/><circle cx="2.5" cy="-1" r="1.3" fill="#ffc700"/><circle cy="2.5" r="1.3" fill="#ffc700"/>`,
-    pepper: () => `<path d="M-8 4q8-14 16 0" fill="none" stroke="#1f8a4c" stroke-width="4" stroke-linecap="round"/>`,
-    onion: () => `<circle r="7" fill="none" stroke="#c0569a" stroke-width="2.4"/><circle r="3.5" fill="none" stroke="#e9a0c8" stroke-width="1.6"/>`,
-    bacon: () => `<rect x="-5" y="-4" width="10" height="8" rx="1.8" fill="#ff8f7a" stroke="#b3412a" stroke-width="1.4"/>`,
-    egg: () => `<path d="M-11 0c0-7 5-10 11-9s11 4 10 10-6 9-12 8-9-3-9-9z" fill="#fff" stroke="${CH}" stroke-width="1.4"/><circle r="5" fill="#ff9d00" stroke="${CH}" stroke-width="1.2"/>`,
-    pepperoni: () => `<circle r="10" fill="#c41e00" stroke="#7a1200" stroke-width="1.6"/><circle cx="-3" cy="-3" r="1.6" fill="#ff6a3d"/><circle cx="3.5" cy="1" r="1.6" fill="#ff6a3d"/><circle cx="-1" cy="4" r="1.3" fill="#ff6a3d"/>`,
-    beef: () => `<path d="M-6-3l4-4 6 2 2 5-4 4-6-1z" fill="#6b2a14" stroke="${CH}" stroke-width="1"/>`,
-    tuna: () => `<path d="M-7-2l5-4 7 1 2 5-5 4-7-2z" fill="#f2c4a8" stroke="#b98b6f" stroke-width="1.3"/>`,
-    merguez: () => `<rect x="-9" y="-3.5" width="18" height="7" rx="3.5" fill="#8f1d0b" stroke="${CH}" stroke-width="1.2"/>`,
-    artichoke: () => `<path d="M0-8C6-4 7 4 0 8-7 4-6-4 0-8z" fill="#a3b53a" stroke="${CH}" stroke-width="1.3"/><path d="M0-5V6" stroke="#6f8f2c" stroke-width="1.3"/>`,
-    chicken: () => `<path d="M-8-3l5-5 8 1 3 6-4 6-9-1z" fill="#f4d9a8" stroke="#c48a3a" stroke-width="1.5"/>`,
-    potato: () => `<rect x="-4.5" y="-4.5" width="9" height="9" rx="2" fill="#f6e653" stroke="#c9a400" stroke-width="1.3"/>`,
-    whitecheese: () => `<path d="M-8-5h16l-3 10h-10z" fill="#fff6d6" stroke="#d6c08a" stroke-width="1.3"/>`,
-    goat: () => `<circle r="8" fill="#ffffff" stroke="#e0d6c5" stroke-width="1.6"/><circle r="5" fill="none" stroke="#efe8dc" stroke-width="1"/>`,
-    kebab: () => `<path d="M-9-1q9-5 18 0v3q-9-5-18 0z" fill="#9a4a1f" stroke="${CH}" stroke-width="1"/>`,
-    chorizo: () => `<circle r="7" fill="#b8250c" stroke="#7a1200" stroke-width="1.4"/><circle cx="-2" cy="-2" r="1.3" fill="#fdbeba"/><circle cx="2.5" cy="2" r="1.3" fill="#fdbeba"/>`,
-    pineapple: () => `<path d="M0-8L8 6H-8z" fill="#ffe14d" stroke="#d4a800" stroke-width="1.5" stroke-linejoin="round"/>`,
-    salmon: () => `<path d="M-10-3q10-6 20 0v6q-10-6-20 0z" fill="#ff8a65" stroke="#d65a35" stroke-width="1.2"/><path d="M-6-2v5M0-3v5M6-2v5" stroke="#ffd2c2" stroke-width="1.2"/>`,
-    truffle: () => `<circle r="4" fill="#2a1a12"/><circle cx="7" cy="3" r="2" fill="#2a1a12"/>`,
-    walnut: () => `<path d="M-6 0a6 5 0 0 1 12 0a6 5 0 0 1-12 0z" fill="#8a5a2b" stroke="${CH}" stroke-width="1.2"/><path d="M0-5v10" stroke="${CH}" stroke-width="1"/>`,
-    tenders: () => `<rect x="-8" y="-4" width="16" height="8" rx="4" fill="#d98a2b" stroke="${CH}" stroke-width="1.3"/>`,
-    cheddar: () => `<rect x="-5" y="-5" width="10" height="10" fill="#ff9d00" stroke="#c96f00" stroke-width="1.2"/>`
-  };
-
-  const KEYWORDS = [
-    [/jambon/i, 'ham'], [/champignon/i, 'mushroom'], [/olive/i, 'olive'], [/anchois/i, 'anchovy'],
-    [/câpres/i, 'caper'], [/tomates fraîches/i, 'tomato'], [/poivron/i, 'pepper'], [/oignon/i, 'onion'],
-    [/lardon|bacon/i, 'bacon'], [/œuf/i, 'egg'], [/pepperoni/i, 'pepperoni'], [/viande hachée/i, 'beef'],
-    [/thon/i, 'tuna'], [/merguez/i, 'merguez'], [/artichaut/i, 'artichoke'], [/poulet|chicken/i, 'chicken'],
-    [/pommes de terre/i, 'potato'], [/raclette|reblochon|boursin|4 fromages/i, 'whitecheese'], [/chèvre/i, 'goat'],
-    [/kebab/i, 'kebab'], [/chorizo/i, 'chorizo'], [/ananas/i, 'pineapple'], [/saumon/i, 'salmon'],
-    [/truffe/i, 'truffle'], [/noix/i, 'walnut'], [/tenders/i, 'tenders'], [/cheddar/i, 'cheddar']
+  // « Vos Envies » : les 11 ingrédients du site, recherchés dans le nom + la description
+  const ENVIES = [
+    ['ANCHOIS', /anchois/], ['BOURSIN', /boursin/], ['CHAMPIGNONS', /champignon/], ['CHÈVRE', /chevre/],
+    ['JAMBON', /jambon/], ['LARDONS', /lardon/], ['MERGUEZ', /merguez/], ['POULET PANÉ', /poulet pane/],
+    ['SAUMON', /saumon/], ['THON', /\bthon\b/], ['VIANDE HACHÉE', /viande hachee/]
   ];
+  const envieMatches = re => Object.values(PRODUCTS).filter(p => re.test(norm(p.n + ' ' + p.d)));
 
-  const SPECIAL = {
-    hero: { name: 'Pizza Food', sauce: 'tomato', toppings: ['pepperoni', 'olive', 'basil', 'mushroom'] },
-    marguerita: { name: 'Marguerita', sauce: 'tomato', toppings: ['olive', 'basil'] }
+  const MODES = ['Livraison', 'À emporter', 'Sur place'];
+  const OFFERS = {
+    'Livraison': { every: 3, label: '2 pizzas achetées = la 3e offerte' },
+    'À emporter': { every: 2, label: '1 pizza achetée = la 2e offerte' }
   };
 
-  function hash(str) {
-    let h = 2166136261;
-    for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
-    return h >>> 0;
-  }
-  function rng(seed) {
-    return () => {
-      seed = (seed + 0x6D2B79F5) | 0;
-      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  }
-  const f = n => n.toFixed(1);
-
-  function wavyCircle(r, amp, waves, phase) {
-    let d = '';
-    for (let i = 0; i <= 72; i++) {
-      const a = (i / 72) * Math.PI * 2;
-      const rr = r + amp * Math.sin(a * waves + phase);
-      d += (i ? 'L' : 'M') + f(Math.cos(a) * rr) + ' ' + f(Math.sin(a) * rr);
-    }
-    return d + 'Z';
-  }
-
-  function recipeFor(key) {
-    if (SPECIAL[key]) return SPECIAL[key];
-    const p = PIZZAS[key];
-    if (!p) return SPECIAL.marguerita;
-    const toppings = KEYWORDS.filter(([re]) => re.test(p.desc)).map(([, t]) => t);
-    if (/miel/i.test(p.desc)) toppings.push('honey');
-    if (/origan/i.test(p.desc)) toppings.push('oregano');
-    return { name: p.name, sauce: p.sauce, toppings };
-  }
-
-  let uid = 0;
-  function pizzaSVG(key, label) {
-    const r = recipeFor(key);
-    const rand = rng(hash(r.name));
-    const col = SAUCES[r.sauce] || SAUCES.tomato;
-    const id = 'pz' + (++uid);
-    let g = '';
-
-    // pâte + bulles
-    g += `<circle r="95" fill="#f2a33a" stroke="${CH}" stroke-width="3.5"/>`;
-    g += `<circle r="86" fill="#ffbf5e"/>`;
-    for (let i = 0; i < 12; i++) {
-      const a = rand() * Math.PI * 2;
-      g += `<ellipse cx="${f(Math.cos(a) * 90)}" cy="${f(Math.sin(a) * 90)}" rx="3.2" ry="2" fill="#d9822b" opacity=".7" transform="rotate(${f(a * 57.3)} ${f(Math.cos(a) * 90)} ${f(Math.sin(a) * 90)})"/>`;
-    }
-    // sauce + fromage fondu
-    g += `<path d="${wavyCircle(80, 2.5, 14, rand() * 6)}" fill="${col.sauce}"/>`;
-    g += `<path d="${wavyCircle(68, 6, 11, rand() * 6)}" fill="${col.cheese}"/>`;
-    for (let i = 0; i < 9; i++) {
-      const a = rand() * Math.PI * 2, d = Math.sqrt(rand()) * 60;
-      g += `<circle cx="${f(Math.cos(a) * d)}" cy="${f(Math.sin(a) * d)}" r="${f(3 + rand() * 5)}" fill="${col.sauce}" opacity=".85"/>`;
-    }
-
-    // garnitures
-    const placeable = r.toppings.filter(t => TOPPINGS[t]);
-    const pts = [];
-    const per = placeable.length ? clamp(Math.round(24 / placeable.length), 4, 12) : 0;
-    placeable.forEach(t => {
-      let n = 0, tries = 0;
-      while (n < per && tries < 300) {
-        tries++;
-        const a = rand() * Math.PI * 2, d = Math.sqrt(rand()) * 66;
-        const x = Math.cos(a) * d, y = Math.sin(a) * d;
-        if (pts.every(([px, py]) => Math.hypot(px - x, py - y) > 15)) {
-          pts.push([x, y]);
-          g += `<g transform="translate(${f(x)} ${f(y)}) rotate(${Math.round(rand() * 360)})">${TOPPINGS[t]()}</g>`;
-          n++;
-        }
-      }
-    });
-    if (r.toppings.includes('honey')) {
-      for (let k = 0; k < 2; k++) {
-        let d = `M${f(-60 + rand() * 20)} ${f(-40 + k * 50)}`;
-        for (let i = 0; i < 6; i++) d += ` q${f(10)} ${f(-14 + rand() * 6)} ${f(20)} 0`;
-        g += `<path d="${d}" fill="none" stroke="#f6b100" stroke-width="3" stroke-linecap="round" opacity=".9"/>`;
-      }
-    }
-    if (r.toppings.includes('oregano')) {
-      for (let i = 0; i < 26; i++) {
-        const a = rand() * Math.PI * 2, d = Math.sqrt(rand()) * 70;
-        g += `<circle cx="${f(Math.cos(a) * d)}" cy="${f(Math.sin(a) * d)}" r="1.2" fill="#1f8a4c"/>`;
-      }
-    }
-
-    // découpe en 8 parts
-    const wedge = (i, rad) => {
-      const a0 = (i * 45 - 90) * Math.PI / 180, a1 = a0 + Math.PI / 4;
-      return `M0 0L${f(Math.cos(a0) * rad)} ${f(Math.sin(a0) * rad)}A${rad} ${rad} 0 0 1 ${f(Math.cos(a1) * rad)} ${f(Math.sin(a1) * rad)}Z`;
-    };
-    let defs = `<g id="${id}">${g}</g>`;
-    let slices = '';
-    for (let i = 0; i < 8; i++) {
-      const mid = (i * 45 - 90 + 22.5) * Math.PI / 180;
-      defs += `<clipPath id="${id}c${i}"><path d="${wedge(i, 100)}"/></clipPath>`;
-      slices += `<g class="slice" style="--dx:${Math.cos(mid).toFixed(3)};--dy:${Math.sin(mid).toFixed(3)}"><use href="#${id}" clip-path="url(#${id}c${i})"/><path class="slice-edge" d="${wedge(i, 95)}"/></g>`;
-    }
-    const a11y = label ? `role="img" aria-label="${label}"` : 'aria-hidden="true" focusable="false"';
-    return `<svg viewBox="-110 -110 220 220" ${a11y}><defs>${defs}</defs>${slices}</svg>`;
-  }
-
-  function renderPizza(el) {
-    const key = el.dataset.recipe;
-    const label = el.id === 'heroPizza' ? 'Pizza en rotation' : (el.dataset.label || '');
-    el.innerHTML = pizzaSVG(key, label);
-  }
-
   /* =======================================================
-     PETITS GÉNÉRATEURS SVG (étoiles, zigzags)
+     PETITS GÉNÉRATEURS SVG
      ======================================================= */
-  function burstPath(n, r1, r2) {
+  const f1 = n => n.toFixed(1);
+  function burstPath(n = 18, r1 = 48, r2 = 39) {
     let d = '';
     for (let i = 0; i < n * 2; i++) {
-      const a = (i / (n * 2)) * Math.PI * 2 - Math.PI / 2;
-      const r = i % 2 ? r2 : r1;
-      d += (i ? 'L' : 'M') + f(Math.cos(a) * r) + ' ' + f(Math.sin(a) * r);
+      const a = (i / (n * 2)) * Math.PI * 2 - Math.PI / 2, r = i % 2 ? r2 : r1;
+      d += (i ? 'L' : 'M') + f1(Math.cos(a) * r) + ' ' + f1(Math.sin(a) * r);
     }
     return d + 'Z';
   }
-  function hydrateShapes(root = document) {
-    $$('[data-burst]', root).forEach(p => {
-      const [n, r1, r2] = p.dataset.burst.split(',').map(Number);
-      p.setAttribute('d', burstPath(n, r1 * 0.97, r2 * 0.97));
-    });
-    $$('[data-zigzag]', root).forEach(pl => {
-      const [w, h, n] = pl.dataset.zigzag.split(',').map(Number);
-      const pts = [];
-      for (let i = 0; i <= n; i++) pts.push(`${i % 2 ? w - 4 : 4},${f((i / n) * h)}`);
-      pl.setAttribute('points', pts.join(' '));
-    });
-    $$('[data-zigzag-h]', root).forEach(pl => {
-      const [w, h, n] = pl.dataset.zigzagH.split(',').map(Number);
-      const pts = [];
-      for (let i = 0; i <= n; i++) pts.push(`${f((i / n) * w)},${i % 2 ? h - 4 : 4}`);
-      pl.setAttribute('points', pts.join(' '));
-    });
-    $$('.zigzag polyline', root).forEach(pl => {
-      try { pl.style.setProperty('--len', Math.ceil(pl.getTotalLength() + 10)); } catch (e) { /* noop */ }
-    });
-  }
+  const burstSVG = (n = 18) => `<svg viewBox="-50 -50 100 100" aria-hidden="true"><path d="${burstPath(n)}"/></svg>`;
+  const zigzagSVG = (n = 60) => {
+    let pts = '';
+    for (let i = 0; i <= n; i++) pts += `${f1((i / n) * 1000)},${i % 2 ? 12 : 2} `;
+    return `<svg class="zz" viewBox="0 0 1000 14" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts.trim()}"/></svg>`;
+  };
+  const ICONS = {
+    arrow: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h17M14 6l6 6-6 6"/></svg>',
+    fb: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 8h3V4h-3c-2.8 0-4 1.8-4 4.3V10H7v4h3v8h4v-8h3l1-4h-4V8.6c0-.4.3-.6.6-.6z"/></svg>',
+    ig: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7.3a4.7 4.7 0 1 0 0 9.4 4.7 4.7 0 0 0 0-9.4zm0 7.7a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm4.9-8.9a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2zM21.9 7c-.1-1.6-.4-3-1.6-4.2S17.6 1.2 16 1.1C14.4 1 9.6 1 8 1.1 6.4 1.2 5 1.5 3.8 2.7S2.2 5.4 2.1 7C2 8.6 2 15.4 2.1 17c.1 1.6.4 3 1.6 4.2s2.6 1.6 4.2 1.7c1.6.1 6.4.1 8 0 1.6-.1 3-.4 4.2-1.7s1.6-2.6 1.7-4.2c.1-1.6.1-8.4.1-10zm-2.1 12.6a3.2 3.2 0 0 1-1.8 1.8c-1.3.5-4.3.4-5.7.4s-4.4.1-5.7-.4a3.2 3.2 0 0 1-1.8-1.8c-.5-1.3-.4-4.3-.4-5.7s-.1-4.4.4-5.7a3.2 3.2 0 0 1 1.8-1.8C6 3.9 9 4 10.4 4h1.6c1.4 0 4.4-.1 5.7.4a3.2 3.2 0 0 1 1.8 1.8c.5 1.3.4 4.3.4 5.7s.1 4.4-.4 5.7z"/></svg>',
+    x: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 2h3.3l-7.2 8.3L22.4 22h-6.6l-5.2-6.8L4.6 22H1.3l7.7-8.8L.9 2h6.8l4.7 6.2zm-1.2 18h1.8L6.5 3.9H4.5z"/></svg>',
+    yt: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6z"/></svg>'
+  };
 
   /* =======================================================
-     DÉCOUPE DU TEXTE EN LETTRES
+     ÉLÉMENTS COMMUNS (nav, footer, panier, modale)
      ======================================================= */
-  function splitText(el) {
-    if (el.classList.contains('split')) return;
-    const label = el.textContent.replace(/\s+/g, ' ').trim();
-    let i = 0;
-    const walk = node => {
-      const frag = document.createDocumentFragment();
-      node.childNodes.forEach(child => {
-        if (child.nodeType === 3) {
-          child.textContent.split(/( )/).forEach(part => {
-            if (part === ' ') { frag.appendChild(document.createTextNode(' ')); return; }
-            if (!part) return;
-            const word = document.createElement('span');
-            word.className = 'word';
-            [...part].forEach(ch => {
-              const c = document.createElement('span');
-              c.className = 'char';
-              c.textContent = ch;
-              c.style.setProperty('--i', i++);
-              word.appendChild(c);
-            });
-            frag.appendChild(word);
-          });
-        } else if (child.nodeType === 1 && child.tagName !== 'BR') {
-          const clone = child.cloneNode(false);
-          clone.appendChild(walk(child));
-          frag.appendChild(clone);
-        } else {
-          frag.appendChild(child.cloneNode(true));
-        }
-      });
-      return frag;
-    };
-    const inner = walk(el);
-    el.textContent = '';
-    const wrap = document.createElement('span');
-    wrap.setAttribute('aria-hidden', 'true');
-    wrap.appendChild(inner);
-    el.appendChild(wrap);
-    if (!el.closest('[aria-label]')) el.setAttribute('aria-label', label);
-    el.classList.add('split');
-  }
-
-  /* =======================================================
-     RENDUS : stars, carte, zones
-     ======================================================= */
-  function sizeChips(name, prices, recipe) {
-    return Object.entries(prices).map(([size, price]) =>
-      `<button class="chip" data-add="${name}" data-size="${size}" data-price="${price}" data-recipe="${recipe || ''}" aria-label="Ajouter ${name} ${size} ${euro(price)}"><small>${size}</small><b>${String(price).replace('.', ',')}€</b></button>`
-    ).join('');
-  }
-
-  function renderStars() {
-    const grid = $('#starsGrid');
-    grid.innerHTML = STARS.map(({ id, tag }, i) => {
-      const p = PIZZAS[id];
-      const short = p.desc.replace(/^(Sauce \w+|Crème fraîche), (fromage|mozzarella), /i, '').replace(/\.$/, '');
-      return `<article class="star" data-reveal="up" style="--d:${(i % 3) * 120}ms">
-        <div class="star__inner">
-          <div class="star__burst" data-cursor="Une part ?">
-            <svg viewBox="-50 -50 100 100" aria-hidden="true"><path data-burst="${14 + (i % 3) * 3},50,41"/></svg>
-            <span class="star__tag">${tag}</span>
-            <div class="pizza" data-recipe="${id}" data-label="Pizza ${p.name}"></div>
-          </div>
-          <h3 class="star__name">${p.name}</h3>
-          <p class="star__desc">${short.charAt(0).toUpperCase() + short.slice(1)}.</p>
-          <div class="star__sizes">${sizeChips(p.name, p.prices, id)}</div>
+  function buildChrome() {
+    const nav = (href, label, key) => `<a href="${href}"${page === key ? ' aria-current="page"' : ''}>${label}</a>`;
+    document.body.insertAdjacentHTML('afterbegin', `
+      <div class="progress" aria-hidden="true"><i id="progress"></i></div>
+      <div class="cursor" id="cursor" aria-hidden="true"><span id="cursorLabel"></span></div>
+      <header class="nav" id="nav">
+        <a class="logo" href="index.html" aria-label="Pizza Food — accueil" data-cursor="Accueil">
+          <span class="logo__mark">${burstSVG(14)}</span>
+          <span class="logo__txt">Pizza<br>Food</span>
+        </a>
+        <nav class="nav__links" aria-label="Navigation principale">
+          ${nav('index.html', 'Accueil', 'home')}
+          ${nav('carte.html', 'La carte', 'carte')}
+          ${nav('livraison.html', 'Livraison', 'livraison')}
+          ${nav('carte.html#envies', 'Vos envies', '')}
+        </nav>
+        <div class="nav__right">
+          <a class="nav__tel link" href="${INFO.tel1Href}" data-cursor="Appeler">${INFO.tel1}</a>
+          <button class="btn nav__cart" id="cartBtn" aria-label="Ouvrir le panier" data-cursor="Panier"><span class="lbl">Commander</span><span class="count" id="cartCount">0</span></button>
+          <button class="nav__burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mmenu"><span></span><span></span><span></span></button>
         </div>
-      </article>`;
-    }).join('');
-    hydrateShapes(grid);
-    $$('.pizza', grid).forEach(renderPizza);
-  }
+      </header>
+      <div class="mmenu" id="mmenu" aria-hidden="true">
+        <nav aria-label="Menu mobile">
+          <a href="index.html">Accueil</a><a href="carte.html">La carte</a><a href="livraison.html">Livraison</a><a href="carte.html#envies">Vos envies</a>
+        </nav>
+        <a class="btn btn--light" href="${INFO.tel1Href}">Appeler le ${INFO.tel1}</a>
+      </div>`);
 
-  let currentTab = MENU[0].id;
-  function renderTabs() {
-    const tabs = $('#tabs');
-    tabs.innerHTML = MENU.map(c =>
-      `<button class="tab" role="tab" id="tab-${c.id}" aria-controls="menuList" aria-selected="${c.id === currentTab}" tabindex="${c.id === currentTab ? 0 : -1}" data-tab="${c.id}" data-cursor="${c.label.split(' ')[0]}">${c.label}</button>`
-    ).join('');
-    tabs.addEventListener('click', e => {
-      const b = e.target.closest('[data-tab]');
-      if (b) selectTab(b.dataset.tab, true);
-    });
-    tabs.addEventListener('keydown', e => {
-      if (!['ArrowRight', 'ArrowLeft'].includes(e.key)) return;
-      const idx = MENU.findIndex(c => c.id === currentTab);
-      const next = MENU[(idx + (e.key === 'ArrowRight' ? 1 : -1) + MENU.length) % MENU.length];
-      selectTab(next.id, true);
-      $(`#tab-${next.id}`).focus();
-    });
-  }
+    const flink = (label, attrs) => `<li>${attrs.startsWith('href') ? `<a ${attrs}>${label}</a>` : `<button type="button" ${attrs}>${label}</button>`}</li>`;
+    document.body.insertAdjacentHTML('beforeend', `
+      <footer class="footer">
+        <div class="footer__top">
+          <div class="news">
+            <h3>Notre newsletter</h3>
+            <p>Les nouveautés et les offres, en premier.</p>
+            <form id="newsForm" novalidate>
+              <div class="field"><label class="sr-only" for="nEmail">E-mail</label><input id="nEmail" name="email" type="email" placeholder="Votre e-mail" autocomplete="email" required></div>
+              <div class="field"><label class="sr-only" for="nMobile">Mobile</label><input id="nMobile" name="mobile" type="tel" placeholder="Votre mobile" autocomplete="tel"></div>
+              <button class="btn" type="submit" style="justify-self:start;margin-top:10px" data-cursor="OK">S'inscrire ${ICONS.arrow}</button>
+            </form>
+          </div>
+          <div>
+            <h3>Commander</h3>
+            <ul class="flinks">
+              ${flink('Zones de livraison', 'href="livraison.html"')}
+              ${flink('À emporter', 'href="livraison.html#emporter"')}
+              ${flink('Commander en ligne', 'href="carte.html"')}
+              ${flink('Mobile', 'data-modal="mobile"')}
+            </ul>
+          </div>
+          <div>
+            <h3>La maison</h3>
+            <ul class="flinks">
+              ${flink('Charte qualité', 'data-modal="charte"')}
+              ${flink('Programme de fidélité', 'data-modal="fidelite"')}
+              ${flink('Votre appréciation', 'data-modal="appreciation"')}
+              ${flink('Recrutement', 'data-modal="recrutement"')}
+            </ul>
+          </div>
+          <div>
+            <h3>Infos</h3>
+            <ul class="flinks">
+              ${flink('Contact', 'data-modal="contact"')}
+              ${flink('Allergènes', 'data-modal="allergenes"')}
+              ${flink('Mentions légales', 'data-modal="mentions"')}
+              ${flink('C.G.V', 'data-modal="cgv"')}
+            </ul>
+            <div class="socials">
+              <a href="https://www.facebook.com/Pizza-Food-1682159702074299" target="_blank" rel="noopener" aria-label="Facebook">${ICONS.fb}</a>
+              <a href="https://www.instagram.com/pizzafood94430/" target="_blank" rel="noopener" aria-label="Instagram">${ICONS.ig}</a>
+              <a href="https://twitter.com/pizzafood94430" target="_blank" rel="noopener" aria-label="X (Twitter)">${ICONS.x}</a>
+              <a href="https://www.youtube.com/channel/UCCv9ak1TfnuyedFZNZe30Tw" target="_blank" rel="noopener" aria-label="YouTube">${ICONS.yt}</a>
+            </div>
+          </div>
+        </div>
+        <p class="footer__giant" id="giant" aria-label="Pizza Food">Pizza Food</p>
+        <div class="footer__bottom">
+          <span>© ${new Date().getFullYear()} Pizza Food — ${INFO.address}, ${INFO.city}</span>
+          <span>${INFO.tel1} · ${INFO.tel2}</span>
+        </div>
+      </footer>
 
-  function selectTab(id, scrollIntoView) {
-    currentTab = id;
-    $$('.tab').forEach(t => {
-      const on = t.dataset.tab === id;
-      t.setAttribute('aria-selected', on);
-      t.tabIndex = on ? 0 : -1;
-      if (on && scrollIntoView) t.scrollIntoView({ block: 'nearest', inline: 'center', behavior: reduceMotion ? 'auto' : 'smooth' });
-    });
-    renderMenu();
-  }
+      <div class="overlay" id="overlay"></div>
+      <aside class="cart" id="cart" aria-hidden="true" aria-label="Mon panier">
+        <div class="cart__head"><h2>Panier</h2><button class="x" id="cartClose" aria-label="Fermer le panier">×</button></div>
+        <div class="seg" role="group" aria-label="Type de commande">${MODES.map(m => `<button type="button" data-setmode="${m}" aria-pressed="false">${m}</button>`).join('')}</div>
+        <p class="cart__hint" id="cartHint"></p>
+        <ul class="cart__list" id="cartList"></ul>
+        <div class="cart__empty"><p>Panier vide</p><a class="btn" href="carte.html">Voir la carte ${ICONS.arrow}</a></div>
+        <div class="cart__foot">
+          <p class="line"><span>Sous-total</span><span id="cartSub"></span></p>
+          <p class="line line--disc" id="cartDiscLine" hidden><span id="cartDiscLbl">Offre</span><span id="cartDisc"></span></p>
+          <p class="line"><span>Livraison</span><span id="cartShip"></span></p>
+          <p class="line line--total"><span>Total</span><span id="cartTotal"></span></p>
+          <p class="cart__warn" id="cartWarn" hidden></p>
+          <button class="btn btn--hot btn--full" id="checkout" data-cursor="Miam">Valider ma commande ${ICONS.arrow}</button>
+        </div>
+      </aside>
 
-  function renderMenu() {
-    const cat = MENU.find(c => c.id === currentTab);
-    const list = $('#menuList');
-    list.setAttribute('role', 'tabpanel');
-    list.setAttribute('aria-labelledby', `tab-${cat.id}`);
-    $('#carteNote').textContent = cat.note;
-    list.innerHTML = cat.items.map(([name, desc, price], i) => {
-      const id = slug(name);
-      const visual = cat.kind === 'pizza'
-        ? `<div class="pizza menu-item__pizza" data-recipe="${id}"></div>`
-        : `<div class="menu-item__icon" data-art="${cat.art}"></div>`;
-      const prices = cat.kind === 'pizza' ? sizeChips(name, price, id)
-        : `<button class="chip" data-add="${name}" data-size="" data-price="${price}" aria-label="Ajouter ${name} ${euro(price)}"><b>${euro(price).replace(/\s/g, '')}</b></button>`;
-      return `<li class="menu-item" style="--i:${i}">
-        ${visual}
-        <div class="menu-item__text"><h3 class="menu-item__name">${name}</h3><p class="menu-item__desc">${desc}</p></div>
-        <div class="menu-item__prices">${prices}</div>
-      </li>`;
-    }).join('');
-    $$('.pizza', list).forEach(renderPizza);
-    $$('[data-art]', list).forEach(el => {
-      const art = $(el.dataset.art);
-      if (art) {
-        const clone = art.cloneNode(true);
-        clone.style.width = '78%';
-        el.appendChild(clone);
-      }
-    });
-    const items = $$('.menu-item', list);
-    requestAnimationFrame(() => requestAnimationFrame(() => items.forEach(it => it.classList.add('is-in'))));
-  }
-
-  function renderZones() {
-    const colors = [
-      ['var(--color-sun-yellow)', 'var(--color-charcoal)'],
-      ['var(--color-cream)', 'var(--color-charcoal)'],
-      ['var(--color-anger-orange)', 'var(--color-sun-yellow)'],
-      ['var(--color-lemon-cream)', 'var(--color-charcoal)']
-    ];
-    const rand = rng(42);
-    $('#zonesList').innerHTML = ZONES.map((z, i) => {
-      const [c, t] = i === 0 ? ['var(--color-anger-orange)', 'var(--color-sun-yellow)'] : colors[i % colors.length];
-      const r = (rand() * 10 - 5).toFixed(1);
-      return `<li class="zone${i === 0 ? ' zone--hq' : ''}" style="--i:${i};--c:${c};--t:${t};--r:${r}deg" data-cursor="Livré !">${z}</li>`;
-    }).join('');
+      <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal__box">
+          <div class="modal__head"><h2 id="modalTitle"></h2><button class="x" id="modalClose" aria-label="Fermer">×</button></div>
+          <div class="modal__body" id="modalBody"></div>
+        </div>
+      </div>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>`);
   }
 
   /* =======================================================
-     PANIER
+     PANIER + OFFRES
      ======================================================= */
-  const cart = { items: [], mode: 'Livraison' };
-  try {
-    const saved = JSON.parse(localStorage.getItem('pf-cart') || 'null');
-    if (saved && Array.isArray(saved.items)) Object.assign(cart, saved);
-  } catch (e) { /* stockage indisponible */ }
-  const save = () => { try { localStorage.setItem('pf-cart', JSON.stringify(cart)); } catch (e) { /* noop */ } };
+  const cart = store.get('pf-cart-v2', { items: [], mode: 'Livraison' });
+  if (!MODES.includes(cart.mode)) cart.mode = 'Livraison';
+  cart.items = (cart.items || []).filter(i => PRODUCTS[i.id]);
+  const saveCart = () => store.set('pf-cart-v2', cart);
 
-  function addToCart(name, size, price, recipe, fromEl) {
-    const key = name + '|' + size;
+  const unitPrice = it => {
+    const p = PRODUCTS[it.id];
+    return p.s ? p.s[it.size] : p.p;
+  };
+  // Offre valable sur les pizzas Senior et Mega, sauf la Marguerita
+  const isEligible = it => {
+    const p = PRODUCTS[it.id];
+    return p.cat.pizza && (it.size === 'Senior' || it.size === 'Mega') && norm(p.n) !== 'marguerita';
+  };
+
+  function computeCart() {
+    const sub = cart.items.reduce((s, i) => s + unitPrice(i) * i.qty, 0);
+    const offer = OFFERS[cart.mode];
+    const free = {};
+    let disc = 0, eligibleCount = 0;
+    if (offer) {
+      const units = [];
+      cart.items.forEach(i => { if (isEligible(i)) for (let k = 0; k < i.qty; k++) units.push({ key: i.key, price: unitPrice(i) }); });
+      eligibleCount = units.length;
+      // Les pizzas offertes sont les moins chères de chaque groupe
+      units.sort((a, b) => b.price - a.price);
+      units.forEach((u, idx) => {
+        if ((idx + 1) % offer.every === 0) { disc += u.price; free[u.key] = (free[u.key] || 0) + 1; }
+      });
+    }
+    const total = sub - disc;
+    const count = cart.items.reduce((s, i) => s + i.qty, 0);
+    return { sub, disc, total, free, count, offer, eligibleCount };
+  }
+
+  function addToCart(id, size, fromEl) {
+    const key = id + '|' + (size || '');
     const found = cart.items.find(i => i.key === key);
     if (found) found.qty++;
-    else cart.items.push({ key, name, size, price: Number(price), qty: 1, recipe });
-    save();
-    flyToCart(fromEl, recipe).then(() => {
+    else cart.items.push({ key, id, size: size || '', qty: 1 });
+    saveCart();
+    const p = PRODUCTS[id];
+    flyToCart(fromEl, p.img).then(() => {
       renderCart();
-      const btn = $('#cartBtn');
-      btn.classList.remove('is-bump');
-      void btn.offsetWidth;
-      btn.classList.add('is-bump');
+      const b = $('#cartBtn');
+      b.classList.remove('is-bump'); void b.offsetWidth; b.classList.add('is-bump');
     });
-    toast(`+1 ${name}${size ? ' ' + size : ''} !`);
+    const c = computeCart();
+    let msg = `+1 <b>${escapeHTML(p.n)}</b>${size ? ' ' + size : ''}`;
+    if (c.offer && isEligible({ id, size })) {
+      const left = c.offer.every - (c.eligibleCount % c.offer.every);
+      msg += left === c.offer.every ? ' · <b>pizza offerte !</b>' : '';
+    }
+    toast(msg);
   }
 
   function renderCart() {
-    const list = $('#cartList');
-    const count = cart.items.reduce((s, i) => s + i.qty, 0);
-    const total = cart.items.reduce((s, i) => s + i.qty * i.price, 0);
-    $('#cartCount').textContent = count;
-    $('#cartTotal').textContent = euro(total);
-    $('#cartMode').textContent = cart.mode;
-    $('#cart').classList.toggle('is-empty', !count);
-    list.innerHTML = cart.items.map((it, idx) => `
-      <li class="cart__item">
-        <div><div class="cart__item-name">${it.name}</div><div class="cart__item-size">${it.size ? it.size + ' · ' : ''}${euro(it.price)}</div></div>
-        <div class="cart__item-price">${euro(it.price * it.qty)}</div>
-        <div class="qty">
-          <button data-qty="-1" data-idx="${idx}" aria-label="Retirer un ${it.name}">−</button>
-          <span>${it.qty}</span>
-          <button data-qty="1" data-idx="${idx}" aria-label="Ajouter un ${it.name}">+</button>
-        </div>
-      </li>`).join('');
+    const c = computeCart();
+    $('#cartCount').textContent = c.count;
+    $('#cart').classList.toggle('is-empty', !c.count);
+    $$('[data-setmode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.setmode === cart.mode));
+    $$('.mode[data-mode]').forEach(m => m.setAttribute('aria-checked', m.dataset.mode === cart.mode));
+    $$('[data-modelabel]').forEach(el => { el.textContent = cart.mode; });
+
+    $('#cartList').innerHTML = cart.items.map((it, idx) => {
+      const p = PRODUCTS[it.id];
+      const free = c.free[it.key];
+      return `<li class="citem">
+        <img src="${p.img}" alt="" class="${p.cat.pizza ? 'is-pizza' : ''}" loading="lazy">
+        <div><div class="citem__name">${escapeHTML(p.n)}</div><div class="citem__meta">${it.size ? it.size + ' · ' : ''}${escapeHTML(p.cat.label)} · ${euro(unitPrice(it))}</div>${free ? `<span class="citem__free">${free > 1 ? free + ' offertes' : 'Offerte'}</span>` : ''}</div>
+        <div class="citem__right"><span class="citem__price">${euro(unitPrice(it) * it.qty)}</span>
+          <span class="qty"><button data-qty="-1" data-idx="${idx}" aria-label="Retirer un ${escapeHTML(p.n)}">−</button><span>${it.qty}</span><button data-qty="1" data-idx="${idx}" aria-label="Ajouter un ${escapeHTML(p.n)}">+</button></span>
+        </div></li>`;
+    }).join('');
+
+    $('#cartSub').textContent = euro(c.sub);
+    $('#cartDiscLine').hidden = !c.disc;
+    $('#cartDisc').textContent = '− ' + euro(c.disc);
+    $('#cartDiscLbl').textContent = c.offer ? 'Offre ' + c.offer.label.replace(/ =.*/, ' : ') + c.offer.label.replace(/.*= /, '') : 'Offre';
+    $('#cartShip').textContent = cart.mode === 'Livraison' ? 'Gratuite' : '—';
+    $('#cartTotal').textContent = euro(c.total);
+
+    let hint = '';
+    if (c.offer) {
+      const left = c.offer.every - (c.eligibleCount % c.offer.every);
+      hint = `Offre ${cart.mode.toLowerCase()} : <b>${c.offer.label}</b>. `;
+      hint += left === c.offer.every && c.eligibleCount ? 'Remise appliquée ✓' : `Encore ${left} pizza${left > 1 ? 's' : ''} Senior ou Mega pour en profiter.`;
+      hint += ' <span style="opacity:.75">(hors Marguerita)</span>';
+    } else hint = 'Sur place : pas d’offre en ligne, les offres concernent la livraison et la vente à emporter.';
+    $('#cartHint').innerHTML = hint;
+
+    const warn = $('#cartWarn');
+    const below = cart.mode === 'Livraison' && c.count && c.total < INFO.minimum;
+    warn.hidden = !below;
+    if (below) warn.textContent = `Minimum de commande en livraison : ${euro(INFO.minimum)}. Il manque ${euro(INFO.minimum - c.total)}.`;
+    $('#checkout').disabled = !!below;
+    $('#checkout').style.opacity = below ? .45 : 1;
   }
 
-  $('#cartList').addEventListener('click', e => {
-    const b = e.target.closest('[data-qty]');
-    if (!b) return;
-    const it = cart.items[+b.dataset.idx];
-    it.qty += +b.dataset.qty;
-    if (it.qty <= 0) cart.items.splice(+b.dataset.idx, 1);
-    save();
+  function setMode(mode, announce) {
+    if (!MODES.includes(mode)) return;
+    cart.mode = mode;
+    saveCart();
     renderCart();
-  });
+    if (announce) {
+      const o = OFFERS[mode];
+      toast(`Mode : <b>${mode}</b>${o ? ' · ' + o.label : ''}`);
+    }
+  }
 
-  function flyToCart(fromEl, recipe) {
+  function flyToCart(fromEl, img) {
     if (reduceMotion || !fromEl) return Promise.resolve();
     const a = fromEl.getBoundingClientRect();
-    const b = $('.nav__cart-ring').getBoundingClientRect();
+    const b = $('#cartBtn').getBoundingClientRect();
     const fly = document.createElement('div');
     fly.className = 'flyer';
-    fly.innerHTML = `<div class="pizza">${pizzaSVG(recipe && (PIZZAS[recipe] || SPECIAL[recipe]) ? recipe : 'marguerita')}</div>`;
+    fly.innerHTML = `<img src="${img}" alt="">`;
     document.body.appendChild(fly);
-    const x0 = a.left + a.width / 2, y0 = a.top + a.height / 2;
-    const x1 = b.left + b.width / 2, y1 = b.top + b.height / 2;
-    const mx = (x0 + x1) / 2, my = Math.min(y0, y1) - 160;
+    const x0 = a.left + a.width / 2, y0 = a.top + a.height / 2, x1 = b.left + b.width / 2, y1 = b.top + b.height / 2;
     const anim = fly.animate([
-      { transform: `translate(${x0}px, ${y0}px) scale(.6) rotate(0deg)` },
-      { transform: `translate(${mx}px, ${my}px) scale(1.6) rotate(240deg)`, offset: 0.5 },
-      { transform: `translate(${x1}px, ${y1}px) scale(.4) rotate(480deg)` }
-    ], { duration: 800, easing: 'cubic-bezier(.5,0,.5,1)' });
+      { transform: `translate(${x0}px,${y0}px) scale(.5) rotate(0deg)`, opacity: 1 },
+      { transform: `translate(${(x0 + x1) / 2}px,${Math.min(y0, y1) - 140}px) scale(1.5) rotate(180deg)`, opacity: 1, offset: .5 },
+      { transform: `translate(${x1}px,${y1}px) scale(.3) rotate(360deg)`, opacity: .6 }
+    ], { duration: 850, easing: 'cubic-bezier(.5,0,.5,1)' });
     return anim.finished.then(() => fly.remove()).catch(() => fly.remove());
   }
 
-  let toastTimer;
-  function toast(msg) {
+  let toastT;
+  function toast(html) {
     const t = $('#toast');
-    t.textContent = msg;
+    t.innerHTML = html;
     t.classList.add('is-on');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('is-on'), 2200);
+    clearTimeout(toastT);
+    toastT = setTimeout(() => t.classList.remove('is-on'), 2600);
   }
 
-  // Ajout depuis n'importe quel bouton [data-add]
-  document.addEventListener('click', e => {
-    const b = e.target.closest('[data-add]');
-    if (!b) return;
-    addToCart(b.dataset.add, b.dataset.size, b.dataset.price, b.dataset.recipe, b);
-    b.classList.remove('is-added');
-    void b.offsetWidth;
-    b.classList.add('is-added');
-  });
+  function bindCart() {
+    const cartEl = $('#cart'), overlay = $('#overlay');
+    let last;
+    const open = () => { last = document.activeElement; cartEl.classList.add('is-open'); overlay.classList.add('is-on'); cartEl.setAttribute('aria-hidden', 'false'); $('#cartClose').focus(); };
+    const close = () => { cartEl.classList.remove('is-open'); overlay.classList.remove('is-on'); cartEl.setAttribute('aria-hidden', 'true'); if (last) last.focus(); };
+    $('#cartBtn').addEventListener('click', open);
+    $('#cartClose').addEventListener('click', close);
+    overlay.addEventListener('click', close);
+    bindCart.close = close;
 
-  // Ouverture / fermeture du panier
-  const cartEl = $('#cart'), overlay = $('#overlay');
-  let lastFocus = null;
-  function openCart() {
-    lastFocus = document.activeElement;
-    cartEl.classList.add('is-open');
-    overlay.classList.add('is-open');
-    cartEl.setAttribute('aria-hidden', 'false');
-    $('#cartClose').focus();
-  }
-  function closeCart() {
-    cartEl.classList.remove('is-open');
-    overlay.classList.remove('is-open');
-    cartEl.setAttribute('aria-hidden', 'true');
-    if (lastFocus) lastFocus.focus();
-  }
-  $('#cartBtn').addEventListener('click', openCart);
-  $('#cartClose').addEventListener('click', closeCart);
-  overlay.addEventListener('click', closeCart);
-  $('#cartModeChange').addEventListener('click', closeCart);
+    $('#cartList').addEventListener('click', e => {
+      const b = e.target.closest('[data-qty]');
+      if (!b) return;
+      const it = cart.items[+b.dataset.idx];
+      it.qty += +b.dataset.qty;
+      if (it.qty <= 0) cart.items.splice(+b.dataset.idx, 1);
+      saveCart();
+      renderCart();
+    });
 
-  // Validation
-  const modal = $('#modal');
-  $('#checkout').addEventListener('click', () => {
-    const total = cart.items.reduce((s, i) => s + i.qty * i.price, 0);
-    $('#modalRecap').innerHTML =
-      `<p><span>Mode</span><b>${cart.mode}</b></p>` +
-      cart.items.map(i => `<p><span>${i.qty} × ${i.name}${i.size ? ' (' + i.size + ')' : ''}</span><span>${euro(i.qty * i.price)}</span></p>`).join('') +
-      `<p class="total"><span>Total</span><span>${euro(total)}</span></p>`;
-    modal.classList.add('is-open');
-    modal.setAttribute('aria-hidden', 'false');
-    $('#modalClose').focus();
-  });
-  const closeModal = () => { modal.classList.remove('is-open'); modal.setAttribute('aria-hidden', 'true'); };
-  $('#modalClose').addEventListener('click', closeModal);
-  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-  document.addEventListener('keydown', e => {
-    if (e.key !== 'Escape') return;
-    if (modal.classList.contains('is-open')) closeModal();
-    else if (cartEl.classList.contains('is-open')) closeCart();
-    else if (mobileMenu.classList.contains('is-open')) toggleMenu(false);
-  });
+    document.addEventListener('click', e => {
+      const add = e.target.closest('[data-add]');
+      if (add) {
+        addToCart(add.dataset.add, add.dataset.size, add);
+        add.classList.remove('is-added'); void add.offsetWidth; add.classList.add('is-added');
+      }
+      const m = e.target.closest('[data-setmode], .mode[data-mode]');
+      if (m) setMode(m.dataset.setmode || m.dataset.mode, true);
+    });
+
+    $('#checkout').addEventListener('click', () => {
+      const c = computeCart();
+      const lines = cart.items.map(i => {
+        const p = PRODUCTS[i.id];
+        return `<p><span>${i.qty} × ${escapeHTML(p.n)}${i.size ? ' (' + i.size + ')' : ''}</span><span>${euro(unitPrice(i) * i.qty)}</span></p>`;
+      }).join('');
+      openModal('Votre commande', `
+        <div class="recap">
+          <p><span>Mode</span><b>${cart.mode}</b></p>
+          ${lines}
+          ${c.disc ? `<p style="color:var(--orange);font-weight:700"><span>Offre ${c.offer.label}</span><span>− ${euro(c.disc)}</span></p>` : ''}
+          ${cart.mode === 'Livraison' ? '<p><span>Livraison</span><span>Gratuite · 40 min</span></p>' : ''}
+          <p class="total"><span>Total</span><span>${euro(c.total)}</span></p>
+        </div>
+        <p style="margin-top:22px">Pour confirmer, appelez le restaurant : la commande est préparée à votre appel${cart.mode === 'Livraison' ? ' et livrée en 40 minutes environ' : ''}.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px">
+          <a class="btn btn--hot" href="${INFO.tel1Href}">Appeler le ${INFO.tel1}</a>
+          <a class="btn" href="${INFO.tel2Href}">${INFO.tel2}</a>
+        </div>`);
+    });
+  }
 
   /* =======================================================
-     MODE DE COMMANDE
+     MODALES (pages du footer)
      ======================================================= */
-  const modeCards = $$('.mode__card');
-  function setMode(mode, announce) {
-    cart.mode = mode;
-    save();
-    modeCards.forEach(c => c.setAttribute('aria-checked', c.dataset.mode === mode));
-    $('#modeStatus').textContent = mode;
-    renderCart();
-    if (announce) toast(`Mode : ${mode}`);
+  const radios = (name, opts, type = 'radio') => `<div class="radios">${opts.map((o, i) => `<label><input type="${type}" name="${name}" value="${o}"${type === 'radio' && i === 0 ? ' checked' : ''}><span>${o}</span></label>`).join('')}</div>`;
+  const field = (label, name, type = 'text', full = false, extra = '') => `<label class="${full ? 'full' : ''}" for="f-${name}">${label}</label>` +
+    (type === 'textarea' ? `<div class="field ${full ? 'full' : ''}"><textarea id="f-${name}" name="${label}" rows="4" ${extra}></textarea></div>`
+      : `<div class="field ${full ? 'full' : ''}"><input id="f-${name}" name="${label}" type="${type}" ${extra}></div>`);
+  // Les champs label + input sont empilés : on les regroupe par paire dans une grille 2 colonnes
+  const pair = (...html) => `<div>${html.join('')}</div>`;
+  const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+  const mailNote = `<p class="form-note">L'envoi ouvre votre messagerie avec le formulaire pré-rempli, à destination de ${INFO.email}.</p>`;
+
+  const MODALS = {
+    charte: ['Charte qualité', `
+      <p>Toujours soucieux de la qualité de ses produits, Pizza Food a mis en place une charte qualité répondant à 3 critères :</p>
+      <h4>La sélection des produits</h4>
+      <p>La qualité des produits servis faisant la force de son concept, Pizza Food a toujours eu pour principe de sélectionner les meilleurs produits. Plusieurs livraisons par semaine assurent une qualité constante et permettent à Pizza Food de vous apporter des produits savoureux chez vous.</p>
+      <h4>Traçabilité des produits</h4>
+      <p>Pizza Food vérifie scrupuleusement tous ses produits à chaque livraison et entretient des relations régulières avec des fournisseurs sélectionnés pour la qualité des produits.</p>
+      <h4>Respect de la chaîne du froid</h4>
+      <p>Pizza Food exerce un contrôle minutieux sur ses produits. Ainsi, tous les produits frais et surgelés qu'utilise Pizza Food sont des produits livrés par camion frigorifique, et respectant la chaîne du froid.</p>`],
+    fidelite: ['Programme de fidélité', `
+      <p class="quote" style="margin-bottom:20px">Votre fidélité chez nous est récompensée…</p>
+      <h4>Une fidélité récompensée</h4>
+      <p>Transformez vos points en cadeaux ! Consultez votre compte pour suivre vos points.</p>
+      <p style="margin-top:20px"><a class="btn" href="carte.html">Commander ${ICONS.arrow}</a></p>`],
+    mobile: ['Mobile', `
+      <p class="quote" style="margin-bottom:20px">Choisissez, commandez, c'est livré.</p>
+      <p>Commandez à partir de votre mobile sur notre nouvelle interface. Quelle que soit la marque de votre mobile, pas d'application à télécharger : juste une adresse à composer, <b>pizza-food.fr</b>.</p>`],
+    mentions: ['Mentions légales', () => DATA.legal.mentions || ''],
+    cgv: ['Conditions générales de vente', () => DATA.legal.cgv || ''],
+    contact: ['Contact', `
+      <p><b>Pizza Food</b><br>${INFO.address}<br>${INFO.city}<br>Tél : <a href="${INFO.tel1Href}">${INFO.tel1}</a> · <a href="${INFO.tel2Href}">${INFO.tel2}</a><br>E-mail : <a href="mailto:${INFO.email}">${INFO.email}</a></p>
+      <form class="form" data-mail="Contact depuis le site">
+        ${pair(field('Nom', 'nom', 'text', false, 'required autocomplete="family-name"'))}${pair(field('Prénom', 'prenom', 'text', false, 'autocomplete="given-name"'))}
+        ${pair(field('E-mail', 'email', 'email', false, 'required autocomplete="email"'))}${pair(field('Téléphone', 'tel', 'tel', false, 'autocomplete="tel"'))}
+        ${field('Objet', 'objet', 'text', true)}
+        ${field('Commentaires', 'com', 'textarea', true, 'required')}
+        <button class="btn btn--hot full" type="submit" style="justify-self:start;margin-top:16px">Envoyer ${ICONS.arrow}</button>
+        ${mailNote}
+      </form>`],
+    recrutement: ['Recrutement', `
+      <h4>Une entreprise qui se développe et qui développe ses collaborateurs</h4>
+      <p>La recherche de l'excellence passe en premier lieu par le recrutement le plus adapté et l'accompagnement de nos collaborateurs dans le développement de leur carrière.</p>
+      <h4>Intégrer Pizza Food, c'est intégrer</h4>
+      <ul><li>Une entreprise qui va de l'avant, qui évolue grâce à ses innovations produits, au dynamisme et à la motivation des équipes qui la composent</li>
+      <li>Une entreprise qui offre de véritables opportunités de carrières</li>
+      <li>Une entreprise qui met en œuvre une politique sociale axée sur la formation et sur la confiance qu'elle accorde au potentiel de chacun</li></ul>
+      <form class="form" data-mail="Candidature">
+        <div class="full"><label>Civilité</label>${radios('Civilité', ['Madame', 'Mademoiselle', 'Monsieur'])}</div>
+        ${pair(field('Nom', 'rnom', 'text', false, 'required'))}${pair(field('Prénom', 'rprenom', 'text', false, 'required'))}
+        ${pair(field('Adresse mail', 'rmail', 'email', false, 'required'))}${pair(field('Date de naissance', 'rnaiss', 'date'))}
+        ${field('Adresse', 'radr', 'text', true)}
+        ${pair(field('Code postal', 'rcp', 'text', false, 'inputmode="numeric"'))}${pair(field('Ville', 'rville'))}
+        ${pair(field('Téléphone 1', 'rtel1', 'tel', false, 'required'))}${pair(field('Téléphone 2', 'rtel2', 'tel'))}
+        <div class="full"><label>Vous recherchez</label>${radios('Vous recherchez', ['Temps plein', 'Temps partiel'])}</div>
+        <div><label>Disponibilités (matin)</label>${radios('Matin', DAYS, 'checkbox')}</div>
+        <div><label>Disponibilités (soir)</label>${radios('Soir', DAYS, 'checkbox')}</div>
+        <button class="btn btn--hot full" type="submit" style="justify-self:start;margin-top:16px">Envoyer ${ICONS.arrow}</button>
+        ${mailNote}
+      </form>`],
+    appreciation: ['Votre appréciation', `
+      <p>Toujours dans le but d'améliorer notre qualité de service, et de satisfaire pleinement vos attentes, nous attachons une grande importance à votre appréciation.</p>
+      <form class="form" data-mail="Votre appréciation">
+        <div class="full"><label>Civilité</label>${radios('Civilité', ['Madame', 'Mademoiselle', 'Monsieur'])}</div>
+        ${pair(field('Nom', 'anom', 'text', false, 'required'))}${pair(field('Prénom', 'aprenom'))}
+        ${field('Votre e-mail', 'amail', 'email', true, 'required')}
+        <div class="full"><label>Sujet</label>${radios('Sujet', ['Idées et questions', "J'ai aimé…", "Je n'ai pas aimé…"])}</div>
+        <div class="full"><label>Restaurant concerné</label>${radios('Restaurant concerné', ['Site web', 'Pizza Food'])}</div>
+        ${field('Commentaires', 'acom', 'textarea', true, 'required')}
+        <div class="full"><label>Appréciation globale</label>${radios('Appréciation globale', ['Très satisfaisant', 'Satisfaisant', 'Moyen', 'Insatisfaisant', 'Très insatisfaisant'])}</div>
+        <div class="full"><label>Rapport qualité/prix</label>${radios('Rapport qualité/prix', ['Très satisfaisant', 'Satisfaisant', 'Moyen', 'Insatisfaisant', 'Très insatisfaisant'])}</div>
+        <div class="full"><label>Recommanderiez-vous ce restaurant à un ami ?</label>${radios('Recommandation', ['Oui', 'Non'])}</div>
+        <button class="btn btn--hot full" type="submit" style="justify-self:start;margin-top:16px">Envoyer ${ICONS.arrow}</button>
+        ${mailNote}
+      </form>`],
+    allergenes: ['Allergènes', () => {
+      const a = DATA.allergens;
+      return `<p><b>Allergènes dans les produits Pizza Food — carte 2026 (France).</b> Légende : « X » = présence.</p>
+        <p>Ces informations ont été établies sur la base des déclarations de nos fournisseurs à propos de la composition de leurs produits. Outre les présences signalées dans le tableau, nous ne pouvons pas exclure une présence accidentelle d'autres ingrédients allergènes qui serait apparue lors de la fabrication des produits chez nos fournisseurs ou lors de leur manipulation dans nos restaurants.</p>
+        <div class="allergens-wrap"><table class="allergens">
+          <thead><tr><th scope="col">Produit</th>${a.cols.map(c => `<th scope="col">${escapeHTML(c)}</th>`).join('')}</tr></thead>
+          <tbody>${a.rows.map(([n, bits]) => `<tr><th scope="row">${escapeHTML(n)}</th>${[...bits].map(b => `<td class="${b === '1' ? 'x-on' : ''}">${b === '1' ? 'X' : ''}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table></div>`;
+    }]
+  };
+
+  let modalLast;
+  function openModal(title, html) {
+    modalLast = document.activeElement;
+    $('#modalTitle').textContent = title;
+    $('#modalBody').innerHTML = html;
+    $('#modalBody').scrollTop = 0;
+    const m = $('#modal');
+    m.classList.add('is-open');
+    m.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('is-locked');
+    $('#modalClose').focus();
   }
-  modeCards.forEach(c => c.addEventListener('click', () => setMode(c.dataset.mode, true)));
+  function closeModal() {
+    const m = $('#modal');
+    m.classList.remove('is-open');
+    m.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('is-locked');
+    if (modalLast) modalLast.focus();
+  }
+  function bindModals() {
+    document.addEventListener('click', e => {
+      const t = e.target.closest('[data-modal]');
+      if (!t) return;
+      e.preventDefault();
+      const [title, body] = MODALS[t.dataset.modal];
+      openModal(title, typeof body === 'function' ? body() : body);
+    });
+    $('#modalClose').addEventListener('click', closeModal);
+    $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      if ($('#modal').classList.contains('is-open')) closeModal();
+      else if ($('#cart').classList.contains('is-open')) bindCart.close();
+      else if ($('#mmenu').classList.contains('is-open')) toggleMenu(false);
+    });
+    // Formulaires → messagerie pré-remplie
+    document.addEventListener('submit', e => {
+      const form = e.target.closest('form[data-mail]');
+      if (!form) return;
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      const fd = new FormData(form);
+      const lines = [];
+      for (const [k, v] of fd.entries()) if (String(v).trim()) lines.push(`${k} : ${v}`);
+      window.location.href = `mailto:${INFO.email}?subject=${encodeURIComponent(form.dataset.mail + ' — pizza-food.fr')}&body=${encodeURIComponent(lines.join('\n'))}`;
+      toast('Votre messagerie s’ouvre…');
+    });
+    $('#newsForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const email = $('#nEmail');
+      if (!email.value || !email.checkValidity()) { email.focus(); toast('Indiquez un e-mail valide'); return; }
+      const body = `Bonjour,\nJe souhaite m'inscrire à la newsletter Pizza Food.\nE-mail : ${email.value}\nMobile : ${$('#nMobile').value}`;
+      window.location.href = `mailto:${INFO.email}?subject=${encodeURIComponent('Inscription newsletter')}&body=${encodeURIComponent(body)}`;
+      toast('Votre messagerie s’ouvre…');
+    });
+  }
 
   /* =======================================================
      MENU MOBILE
      ======================================================= */
-  const burger = $('#burger'), mobileMenu = $('#mobileMenu');
   function toggleMenu(force) {
-    const open = typeof force === 'boolean' ? force : !mobileMenu.classList.contains('is-open');
-    mobileMenu.classList.toggle('is-open', open);
-    mobileMenu.setAttribute('aria-hidden', !open);
-    burger.setAttribute('aria-expanded', open);
-    burger.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
-    document.body.style.overflow = open ? 'hidden' : '';
+    const mm = $('#mmenu'), b = $('#burger');
+    const open = typeof force === 'boolean' ? force : !mm.classList.contains('is-open');
+    mm.classList.toggle('is-open', open);
+    mm.setAttribute('aria-hidden', !open);
+    b.setAttribute('aria-expanded', open);
+    document.body.classList.toggle('is-locked', open);
   }
-  burger.addEventListener('click', () => toggleMenu());
-  $$('a', mobileMenu).forEach(a => a.addEventListener('click', () => toggleMenu(false)));
+
+  /* =======================================================
+     RENDUS PAR PAGE
+     ======================================================= */
+  const sizeChips = p => p.s
+    ? Object.entries(p.s).map(([sz, pr]) => `<button class="chip" data-add="${p.id}" data-size="${sz}" aria-label="Ajouter ${escapeHTML(p.n)} ${sz}, ${euro(pr)}"><small>${sz}</small><b>${euro(pr).replace(/\s/g, '')}</b></button>`).join('')
+    : `<button class="chip" data-add="${p.id}" data-size="" aria-label="Ajouter ${escapeHTML(p.n)}, ${euro(p.p)}"><small>Ajouter</small></button>`;
+
+  function cardHTML(p, i) {
+    const desc = escapeHTML(p.d || (p.cat.pizza ? '' : p.cat.label));
+    return `<article class="card" data-id="${p.id}" style="--i:${i}">
+      <div class="card__media${p.cat.pizza ? ' is-pizza' : ''}" data-cursor="${p.s ? 'Une part ?' : 'Miam'}"><img src="${p.img}" alt="${escapeHTML(p.n)}" loading="lazy" width="260" height="250"></div>
+      <h3 class="card__name">${escapeHTML(p.n)}</h3>
+      <p class="card__desc">${desc}</p>
+      <div class="card__foot">${p.s ? '' : `<span class="card__price">${euro(p.p)}</span>`}<div class="sizes">${sizeChips(p)}</div></div>
+    </article>`;
+  }
+
+  function renderSignatures() {
+    const el = $('#sigGrid');
+    if (!el) return;
+    const ids = ['80', '120', '304', '307', '303', '104'];
+    el.innerHTML = ids.map((id, i) => {
+      const p = PRODUCTS[id];
+      const short = p.d.replace(/^(Sauce \w+|Crème fraîche), (fromage|mozzarella), /i, '').replace(/\.$/, '');
+      return `<article class="sig" data-reveal style="--d:${(i % 3) * 120}ms">
+        <span class="sig__num">0${i + 1} — ${escapeHTML(p.cat.label)}</span>
+        <div class="sig__media" data-cursor="Une part ?"><div class="burst">${burstSVG(16)}</div><img src="${p.img}" alt="Pizza ${escapeHTML(p.n)}" loading="lazy"></div>
+        <h3 class="sig__name">${escapeHTML(p.n)}</h3>
+        <p class="sig__desc">${escapeHTML(short.charAt(0).toUpperCase() + short.slice(1))}.</p>
+        <div class="sizes">${sizeChips(p)}</div>
+      </article>`;
+    }).join('');
+  }
+
+  function renderEnvieLinks() {
+    $$('[data-envies-links]').forEach(el => {
+      el.innerHTML = ENVIES.map(([label, re]) => `<a class="envie" href="carte.html?envie=${encodeURIComponent(label)}#envies" data-cursor="Voir">${label}<small>${envieMatches(re).length}</small></a>`).join('');
+    });
+  }
+
+  function renderZones() {
+    const el = $('#zonesList');
+    if (!el) return;
+    el.innerHTML = ZONES.map(([n, cp], i) => `<li class="zone" data-cp="${cp}" data-reveal style="--d:${i * 50}ms">
+      <span class="zone__n">${String(i + 1).padStart(2, '0')}</span><span class="zone__name">${n}</span>
+      <span class="zone__t">Gratuit · 40 min</span><span class="zone__cp">${cp}</span></li>`).join('');
+
+    const form = $('#checkForm'), input = $('#cpInput'), res = $('#checkRes');
+    if (!form) return;
+    const check = () => {
+      const v = input.value.trim().toLowerCase();
+      $$('.zone').forEach(z => z.classList.remove('is-match'));
+      if (!v) { res.className = 'checker__res'; res.innerHTML = ''; return; }
+      const hits = ZONES.filter(([n, cp]) => cp === v || (v.length > 2 && norm(n).includes(norm(v))));
+      if (hits.length) {
+        hits.forEach(([, cp]) => $$(`.zone[data-cp="${cp}"]`).forEach(z => z.classList.add('is-match')));
+        res.className = 'checker__res is-ok';
+        res.innerHTML = `<b>On vous livre</b><span>${hits.map(h => h[0] + ' (' + h[1] + ')').join(', ')} — livraison gratuite en 40 minutes, dès ${euro(INFO.minimum)} de commande.</span>`;
+      } else if (/^\d{5}$/.test(v) || v.length > 2) {
+        res.className = 'checker__res is-ko';
+        res.innerHTML = `<b>Hors zone</b><span>Pas de livraison ici pour l'instant… mais votre commande peut être à emporter au ${INFO.address} : <a href="#emporter">1 pizza achetée = la 2e offerte</a>.</span>`;
+      }
+    };
+    form.addEventListener('submit', e => { e.preventDefault(); check(); });
+    input.addEventListener('input', () => { if (input.value.trim().length >= 5 || input.value.trim().length === 0 || /\D/.test(input.value)) check(); });
+  }
+
+  /* ----- Page carte ----- */
+  function renderCarte() {
+    const wrap = $('#menu');
+    if (!wrap) return;
+    $('#catbar').innerHTML = DATA.cats.map(c => `<a href="#cat-${c.id}" data-cat="${c.id}">${c.label}<sup>${c.items.length}</sup></a>`).join('');
+    wrap.innerHTML = DATA.cats.map(c => `<section class="cat" id="cat-${c.id}" data-cat="${c.id}">
+        <div class="cat__head"><h2 class="split-me">${c.label}</h2><span class="cat__count" data-count-cat>${c.items.length} produits${c.pizza ? ' · Junior / Senior / Mega' : ''}</span></div>
+        <div class="grid">${c.items.map((it, i) => cardHTML(PRODUCTS[it.id], i)).join('')}</div>
+      </section>`).join('') + `<div class="empty-msg" id="emptyMsg"><p class="display display--sm">Aucun produit</p></div>`;
+
+    // Vos envies
+    const box = $('#enviesBtns');
+    box.innerHTML = ENVIES.map(([label, re], i) => `<button type="button" class="envie" data-envie="${i}" aria-pressed="false">${label}<small>${envieMatches(re).length}</small></button>`).join('');
+    let active = -1;
+    const apply = (idx, scroll) => {
+      active = idx;
+      $$('.envie', box).forEach((b, i) => b.setAttribute('aria-pressed', i === idx));
+      const status = $('#enviesStatus');
+      if (idx < 0) {
+        $$('.card', wrap).forEach(c => { c.classList.remove('is-hidden', 'is-pop'); });
+        $$('.cat', wrap).forEach(s => {
+          s.classList.remove('is-hidden');
+          const n = $$('.card', s).length;
+          $('[data-count-cat]', s).textContent = `${n} produits${DATA.cats.find(c => c.id === s.dataset.cat).pizza ? ' · Junior / Senior / Mega' : ''}`;
+        });
+        $$('.card__desc mark', wrap).forEach(m => m.replaceWith(m.textContent));
+        status.innerHTML = 'Choisissez un ingrédient : on vous montre tous les produits qui en contiennent.';
+        $('#emptyMsg').classList.remove('is-on');
+        try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) { /* file:// */ }
+        return;
+      }
+      const [label, re] = ENVIES[idx];
+      let total = 0, k = 0;
+      $$('.cat', wrap).forEach(s => {
+        let n = 0;
+        $$('.card', s).forEach(card => {
+          const p = PRODUCTS[card.dataset.id];
+          const hit = re.test(norm(p.n + ' ' + p.d));
+          card.classList.toggle('is-hidden', !hit);
+          card.classList.remove('is-pop');
+          const d = $('.card__desc', card);
+          d.innerHTML = escapeHTML(p.d || (p.cat.pizza ? '' : p.cat.label));
+          if (hit) {
+            n++;
+            void card.offsetWidth;
+            card.style.setProperty('--i', k++);
+            card.classList.add('is-pop');
+            d.innerHTML = markTerm(p.d || '', re);
+          }
+        });
+        s.classList.toggle('is-hidden', !n);
+        $('[data-count-cat]', s).textContent = `${n} produit${n > 1 ? 's' : ''} avec ${label.toLowerCase()}`;
+        total += n;
+      });
+      status.innerHTML = `<b>${total} produit${total > 1 ? 's' : ''}</b> avec ${label.toLowerCase()} · <button type="button" class="link" id="enviesReset" style="border:0;background:none;padding:0">tout afficher</button>`;
+      $('#emptyMsg').classList.toggle('is-on', !total);
+      try { history.replaceState(null, '', `?envie=${encodeURIComponent(label)}${location.hash}`); } catch (e) { /* file:// */ }
+      if (scroll) $('#menu').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    };
+    box.addEventListener('click', e => {
+      const b = e.target.closest('[data-envie]');
+      if (b) apply(+b.dataset.envie === active ? -1 : +b.dataset.envie, true);
+    });
+    document.addEventListener('click', e => { if (e.target.id === 'enviesReset') apply(-1); });
+    const q = new URLSearchParams(location.search).get('envie');
+    const qi = q ? ENVIES.findIndex(([l]) => norm(l) === norm(q)) : -1;
+    apply(qi, false);
+
+    // Catégorie active dans la barre (scrollspy)
+    const links = $$('#catbar a');
+    const spy = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (!en.isIntersecting) return;
+        links.forEach(a => {
+          const on = a.dataset.cat === en.target.dataset.cat;
+          a.classList.toggle('is-active', on);
+          if (on) {
+            const bar = a.parentElement;
+            bar.scrollTo({ left: a.offsetLeft - bar.clientWidth / 2 + a.offsetWidth / 2, behavior: reduceMotion ? 'auto' : 'smooth' });
+          }
+        });
+      });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    $$('.cat', wrap).forEach(s => spy.observe(s));
+  }
 
   /* =======================================================
      OUVERT / FERMÉ (heure de Paris)
      ======================================================= */
   function updateOpen() {
-    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
-      timeZone: 'Europe/Paris', weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false
-    }).formatToParts(new Date()).map(p => [p.type, p.value]));
-    const day = parts.weekday; // Mon..Sun
-    const mins = (+parts.hour % 24) * 60 + +parts.minute;
-    const isSunday = day === 'Sun';
-    const open = !isSunday && mins >= 11 * 60 && mins < 23 * 60;
-    let text;
-    if (open) text = 'Ouvert maintenant · jusqu\'à 23h';
-    else if (isSunday || (day === 'Sat' && mins >= 23 * 60)) text = 'Fermé · réouverture lundi 11h';
-    else if (mins < 11 * 60) text = 'Fermé · ouvre à 11h';
-    else text = 'Fermé · réouverture demain 11h';
-    $('#openText').textContent = text;
-    $('#openBadge').classList.toggle('is-closed', !open);
+    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Paris', weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(new Date()).map(p => [p.type, p.value]));
+    const day = parts.weekday, mins = (+parts.hour % 24) * 60 + +parts.minute;
+    const open = day !== 'Sun' && mins >= 660 && mins < 1380;
+    let txt;
+    if (open) txt = 'Ouvert maintenant · jusqu’à 23h';
+    else if (day === 'Sun' || (day === 'Sat' && mins >= 1380)) txt = 'Fermé · réouverture lundi 11h';
+    else if (mins < 660) txt = 'Fermé · ouvre à 11h';
+    else txt = 'Fermé · réouverture demain 11h';
+    $$('[data-open]').forEach(el => { el.classList.toggle('is-closed', !open); el.innerHTML = `<i></i>${txt}`; });
   }
 
   /* =======================================================
-     APPARITIONS (IntersectionObserver)
+     ANIMATIONS
      ======================================================= */
-  let io;
+  function splitWords(el) {
+    if (el.dataset.split) return;
+    el.dataset.split = '1';
+    const label = el.textContent.replace(/\s+/g, ' ').trim();
+    let i = 0;
+    const walk = node => {
+      const frag = document.createDocumentFragment();
+      node.childNodes.forEach(ch => {
+        if (ch.nodeType === 3) {
+          ch.textContent.split(/(\s+)/).forEach(part => {
+            if (!part) return;
+            if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); return; }
+            const w = document.createElement('span');
+            w.className = 'w';
+            const inner = document.createElement('span');
+            inner.textContent = part;
+            w.style.setProperty('--i', i++);
+            w.appendChild(inner);
+            inner.style.setProperty('--i', i);
+            frag.appendChild(w);
+          });
+        } else if (ch.nodeType === 1 && ch.tagName !== 'BR') {
+          const c = ch.cloneNode(false);
+          c.appendChild(walk(ch));
+          frag.appendChild(c);
+        } else frag.appendChild(ch.cloneNode(true));
+      });
+      return frag;
+    };
+    const frag = walk(el);
+    el.textContent = '';
+    el.appendChild(frag);
+    el.classList.add('split');
+    if (!el.getAttribute('aria-label')) el.setAttribute('aria-label', label);
+    $$('.w', el).forEach(w => w.setAttribute('aria-hidden', 'true'));
+  }
+
+  function hydrate() {
+    $$('[data-burst]').forEach(el => { el.innerHTML = burstSVG(+el.dataset.burst || 18) + el.innerHTML; });
+    $$('[data-zigzag]').forEach(el => { el.outerHTML = zigzagSVG(+el.dataset.zigzag || 60); });
+    $$('.zz polyline').forEach(p => { try { p.style.setProperty('--len', Math.ceil(p.getTotalLength() + 20)); } catch (e) { /* noop */ } });
+    $$('.split-me, .display, .hero__title').forEach(splitWords);
+    const giant = $('#giant');
+    if (giant) giant.innerHTML = [...giant.textContent].map(ch => ch === ' ' ? ' ' : `<span class="ch" aria-hidden="true">${ch}</span>`).join('');
+  }
+
   function startReveals() {
-    const targets = $$('[data-reveal], [data-split]:not(.hero__line), .zigzag, .zones__list, .number');
+    const targets = $$('[data-reveal], .split, .zz, [data-count]');
     if (reduceMotion || !('IntersectionObserver' in window)) {
       targets.forEach(t => t.classList.add('is-in'));
-      $$('.hero__line').forEach(t => t.classList.add('is-in'));
-      $$('[data-count]').forEach(el => { el.textContent = el.dataset.count + (el.dataset.suffix || ''); });
+      $$('[data-count]').forEach(el => { el.textContent = el.dataset.count; });
       return;
     }
-    io = new IntersectionObserver(entries => {
+    const io = new IntersectionObserver(entries => {
       entries.forEach(en => {
         if (!en.isIntersecting) return;
         en.target.classList.add('is-in');
-        $$('[data-count]', en.target).forEach(countUp);
-        if (en.target.matches('.zones__list')) setTimeout(() => en.target.classList.add('settled'), 1600);
+        if (en.target.dataset.count) countUp(en.target);
         io.unobserve(en.target);
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    }, { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
     targets.forEach(t => io.observe(t));
-    $$('.hero__line').forEach(t => t.classList.add('is-in'));
+    // Les nouvelles cartes (filtre) apparaissent sans attendre
+    startReveals.io = io;
   }
-
   function countUp(el) {
-    const target = +el.dataset.count, suffix = el.dataset.suffix || '';
-    const t0 = performance.now(), dur = 1400;
+    const target = +el.dataset.count, t0 = performance.now();
     const tick = now => {
-      const p = clamp((now - t0) / dur);
-      const e = 1 - Math.pow(1 - p, 4);
-      el.textContent = Math.round(target * e) + suffix;
+      const p = clamp((now - t0) / 1500), e = 1 - Math.pow(1 - p, 4);
+      el.textContent = Math.round(target * e);
       if (p < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
   }
 
-  /* =======================================================
-     MARQUEES
-     ======================================================= */
-  const marquees = $$('[data-marquee]').map(m => {
-    const track = $('.marquee__track', m);
-    m.setAttribute('aria-hidden', 'true');
-    const original = track.innerHTML;
-    let guard = 0;
-    while (track.scrollWidth < window.innerWidth * 1.5 && guard++ < 10) track.innerHTML += original;
-    track.innerHTML += track.innerHTML;
-    return { track, dir: +m.dataset.marquee, x: 0, half: track.scrollWidth / 2 };
-  });
-
-  /* =======================================================
-     SCROLL HORIZONTAL
-     ======================================================= */
-  const hSection = $('#plus'), hTrack = $('#hTrack');
-  const hPanels = $$('.hpanel', hTrack);
-  let hDist = 0;
-  function sizeHScroll() {
-    hDist = Math.max(0, hTrack.scrollWidth - window.innerWidth);
-    hSection.style.height = (hDist + window.innerHeight) + 'px';
-    marquees.forEach(m => { m.half = m.track.scrollWidth / 2; });
-  }
-
-  /* =======================================================
-     MANIFESTE — mots qui s'allument au scroll
-     ======================================================= */
-  const mani = $('#manifesto');
-  const HL = /^(fromage|file,|débordent,|trois|gratuite|Mega)/i;
-  (function splitWords() {
-    const words = mani.textContent.trim().split(/\s+/);
-    mani.setAttribute('aria-label', mani.textContent.trim());
-    mani.innerHTML = '<span aria-hidden="true">' + words.map(w => `<span class="w${HL.test(w) ? ' hl' : ''}">${w}</span>`).join(' ') + '</span>';
-  })();
-  const maniWords = $$('.w', mani);
-
-  /* =======================================================
-     CURSEUR, MAGNÉTISME, TILT
-     ======================================================= */
-  const cursor = $('#cursor'), cursorLabel = $('#cursorLabel');
-  const mouse = { x: innerWidth / 2, y: innerHeight / 2, nx: 0, ny: 0 };
-  const cpos = { x: mouse.x, y: mouse.y };
-  const useCursor = finePointer && !reduceMotion;
-  if (useCursor) document.documentElement.classList.add('has-cursor');
-
-  window.addEventListener('pointermove', e => {
-    mouse.x = e.clientX; mouse.y = e.clientY;
-    mouse.nx = (e.clientX / innerWidth) * 2 - 1;
-    mouse.ny = (e.clientY / innerHeight) * 2 - 1;
-  }, { passive: true });
-
-  if (useCursor) {
-    document.addEventListener('pointerover', e => {
-      const t = e.target.closest('[data-cursor], a, button');
-      if (t) {
-        cursor.classList.add('is-big');
-        cursorLabel.textContent = t.dataset.cursor || 'Clic';
-      } else cursor.classList.remove('is-big');
+  function setupMarquees() {
+    return $$('[data-marquee]').map(m => {
+      const track = $('.marquee__track', m);
+      m.setAttribute('aria-hidden', 'true');
+      const original = track.innerHTML;
+      let guard = 0;
+      while (track.scrollWidth < innerWidth * 1.6 && guard++ < 12) track.innerHTML += original;
+      track.innerHTML += track.innerHTML;
+      return { track, dir: +m.dataset.marquee, x: 0, half: track.scrollWidth / 2 };
     });
-    document.addEventListener('pointerdown', () => cursor.classList.add('is-down'));
-    document.addEventListener('pointerup', () => cursor.classList.remove('is-down'));
-    document.addEventListener('mouseleave', () => { cursor.style.opacity = 0; });
-    document.addEventListener('mouseenter', () => { cursor.style.opacity = 1; });
   }
 
-  if (finePointer && !reduceMotion) {
+  function setupCursor() {
+    if (!finePointer || reduceMotion) return null;
+    document.documentElement.classList.add('has-cursor');
+    const el = $('#cursor'), lbl = $('#cursorLabel');
+    document.addEventListener('pointerover', e => {
+      const t = e.target.closest('[data-cursor], a, button, label');
+      el.classList.toggle('is-big', !!(t && t.dataset.cursor));
+      lbl.textContent = t && t.dataset.cursor ? t.dataset.cursor : '';
+      el.style.scale = t && !t.dataset.cursor ? '2' : '1';
+    });
+    document.addEventListener('mouseleave', () => { el.style.opacity = 0; });
+    document.addEventListener('mouseenter', () => { el.style.opacity = 1; });
+    return el;
+  }
+
+  function setupMagnetic() {
+    if (!finePointer || reduceMotion) return;
     $$('.magnetic').forEach(el => {
       el.addEventListener('pointermove', e => {
         const r = el.getBoundingClientRect();
-        const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
-        el.style.translate = `${dx * 0.3}px ${dy * 0.4}px`;
+        el.style.translate = `${(e.clientX - r.left - r.width / 2) * .25}px ${(e.clientY - r.top - r.height / 2) * .35}px`;
       });
       el.addEventListener('pointerleave', () => { el.style.translate = '0 0'; });
     });
-
-    document.addEventListener('pointermove', e => {
-      const star = e.target.closest('.star');
-      $$('.star__inner.is-tilt').forEach(s => {
-        if (!star || !star.contains(s)) { s.style.transform = ''; s.classList.remove('is-tilt'); }
-      });
-      if (!star) return;
-      const inner = $('.star__inner', star);
-      const r = star.getBoundingClientRect();
-      const px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
-      inner.classList.add('is-tilt');
-      inner.style.transform = `rotateY(${px * 18}deg) rotateX(${-py * 14}deg)`;
-    }, { passive: true });
   }
 
-  /* =======================================================
-     BOUCLE D'ANIMATION (scroll + souris)
-     ======================================================= */
-  const nav = $('#nav'), bar = $('#progressBar'), toTop = $('#toTop');
-  const hero = $('#top'), heroPizza = $('#heroPizza');
-  const floaties = $$('.floaty');
-  const speedEls = $$('[data-speed]');
-  let lastY = scrollY, vel = 0, scrollDir = 1;
+  function loop(marquees, cursorEl) {
+    const nav = $('#nav'), bar = $('#progress');
+    const heroMedia = $('.hero__media');
+    const heroEl = $('.hero');
+    const hSec = $('.hscroll'), hTrack = $('.hscroll__track');
+    const hPanels = hTrack ? $$('.hpanel', hTrack) : [];
+    const mouse = { x: innerWidth / 2, y: innerHeight / 2 }, cpos = { ...mouse };
+    let lastY = scrollY, vel = 0, dir = 1, hDist = 0;
 
-  toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }));
+    addEventListener('pointermove', e => { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
+    const size = () => {
+      if (hSec) { hDist = Math.max(0, hTrack.scrollWidth - innerWidth); hSec.style.height = (hDist + innerHeight) + 'px'; }
+      marquees.forEach(m => { m.half = m.track.scrollWidth / 2; });
+    };
+    size();
+    addEventListener('resize', size);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(size);
 
-  function frame() {
-    const y = scrollY, vh = innerHeight;
-    const dy = y - lastY;
-    vel = lerp(vel, dy, 0.2);
-    if (Math.abs(dy) > 0.5) scrollDir = dy > 0 ? 1 : -1;
+    const frame = () => {
+      const y = scrollY, vh = innerHeight, dy = y - lastY;
+      vel = lerp(vel, dy, .2);
+      if (Math.abs(dy) > .5) dir = dy > 0 ? 1 : -1;
 
-    // progression globale
-    const max = document.documentElement.scrollHeight - vh;
-    const p = max > 0 ? y / max : 0;
-    bar.style.transform = `scaleX(${p})`;
-    toTop.style.setProperty('--p', p);
-    toTop.classList.toggle('is-on', y > vh * 0.9);
+      const max = document.documentElement.scrollHeight - vh;
+      bar.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
 
-    // nav
-    nav.classList.toggle('is-scrolled', y > 30);
-    if (!mobileMenu.classList.contains('is-open')) {
-      if (dy > 6 && y > 400) nav.classList.add('is-hidden');
-      else if (dy < -6 || y < 400) nav.classList.remove('is-hidden');
-    }
-
-    if (!reduceMotion) {
-      // héros : la pizza tourne et s'ouvre au scroll
-      const hp = clamp(y / hero.offsetHeight);
-      heroPizza.style.transform = `rotate(${y * 0.25}deg) scale(${1 + hp * 0.25})`;
-      heroPizza.style.setProperty('--spull', (hp * 34).toFixed(2));
-
-      floaties.forEach(el => {
-        const d = +el.dataset.depth;
-        el.style.translate = `${mouse.nx * d * 30}px ${mouse.ny * d * 30 - y * d * 0.35}px`;
-      });
-
-      speedEls.forEach(el => {
-        const r = el.parentElement.getBoundingClientRect();
-        const offset = (r.top + r.height / 2 - vh / 2) * +el.dataset.speed;
-        el.style.translate = `0 ${offset.toFixed(1)}px`;
-      });
-
-      // marquees : vitesse liée au scroll, sens inversé quand on remonte
-      marquees.forEach(m => {
-        m.x -= m.dir * scrollDir * (1.2 + Math.min(Math.abs(vel) * 0.35, 30));
-        if (m.x <= -m.half) m.x += m.half;
-        if (m.x > 0) m.x -= m.half;
-        m.track.style.transform = `translate3d(${m.x}px,0,0)`;
-      });
-
-      // curseur
-      if (useCursor) {
-        cpos.x = lerp(cpos.x, mouse.x, 0.22);
-        cpos.y = lerp(cpos.y, mouse.y, 0.22);
-        cursor.style.translate = `${cpos.x}px ${cpos.y}px`;
+      const heroBottom = heroEl ? heroEl.offsetHeight - 90 : 40;
+      nav.classList.toggle('is-solid', y > heroBottom || !heroEl);
+      if (!$('#mmenu').classList.contains('is-open')) {
+        if (dy > 6 && y > 500) nav.classList.add('is-hidden');
+        else if (dy < -6 || y < 500) nav.classList.remove('is-hidden');
       }
-    }
 
-    // scroll horizontal (fonctionne aussi en mouvement réduit : c'est de la navigation)
-    const hr = hSection.getBoundingClientRect();
-    if (hr.top < vh && hr.bottom > 0) {
-      const hp = clamp(-hr.top / Math.max(1, hr.height - vh));
-      hTrack.style.transform = `translate3d(${-hp * hDist}px,0,0)`;
-      hPanels.forEach(panel => {
-        const pr = panel.getBoundingClientRect();
-        const vis = 1 - clamp(Math.abs(pr.left + pr.width / 2 - innerWidth / 2) / innerWidth);
-        panel.style.setProperty('--p', reduceMotion ? 1 : vis.toFixed(3));
-      });
-    }
+      if (!reduceMotion) {
+        if (heroMedia && y < vh * 1.2) heroMedia.style.translate = `0 ${y * .3}px`;
+        marquees.forEach(m => {
+          m.x -= m.dir * dir * (1 + Math.min(Math.abs(vel) * .3, 26));
+          if (m.x <= -m.half) m.x += m.half;
+          if (m.x > 0) m.x -= m.half;
+          m.track.style.transform = `translate3d(${m.x}px,0,0)`;
+        });
+        if (cursorEl) {
+          cpos.x = lerp(cpos.x, mouse.x, .2); cpos.y = lerp(cpos.y, mouse.y, .2);
+          cursorEl.style.translate = `${cpos.x}px ${cpos.y}px`;
+        }
+      }
 
-    // manifeste
-    const mr = mani.getBoundingClientRect();
-    if (mr.top < vh && mr.bottom > 0) {
-      const mp = reduceMotion ? 1 : clamp((vh * 0.85 - mr.top) / (mr.height + vh * 0.2));
-      const n = Math.round(mp * maniWords.length);
-      maniWords.forEach((w, i) => w.classList.toggle('on', i < n));
-    }
-
-    lastY = y;
+      if (hSec) {
+        const r = hSec.getBoundingClientRect();
+        if (r.top < vh && r.bottom > 0) {
+          const p = clamp(-r.top / Math.max(1, r.height - vh));
+          hTrack.style.transform = `translate3d(${-p * hDist}px,0,0)`;
+          hPanels.forEach(pn => {
+            const pr = pn.getBoundingClientRect();
+            pn.style.setProperty('--p', reduceMotion ? 1 : (1 - clamp(Math.abs(pr.left + pr.width / 2 - innerWidth / 2) / innerWidth)).toFixed(3));
+          });
+        }
+      }
+      lastY = y;
+      requestAnimationFrame(frame);
+    };
     requestAnimationFrame(frame);
   }
 
   /* =======================================================
-     LOADER + INITIALISATION
+     TRANSITIONS ENTRE PAGES
      ======================================================= */
-  function init() {
-    hydrateShapes();
-    $$('.pizza[data-recipe]').forEach(renderPizza);
-    $$('[data-split]').forEach(splitText);
-    renderStars();
-    renderTabs();
-    renderMenu();
-    renderZones();
-    setMode(cart.mode, false);
-    renderCart();
-    updateOpen();
-    setInterval(updateOpen, 60000);
-    $('#year').textContent = new Date().getFullYear();
-    sizeHScroll();
-    window.addEventListener('resize', sizeHScroll);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(sizeHScroll);
-    requestAnimationFrame(frame);
+  function setupCurtain() {
+    const curtain = $('#curtain');
+    if (!curtain) return Promise.resolve();
+    let seen = false;
+    try { seen = sessionStorage.getItem('pf-seen') === '1'; sessionStorage.setItem('pf-seen', '1'); } catch (e) { /* noop */ }
+    if (reduceMotion) { curtain.remove(); return Promise.resolve(); }
+    if (seen) curtain.classList.add('is-quick');
+    const wait = seen ? 350 : 1300;
+    const fontsReady = document.fonts ? Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 2500))]) : Promise.resolve();
+    const lifted = Promise.all([fontsReady, new Promise(r => setTimeout(r, wait))]).then(() => {
+      curtain.classList.add('is-up');
+      document.body.classList.remove('is-locked');
+    });
+
+    // Rideau qui retombe avant de changer de page
+    document.addEventListener('click', e => {
+      const a = e.target.closest('a[href]');
+      if (!a || a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+      const href = a.getAttribute('href');
+      if (!/^[\w-]+\.html/.test(href)) return;
+      const samePage = href.split(/[?#]/)[0] === (location.pathname.split('/').pop() || 'index.html');
+      if (samePage && href.includes('#') && !href.includes('?')) return;
+      e.preventDefault();
+      curtain.classList.add('is-quick');
+      curtain.classList.remove('is-up');
+      setTimeout(() => { location.href = href; }, 620);
+    });
+    addEventListener('pageshow', e => { if (e.persisted) curtain.classList.add('is-up'); });
+    return lifted;
   }
 
-  function runLoader() {
-    const loader = $('#loader'), count = $('#loaderCount');
-    const finish = () => {
-      loader.classList.add('is-done');
-      document.body.classList.remove('is-loading');
-      startReveals();
-      setTimeout(() => loader.remove(), 1100);
-    };
-    if (reduceMotion) { loader.remove(); document.body.classList.remove('is-loading'); startReveals(); return; }
-    const t0 = performance.now(), minDur = 1300;
-    let loaded = document.readyState === 'complete';
-    window.addEventListener('load', () => { loaded = true; });
-    const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
-    let fontsOk = false;
-    fontsReady.then(() => { fontsOk = true; });
-    const tick = now => {
-      const elapsed = now - t0;
-      const ready = (loaded && fontsOk) || elapsed > 3500;
-      const p = ready ? clamp(elapsed / minDur) : Math.min(0.9, elapsed / (minDur * 1.4));
-      count.textContent = Math.round(p * 100);
-      if (ready && elapsed >= minDur) finish();
-      else requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  }
+  /* =======================================================
+     INITIALISATION
+     ======================================================= */
+  buildChrome();
+  bindCart();
+  bindModals();
+  $('#burger').addEventListener('click', () => toggleMenu());
+  $$('#mmenu a').forEach(a => a.addEventListener('click', () => toggleMenu(false)));
 
-  init();
-  runLoader();
+  renderSignatures();
+  renderEnvieLinks();
+  renderZones();
+  renderCarte();
+  renderCart();
+  updateOpen();
+  setInterval(updateOpen, 60000);
+  hydrate();
+
+  const marquees = setupMarquees();
+  const cursorEl = setupCursor();
+  setupMagnetic();
+  setupCurtain().then(() => {
+    startReveals();
+    if (location.hash) {
+      const t = document.getElementById(location.hash.slice(1));
+      if (t) setTimeout(() => t.scrollIntoView({ behavior: 'auto', block: 'start' }), 50);
+    }
+  });
+  loop(marquees, cursorEl);
 })();

@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Livraison & à emporter — Pizza Food</title>
+  <meta name="description" content="Pizza Food livre gratuitement en 40 minutes dans 11 villes du Val-de-Marne, minimum de commande 15 €. À emporter au 34 rue du Général de Gaulle, Chennevières-sur-Marne.">
+  <meta name="theme-color" content="#292622">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bowlby+One+SC&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <noscript><style>.curtain{display:none}</style></noscript>
+</head>
+<body data-page="livraison">
+  <div class="curtain" id="curtain" aria-hidden="true">
+    <div class="curtain__word"><span>Livraison</span></div>
+    <div class="curtain__line"><i></i></div>
+  </div>
+
+  <main>
+    <section class="hero hero--page">
+      <div class="hero__media"><img src="img/bandeaux/livraison.webp" alt="" fetchpriority="high"></div>
+      <div class="hero__meta"><span>Livraison gratuite · minimum 15 €</span><span>11 villes du Val-de-Marne</span></div>
+      <div class="hero__center">
+        <p class="eyebrow">L'engagement Pizza Food</p>
+        <h1 class="hero__title">Livrée en <em>40 min</em></h1>
+      </div>
+      <div class="hero__bottom">
+        <p class="lede" data-reveal>Votre commande n'est préparée qu'à votre appel, puis livrée gratuitement en 40 minutes. Ou passez la chercher : une pizza achetée, la deuxième est offerte.</p>
+        <div class="hero__ctas" data-reveal style="--d:150ms">
+          <a class="btn btn--light magnetic" href="#zones" data-cursor="Zones">Les zones</a>
+          <a class="btn btn--light btn--hot magnetic" href="#emporter" data-cursor="Hop">À emporter</a>
+        </div>
+      </div>
+      <div class="burst hero__badge" data-burst="20" data-cursor="Gratuit"><span>Livraison<b>gratuite</b></span></div>
+    </section>
+
+    <!-- ============ VÉRIFICATEUR ============ -->
+    <section class="sec">
+      <div class="checker">
+        <div>
+          <p class="eyebrow">Est-ce qu'on vous livre ?</p>
+          <h2 class="display display--md">Votre <em>code postal</em></h2>
+        </div>
+        <div>
+          <form id="checkForm" role="search" aria-label="Vérifier une adresse de livraison">
+            <label class="sr-only" for="cpInput">Code postal ou ville</label>
+            <input id="cpInput" type="text" inputmode="text" autocomplete="postal-code" placeholder="94430" maxlength="40">
+            <button type="submit" data-cursor="Vérifier">Vérifier →</button>
+          </form>
+          <div class="checker__res" id="checkRes" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ZONES ============ -->
+    <section class="sec" id="zones" style="padding-top:0">
+      <div class="head">
+        <div>
+          <p class="eyebrow">Zones de livraison</p>
+          <h2 class="display">Onze <em>villes</em></h2>
+        </div>
+        <p class="lede" data-reveal>Minimum de commande 15 €. En cas d'affluence, de problèmes techniques ou de contraintes climatiques, le délai peut être rallongé : vous en serez averti par le restaurant.</p>
+      </div>
+      <ul class="zones" id="zonesList"></ul>
+    </section>
+
+    <!-- ============ L'ENGAGEMENT ============ -->
+    <section class="sec sec--linen">
+      <div class="facts">
+        <div class="fact" data-reveal><b>0 €</b><span>Frais de livraison</span></div>
+        <div class="fact" data-reveal style="--d:100ms"><b><span data-count="40">40</span> min</b><span>Délai de livraison</span></div>
+        <div class="fact" data-reveal style="--d:200ms"><b><span data-count="15">15</span> €</b><span>Minimum de commande</span></div>
+        <div class="fact" data-reveal style="--d:300ms"><b>6j/7</b><span>De 11h à 23h · fermé le dimanche</span></div>
+      </div>
+      <div class="split-2" style="margin-top:clamp(60px,8vw,110px)">
+        <div class="photo" data-reveal="img" style="aspect-ratio:4/3"><img src="img/bandeaux/assiettes.webp" alt="Assiette grecque avec frites et crudités" loading="lazy"></div>
+        <div>
+          <p class="eyebrow">L'engagement Pizza Food</p>
+          <p class="quote" data-reveal>« Votre livraison gratuite en 40 minutes. »</p>
+          <p class="body-copy" data-reveal style="margin-top:24px">La satisfaction de nos clients, clés de notre succès, est avant tout liée à la qualité de nos produits dont la fraîcheur est une composante essentielle.</p>
+          <p class="body-copy" data-reveal>C'est pourquoi l'intégralité de votre commande ne sera préparée qu'à votre appel, entraînant un délai de livraison de 40 minutes.</p>
+          <button class="btn" type="button" data-modal="charte" data-cursor="Lire" style="margin-top:14px">Notre charte qualité</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ OFFRES ============ -->
+    <section class="sec sec--orange" id="offres">
+      <div class="offers">
+        <article class="offer" data-reveal>
+          <span class="offer__tag">En livraison</span>
+          <p class="offer__big"><small>2 pizzas achetées =</small>la 3e offerte*</p>
+        </article>
+        <article class="offer" data-reveal style="--d:120ms">
+          <span class="offer__tag">À emporter</span>
+          <p class="offer__big"><small>1 pizza achetée =</small>la 2e offerte*</p>
+        </article>
+      </div>
+      <p class="offers__note">* Valable sur les pizzas Senior et Mega, sauf Marguerita. La remise est calculée automatiquement dans votre panier.</p>
+    </section>
+
+    <!-- ============ À EMPORTER ============ -->
+    <section class="sec" id="emporter">
+      <div class="split-2">
+        <div>
+          <p class="eyebrow">À emporter</p>
+          <h2 class="display display--md">Passez la <em>chercher</em></h2>
+          <p class="body-copy" data-reveal style="margin-top:26px">Commandez par téléphone ou composez votre panier en ligne, puis récupérez votre commande au restaurant. Une pizza Senior ou Mega achetée, la deuxième est offerte (sauf Marguerita).</p>
+          <p class="info__big" data-reveal style="margin-top:26px">34 rue du Général de Gaulle<br>94430 Chennevières-sur-Marne</p>
+          <div class="hero__ctas" data-reveal>
+            <a class="btn btn--hot" href="https://www.google.com/maps/search/?api=1&amp;query=34+Rue+du+General+de+Gaulle+94430+Chennevieres-sur-Marne" target="_blank" rel="noopener" data-cursor="Go">Itinéraire</a>
+            <a class="btn" href="tel:0145942950" data-cursor="Appeler">01 45 94 29 50</a>
+            <a class="btn" href="tel:0749458955" data-cursor="Appeler">07 49 45 89 55</a>
+          </div>
+        </div>
+        <div class="photo" data-reveal="img" style="aspect-ratio:1"><img src="img/bandeaux/emporter.webp" alt="Pizza aux olives et tomates cerises" loading="lazy"></div>
+      </div>
+    </section>
+
+    <!-- ============ MODE ============ -->
+    <section class="sec sec--linen" id="commander">
+      <div class="head">
+        <div>
+          <p class="eyebrow">Commander</p>
+          <h2 class="display display--md">Votre <em>mode</em></h2>
+        </div>
+        <p class="open" data-open></p>
+      </div>
+      <div class="modes" role="radiogroup" aria-label="Type de commande">
+        <button class="mode" type="button" role="radio" aria-checked="true" data-mode="Livraison" data-cursor="Vroum">
+          <span class="mode__num">A</span>
+          <span class="mode__ico"><svg viewBox="0 0 64 48"><path d="M10 34h26l6-14h8M18 18h16v10H18z"/><circle cx="12" cy="38" r="6"/><circle cx="48" cy="38" r="6"/><path d="M50 20l-4-10h-6M0 24h7M2 30h6"/></svg></span>
+          <span class="mode__name">En livraison</span>
+          <p class="mode__info">Gratuite en 40 minutes · minimum 15 €</p>
+          <span class="mode__offer">2 achetées = la 3e offerte</span>
+          <span class="mode__check" aria-hidden="true">✓</span>
+        </button>
+        <button class="mode" type="button" role="radio" aria-checked="false" data-mode="À emporter" data-cursor="Hop">
+          <span class="mode__num">B</span>
+          <span class="mode__ico"><svg viewBox="0 0 64 48"><path d="M14 14h36l-4 32H18zM24 14v-4a8 8 0 0 1 16 0v4M26 30l5 5 8-9"/></svg></span>
+          <span class="mode__name">À emporter</span>
+          <p class="mode__info">34 rue du Général de Gaulle</p>
+          <span class="mode__offer">1 achetée = la 2e offerte</span>
+          <span class="mode__check" aria-hidden="true">✓</span>
+        </button>
+        <button class="mode" type="button" role="radio" aria-checked="false" data-mode="Sur place" data-cursor="À table">
+          <span class="mode__num">C</span>
+          <span class="mode__ico"><svg viewBox="0 0 64 48"><ellipse cx="32" cy="34" rx="24" ry="8"/><path d="M18 32L32 12l14 20M4 8v18M1 8v7M7 8v7M60 8c-5 3-5 12 0 13v13"/></svg></span>
+          <span class="mode__name">Sur place</span>
+          <p class="mode__info">Du lundi au samedi, 11h — 23h</p>
+          <span class="mode__offer mode__offer--muted">Fermé le dimanche</span>
+          <span class="mode__check" aria-hidden="true">✓</span>
+        </button>
+      </div>
+      <div class="modes-foot">
+        <p>Mode choisi : <b data-modelabel>Livraison</b></p>
+        <a class="btn btn--hot magnetic" href="carte.html" data-cursor="Miam">Voir la carte <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h17M14 6l6 6-6 6"/></svg></a>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
