@@ -955,6 +955,11 @@
     if (!finePointer || reduceMotion) return null;
     document.documentElement.classList.add('has-cursor');
     const el = $('#cursor');
+    // Le point jaune remplace la souris : il est placé directement à chaque mouvement, sans retard
+    el.style.opacity = 0;
+    const place = e => { el.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`; el.style.opacity = 1; };
+    document.addEventListener('pointermove', place, { passive: true });
+    document.addEventListener('pointerdown', place, { passive: true });
     document.addEventListener('pointerover', e => {
       // le curseur reste un petit rond jaune : il grossit à peine sur les éléments cliquables
       el.classList.toggle('is-hover', !!e.target.closest('[data-cursor], a, button, label, .pz'));
@@ -994,7 +999,7 @@
       mani.innerHTML = '<span aria-hidden="true">' + words.map(w => `<span class="w${HL.test(w) ? ' hl' : ''}">${w}</span>`).join(' ') + '</span>';
       maniWords = $$('.w', mani);
     }
-    const mouse = { x: innerWidth / 2, y: innerHeight / 2, nx: 0, ny: 0 }, cpos = { ...mouse };
+    const mouse = { x: innerWidth / 2, y: innerHeight / 2, nx: 0, ny: 0 };
     addEventListener('pointermove', e => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.nx = e.clientX / innerWidth * 2 - 1; mouse.ny = e.clientY / innerHeight * 2 - 1; }, { passive: true });
     let lastY = scrollY, vel = 0, dir = 1, hDist = 0;
     const size = () => {
@@ -1054,7 +1059,6 @@
           if (m.x > 0) m.x -= m.half;
           m.track.style.transform = `translate3d(${m.x}px,0,0)`;
         });
-        if (cursorEl) { cpos.x = lerp(cpos.x, mouse.x, .22); cpos.y = lerp(cpos.y, mouse.y, .22); cursorEl.style.translate = `${cpos.x}px ${cpos.y}px`; }
       }
       if (hSec) {
         const r = hSec.getBoundingClientRect();

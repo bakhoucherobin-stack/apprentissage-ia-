@@ -136,12 +136,12 @@ button { cursor: pointer; }
 .zigzag--o polyline { stroke: var(--orange); }
 
 /* ---------- Curseur, progression, particules ---------- */
-.cursor { position: fixed; top: 0; left: 0; z-index: 1000; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: var(--yellow); border: 2px solid var(--charcoal); pointer-events: none; display: none; place-items: center; transition: width .35s var(--ease-pop), height .35s var(--ease-pop), margin .35s var(--ease-pop), background .2s; }
+.cursor { position: fixed; top: 0; left: 0; z-index: 1000; will-change: transform; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: var(--yellow); border: 2px solid var(--charcoal); pointer-events: none; display: none; place-items: center; transition: width .35s var(--ease-pop), height .35s var(--ease-pop), margin .35s var(--ease-pop), background .2s; }
 .has-cursor .cursor { display: grid; }
 .cursor span { display: none; }
 .cursor.is-hover { width: 30px; height: 30px; margin: -15px 0 0 -15px; }
 .cursor.is-down { scale: .8; }
-@media (hover: hover) and (pointer: fine) { .has-cursor, .has-cursor a, .has-cursor button, .has-cursor label { cursor: none; } }
+@media (hover: hover) and (pointer: fine) { .has-cursor, .has-cursor * { cursor: none !important; } }
 .progress { position: fixed; top: 0; left: 0; right: 0; z-index: 120; height: 6px; pointer-events: none; }
 .progress i { display: block; height: 100%; background: var(--yellow); border-bottom: 2px solid var(--charcoal); transform-origin: 0 50%; transform: scaleX(0); }
 .fx { position: fixed; inset: 0; z-index: 950; pointer-events: none; }
