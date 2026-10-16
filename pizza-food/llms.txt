@@ -1,0 +1,284 @@
+# Pizza Food
+
+> Pizzeria et restauration rapide au 34 rue du Général de Gaulle, 94430 Chennevières-sur-Marne (Val-de-Marne, France). Pizzas, burgers, tacos, tex-mex, sandwichs, salades et desserts, en livraison gratuite, à emporter ou sur place.
+
+## Infos pratiques
+
+- Téléphone : 01 45 94 29 50 ou 07 49 45 89 55 — e-mail : contact@pizza-food.fr
+- Horaires : du lundi au samedi, de 11 h à 23 h (fermé le dimanche).
+- Livraison gratuite, minimum de commande 15 €, délai indicatif 40 minutes. À emporter : environ 20 minutes.
+- Villes livrées : Chennevières-sur-Marne, Bonneuil-sur-Marne, Champigny-sur-Marne, La Queue-en-Brie, La Varenne Saint-Hilaire, Le Plessis-Trévise, Noiseau, Ormesson-sur-Marne, Saint-Maur-des-Fossés, Sucy-en-Brie, Villiers-sur-Marne.
+- Offres : en livraison, 2 pizzas achetées = la 3e offerte ; à emporter, 1 pizza achetée = la 2e offerte.
+- Paiement à la livraison ou au retrait uniquement : carte bancaire (terminal), espèces, titres-restaurant. Aucun paiement en ligne.
+- Commande : sur le site (panier, puis e-mail pré-rempli envoyé au restaurant) ou par téléphone.
+- Allergènes : tableau sur le site pour les pizzas ; pour les autres produits, appeler le restaurant avant de commander.
+
+## Pages
+
+- [Accueil](https://pizza-food.fr/index.html)
+- [La carte](https://pizza-food.fr/carte.html)
+- [Livraison et à emporter](https://pizza-food.fr/livraison.html)
+- [Ma commande](https://pizza-food.fr/commande.html)
+- [Mentions légales](https://pizza-food.fr/mentions-legales.html)
+- [Conditions générales de vente](https://pizza-food.fr/cgv.html)
+- [Conditions d'utilisation](https://pizza-food.fr/cgu.html)
+- [Politique de confidentialité](https://pizza-food.fr/confidentialite.html)
+- [Politique cookies](https://pizza-food.fr/cookies.html)
+- [Accessibilité](https://pizza-food.fr/accessibilite.html)
+
+## La carte (prix TTC en euros)
+
+### Menus enfants
+
+- Cheese Burger — 6,50 € — 1 Cheese burger + 1 Frites + 1 Capri-sun + 1 Compote.
+- Nuggets — 6,50 € — 5 Nuggets + 1 Frites + 1 Capri-sun + 1 Compote.
+
+### Menus
+
+- Solo — 14,50 € — 1 Pizza Junior au choix + 6 Wings ou 6 Nuggets + 1 Boisson 33cl au choix.
+- Duo — 29,00 € — 2 Pizzas Senior au choix + 10 Wings ou 10 Nuggets + 1 Boisson maxi 1.5l.
+- Triple — 26,00 € — 3 Pizzas Junior au choix + 1 Boisson maxi 1.5l.
+
+### Menus midi
+
+- Pizza — 11,00 € — 1 Pizza Junior au choix + 1 Dessert au choix + 1 Boisson 33cl au choix.
+- Salade — 11,00 € — 1 Salade au choix + 1 Dessert au choix + 1 Boisson 33cl au choix.
+- Sandwich — 11,00 € — 1 Sandwich grec ou chicken + 1 Dessert au choix + 1 Boisson 33cl au choix.
+- Tex Mex — 11,00 € — 7 Pièces de tex-mex au choix + 1 Dessert au choix + 1 Boisson 33cl au choix.
+
+### Pizzas tomate
+
+- Marguerita — Junior 8,00 € / Senior 12,00 € / Mega 16,00 € — Sauce tomate, fromage, olives.
+- Reine — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, jambon, champignons.
+- Napolitaine — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, anchois, câpres, olives.
+- Vegetarienne — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, champignons, tomates fraîches, poivrons, oignons, olives.
+- Paysanne — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, lardons, oeuf.
+- Texas — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, pepperoni, viande hachée, oignons.
+- Campione — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, viande hachée, champignons, oeuf.
+- Neptune — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, thon, poivrons, oeuf, olives.
+- Buffalo — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, mozzarella, viande hachée, poivrons, oignons rouges, sauce barbecue.
+- Bolognaise — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, viande hachée,pommes de terre, oignons.
+- Orientale — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, merguez, poivrons, oeuf, olives.
+- 4 Saisons — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, jambon*, artichauts, champignons, poivrons.
+- Chicken — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, poulet, pommes de terre, poivrons, fromage à raclette.
+- Boursin — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, viande hachée, oignons, boursin.
+- Kebab — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, viande de kebab, tomates fraîches, oeuf, origan.
+- Mexicaine — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, poulet paprika, poivrons, oignons, tomates fraîches.
+- 4 Fromages — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, assortiment de 4 fromages.
+- 3 Jambons — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, jambon, chorizo, lardons.
+- Fruits De Mer — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, cocktail de fruits de mer, persil, huile d'olives.
+- Mega Viande — Junior 11,00 € / Senior 18,00 € / Mega 25,00 € — Sauce tomate, fromage, poulet, viande hachée, merguez, jambon.
+- Bresilienne — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, viande hachée, merguez, poivrons, oeuf.
+- Saumon — Junior 11,00 € / Senior 18,00 € / Mega 25,00 € — Sauce tomate, fromage, saumon fumé, pot de crème fraîche.
+- Pepperoni — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Tomate, mozzarella, fromage, pepperoni.
+- Canaveroise — Junior 8,00 € / Senior 12,00 € / Mega 16,00 € — Sauce tomate, aubergine, jambon, artichauts.
+
+### Pizzas crème fraîche
+
+- Fermiere — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Crème fraîche, fromage, poulet, pommes de terre.
+- Milano — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Crème fraîche, fromage, lardons, raclette, pommes de terre, oignons.
+- Tartiflette — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Crème fraîche, fromage, lardons, raclette, pommes de terre, oignons.
+- Capricieuse — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Crème fraîche, fromage, jambon, pommes de terre, oignons.
+- Speciale — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Crème fraîche, fromage, viande hachée, pommes de terre, reblochon, oignons.
+- Casanova — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Crème fraîche, fromage, bacon, reblochon, pommes de terre.
+- Chevre Miel — Junior 11,00 € / Senior 18,00 € / Mega 25,00 € — Crème fraîche, fromage, chèvre, miel.
+- Hawaienne Poulet — Junior 11,00 € / Senior 18,00 € / Mega 25,00 € — Crème fraîche, fromage, poulet, ananas.
+- Hawaienne Jambon — Junior 11,00 € / Senior 18,00 € / Mega 25,00 € — Crème fraîche, fromage, jambon, ananas.
+- Pacifico — Junior 11,00 € / Senior 18,00 € / Mega 25,00 € — Crème fraîche, fromage, saumon fumé.
+- Tartoffu — Junior 11,00 € / Senior 18,00 € / Mega 25,00 € — Crème fraîche, mozzarella, crème de truffe, champignons.
+- Toscane — Junior 11,00 € / Senior 18,00 € / Mega 25,00 € — Crème fraîche, mozzarella, poulet, chèvre, miel, noix.
+
+### Pizzas barbecue
+
+- Miami — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce barbecue, fromage, poulet, viande hachée, oignons.
+- Latina — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce barbecue, fromage, jambon, poulet, champignons.
+- Playa — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce barbecue, fromage, poulet rôti, bacon, poivrons, oignons rouges.
+- Crousty — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce barbecue, mozzarella, cheddar, tenders crispy, olives, poivrons, oignons rouges.
+- Indienne — Junior 11,00 € / Senior 18,00 € / Mega 25,00 € — Sauce curry, chicken curry, chicken tandoori, cheddar, tenders crispy, olives, poivrons, oignons rouges.
+
+### Pizzas calzones
+
+- Jambon — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, jambon, oeuf.
+- Viande Hachee — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, viande hachée, oeuf.
+- Thon — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, thon, oeuf.
+- 4 Fromages — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, brie, bleu, chèvre.
+- Merguez — Junior 11,00 € / Senior 17,00 € / Mega 23,00 € — Sauce tomate, fromage, merguez, oeuf.
+
+### Pâtes
+
+- Tagliatelles Tartuffa — 8,50 €
+- Tagliatelles Carbonara — 8,50 €
+- Tagliatelles Bolognaise — 8,50 €
+- Tagliatelles Saumon — 8,50 €
+- Tagliatelles 4 Fromages — 8,50 €
+- Tagliatelles Forestiere — 8,50 €
+- Lasagne Bolognaise — 8,50 €
+
+### Assiettes
+
+- Grec — 12,50 € — Servie avec salade verte, tomates, oignons, blé + Frites.
+- Chicken — 12,50 € — Servie avec salade verte, tomates, oignons, blé + Frites.
+- Steak — 12,50 € — Servie avec salade verte, tomates, oignons, blé + Frites.
+- Omelette — 12,50 € — Servie avec salade verte, tomates, oignons, blé + Frites.
+- Wings — 12,50 € — Servie avec salade verte, tomates, oignons, blé + Frites.
+- Mixte — 14,00 € — Servie avec salade verte, tomates, oignons, blé + Frites.
+
+### Sandwichs
+
+- Grec — 8,00 € — Viande de kebab + Frites.
+- Chicken Jaune — 8,00 € — Poulet mariné, sauce curry, cheddar + Frites.
+- Chicken Rouge — 8,00 € — Poulet mariné, sauce paprika, cheddar + Frites.
+- Radical — 9,00 € — 2 Steaks, cordon bleu, cheddar + Frites.
+- Escalope — 8,00 € — Escalope de volaille, cheddar + Frites.
+- Cordon Bleu — 8,00 € — Cordon bleu, cheddar + Frites.
+- Bily Joe — 9,00 € — 2 Steaks, oeuf, cheddar, bacon + Frites.
+- Duo — 7,50 € — 2 Steaks, cheddar + Frites.
+- Trio — 8,00 € — 3 Steaks, cheddar + Frites.
+- Quattro — 10,00 € — 4 Steaks, cheddar + Frites.
+- Boom — 10,00 € — Steak, viande de kebab, cheddar + Frites.
+- Boursin — 9,00 € — Escalope de volaille, sauce boursin, cheddar, mozzarella + Frites.
+- Du Chef — 9,00 € — Escalope de volaille, cheddar, crème fraîche, champignons + Frites.
+- Nevada — 10,00 € — 3 Steaks, bacon, galette de pommes de terre, triple cheddar + Frites.
+- Avocado Chicken — 9,00 € — Chicken curry, avocat + Frites.
+- Crispy Tenders — 9,00 € — Tenders, jambon, cheddar + Frites.
+- Chikitos — 9,00 € — Chicken curry, merguez + Frites.
+- Savoyard — 9,00 € — Escalope, galette de pommes de terre, raclette + Frites.
+- Mixte — 10,00 € — 2 Viandes au choix, cheddar + Frites.
+
+### Burgers gourmands
+
+- Le Big Mokh — 10,90 € — Pain gourmet brioché, steak du boucher, cheddar, oeuf, crispy oignons, crudités + frites.
+- Le Rosty Bbq — 10,90 € — Pain gourmet brioché, steak du boucher, galette de pommes de terre, double bacon, double cheddar, crudités + frites.
+- Le Chevre Miel — 10,90 € — Pain gourmet brioché, steak de boucher, chèvre, miel, crudités + frites.
+- Le New Yorkais — 10,90 € — Pain gourmet brioché, 1 steak du boucher, fromage, cornichons, crudités + frites.
+- Le Avocado Ranch — 10,90 € — Pain gourmet brioché, escalope de poulet, oeuf, tranches d'avocat, double cheddar + frites.
+- Le Forest — 10,90 € — Pain gourmet brioché, poulet crispy, champignons grillés, fromage raclette, cheddar + frites.
+- Le Chick Farmer — 10,90 € — Pain gourmet brioché, escalope poulet pané, double bacon, double cheddar, galette de pommes de terre + frites.
+- Le Magistral — 14,90 € — Pain gourmet brioché, triple steak, triple cheddar, triple bacon, lardons + frites.
+
+### Burgers classiques
+
+- Cheese — 5,00 € — 1 Steak 45g, cheddar + Frites
+- Double Cheese — 6,50 € — 2 Steaks 45g, double cheddar + Frites.
+- Royal Cheese — 6,50 € — Steak 90g, double cheddar, crudités + Frites.
+- Double Royal — 7,50 € — 2 Steaks 90g, cheddar, crudités + Frites.
+- Le 180 — 9,00 € — 1 Steak 180g, cheddar, crudités + Frites.
+- Le 360 — 11,00 € — 2 Steaks 180g, double cheddar, crudités + Frites.
+- Chicken Burger — 6,50 € — Poulet pané, cheddar + Frites.
+- Double Chicken — 8,00 € — Double poulet pané. double cheddar + Frites.
+- Fish — 8,00 € — Poisson pané, cheddar + Frites.
+- Double Fish — 8,00 € — Double poissons pané, double cheddar + Frites.
+- Triple Cheese — 7,50 € — 3 Steaks 45g, triple cheddar + Frites.
+- Le Mastoc — 13,00 € — 3 Steaks 180g, triple cheddar, crudités + Frites.
+
+### Hummers
+
+- H1 — 5,50 € — 1 Steak.
+- H2 — 7,50 € — 2 Steaks.
+- H3 — 9,00 € — 3 Steaks.
+- H4 — 11,00 € — 4 Steaks.
+
+### Paninis
+
+- Kebab — 6,00 € — + Frites.
+- Viande Hachee — 6,00 € — + Frites.
+- Jambon De Dinde — 6,00 € — + Frites.
+- Fromages — 6,00 € — + Frites.
+- Chevre — 6,00 € — + Frites.
+- Poulet — 6,00 € — + Frites.
+- Thon — 6,00 € — + Frites.
+- Merguez — 6,00 € — + Frites.
+- Saumon — 6,00 € — + Frites.
+- Nutella — 3,50 €
+
+### Tacos
+
+- 1 Viande — 8,00 € — Garni de frites + Sauce fromagère + 1 Viande au choix.
+- 2 Viandes — 9,00 € — Garni de frites + Sauce fromagère + 2 Viandes au choix.
+- 3 Viandes — 11,00 € — Garni de frites + Sauce fromagère + 3 Viandes au choix.
+- 4 Viandes — 13,00 € — Garni de frites + Sauce fromagère + 4 Viandes au choix.
+
+### Tex-Mex
+
+- 6 Nuggets — 5,00 € — 6 Pièces Servies avec frites.
+- 10 Nuggets — 8,00 € — 10 Pièces Servies avec frites.
+- 6 Wings — 5,00 € — 6 Pièces Servies avec frites.
+- 10 Wings — 8,00 € — 10 Pièces Servies avec frites.
+- 6 Calamars — 5,00 € — 6 Pièces Servies avec frites.
+- 10 Calamars — 8,00 € — 10 Pièces Servies avec frites.
+- 6 Onions Rings — 5,00 € — 6 Pièces Servies avec frites.
+- 10 Onions Rings — 8,00 € — 10 Pièces Servies avec frites.
+- 6 Mozzarella Sticks — 5,00 € — 6 Pièces Servies avec frites.
+- 10 Mozzarella Sticks — 8,00 € — 10 Pièces Servies avec frites.
+- 6 Jalapenos — 7,00 € — 6 Pièces Servies avec frites.
+- 10 Jalapenos — 10,00 € — 10 Pièces Servies avec frites.
+- 6 Bouchees De Camembert — 7,00 € — 6 Pièces Servies avec frites.
+- 10 Bouchees De Camembert — 10,00 € — 10 Pièces Servies avec frites.
+- 6 Tenders — 7,00 € — 6 Pièces Servies avec frites.
+- 10 Tenders — 10,00 € — 10 Pièces Servies avec frites.
+
+### Riz crousty
+
+- Petite — 6,00 € — 1 Viande au choix, riz, sauce fromagère, sauce chili thaï.
+- Grande — 8,00 € — 1 Viande au choix, riz, sauce fromagère, sauce chili thaï.
+
+### Salades
+
+- Nicoise — 8,50 € — Salade verte, tomates, thon, pommes de terre, maïs, olives Servis avec pain.
+- Auvergnate — 8,00 € — Salade verte, tomates, jambon, noix, bleu d'auvergne, croûtons Servis avec pain.
+- Norvegienne — 8,50 € — Salade verte, tomates, saumon, crème fraîche, olives Servis avec pain.
+- Cesar — 8,50 € — Salade verte, tomates, poulet pané, olives, croûtons Servis avec pain.
+- Chevre Chaud — 8,50 € — Salade verte, tomates, lardons, chèvre sur toast Servis avec pain.
+- Avocat Crevettes — 8,50 € — Salade verte, tomates, avocat, crevettes Servis avec pain.
+
+### Desserts
+
+- Salade De Fruits — 2,50 €
+- Brownie — 3,50 €
+- Tarte Au Citron — 3,50 €
+- Tarte Aux Pommes — 3,50 €
+- Fondant Au Chocolat — 3,50 €
+- Tarte Aux Poires — 3,50 €
+- Tarte Aux Daims — 3,50 €
+- Tiramisu Kinder — 3,50 € — Fait maison.
+- Tiramisu Oreo — 3,50 € — Fait maison.
+- Tiramisu M&m S — 3,50 € — Fait maison.
+- Tiramisu Caramel — 3,50 € — Fait maison.
+- Tiramisu Speculoos — 3,50 € — Fait maison.
+- Tiramisu Nutella — 3,50 € — Fait maison.
+- Tiramisu Aux Daims — 3,50 € — Fait maison.
+
+### Glaces
+
+- Haagen-Dazs 100ml — 3,50 € — Pot de 100ml.
+- Haagen-Dazs 500ml — 7,50 € — Pot de 500ml.
+- Magnum — 2,50 € — Bâtonnets.
+
+### Boissons
+
+- Coca Cola 33cl — 1,50 €
+- Coca Cola Zero 33cl — 1,50 €
+- Coca Cola Cherry 33cl — 1,50 €
+- Orangina 33cl — 1,50 €
+- Fanta Citron 33cl — 1,50 €
+- Fanta Orange 33cl — 1,50 €
+- Oasis Pomme Cassis Framboise 33cl — 1,50 €
+- Ice Tea Peche 33cl — 1,50 €
+- Ice Tea Framboise 33cl — 1,50 €
+- Ice Tea Pasteque Menthe 33cl — 1,50 €
+- Mirinda 33cl — 1,50 €
+- Schweppes 33cl — 1,50 €
+- 7 Up Tropical 33cl — 1,50 €
+- Pepsi 33cl — 1,50 €
+- Oasis Orange 33cl — 1,50 €
+- Oasis Tropical 33cl — 1,50 €
+- Perrier 33cl — 1,50 €
+- Cristaline 50cl — 1,50 €
+- Maxi Coca Cola 1.25l — 3,00 €
+- Coca Zero 1.5l — 3,00 €
+- Maxi Fanta Orange 1.5l — 3,00 €
+- Tropico 1.5l — 3,00 €
+- Ice Tea 1.5l — 3,00 €
+- Maxi Oasis 2l — 3,50 €
+
+Mis à jour le 2026-10-16. Les prix et la disponibilité confirmés lors de la commande font foi.

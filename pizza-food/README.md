@@ -14,7 +14,7 @@ Pour revenir à l'ancien style « néon circus », il suffit de supprimer la lig
 
 ## Ouvrir le site
 
-Décompressez le dossier puis double-cliquez sur `index.html`. Pas d'installation. Une connexion Internet est nécessaire pour les polices.
+Décompressez le dossier puis double-cliquez sur `index.html`. Pas d'installation, et plus besoin d'Internet pour les polices : elles sont dans `fonts/` (aucune requête vers Google au chargement).
 
 ## Pages
 
@@ -22,10 +22,11 @@ Décompressez le dossier puis double-cliquez sur `index.html`. Pas d'installatio
 - `carte.html` : les 190 produits des 21 catégories, filtre « Vos envies », barre de catégories avec flèches et barre de position (glissable)
 - `livraison.html` : vérificateur de code postal, 11 villes, engagement 40 min, offres, à emporter
 - `commande.html` : la commande en 3 étapes (Mon panier, Authentification et paiement, Confirmation)
+- Pages légales (lisibles sans JavaScript) : `mentions-legales.html`, `cgv.html`, `cgu.html`, `confidentialite.html`, `cookies.html`, `accessibilite.html` — générées par un script, mais ce sont de simples fichiers HTML modifiables à la main
 
 ## Animations et interactions
 
-- Pizzas (photos réelles) découpées en 8 parts : quand le curseur approche, la pizza bouge et se découpe, la part la plus proche sort. Au clic, quelques ingrédients s'échappent (rien au survol, pour garder le site fluide).
+- Pizzas (photos réelles) découpées en 8 parts : au survol, les parts s'écartent un peu et la pizza tourne (sans suivre la position de la souris). Au clic, quelques ingrédients s'échappent.
 - Chargement avec pizza qui tourne, rideau entre les pages, lettres qui tombent, bandeaux défilants à vitesse constante, rangée de catégories avec barre de défilement (ou glisser les cartes), pizza vitrine qui tourne et s'ouvre au survol avec ingrédients poussés par le curseur, texte qui s'allume, compteurs, boutons magnétiques, pluie d'ingrédients au clic dans le vide.
 
 ## Composer un produit (comme sur le site d'origine)
@@ -58,7 +59,7 @@ Codes promo : à déclarer dans `js/config.js` (`promoCodes`, exemples en commen
 
 ## Données
 
-- `js/data.js` : carte, allergènes, mentions légales et CGV (repris de pizza-food.fr)
+- `js/data.js` : carte et allergènes (repris de pizza-food.fr)
 - `js/options.js` : options de composition de chaque produit (relevées sur pizza-food.fr)
 - `js/shop.js` : fenêtre de composition, page commande, compte client, adresses, code promo
 - `js/tray.js` : dessins des articles et mise en place du plateau
@@ -77,10 +78,34 @@ Le bloc « Avis Google » de l'accueil importe les avis en direct depuis la fich
 2. Créer une clé d'API et la restreindre au domaine du site.
 3. Coller la clé dans `googleMapsKey`. L'identifiant de la fiche (`googlePlaceId`) est facultatif : sinon la fiche est cherchée par son adresse.
 
-Google renvoie jusqu'à 5 avis, affichés en carrousel avec la note moyenne et le nombre d'avis. Sans clé, le bloc propose « Voir les avis » et « Laisser un avis » vers la fiche Google : aucun avis n'est inventé.
+Par respect du RGPD, rien n'est chargé depuis Google tant que le visiteur n'a pas cliqué sur « Afficher les avis Google ». Google renvoie jusqu'à 5 avis, affichés en carrousel avec la note moyenne et le nombre d'avis. Sans clé, le bloc propose « Voir les avis » et « Laisser un avis » vers la fiche Google : aucun avis n'est inventé.
 
 ## À brancher avant la mise en ligne
 
 - Envoi de la commande et paiement en ligne : sans serveur, la commande part par e-mail (ou par téléphone). Pour la recevoir directement en caisse, il faudra relier le site au logiciel de commande du restaurant.
 - Comptes clients : enregistrés dans le navigateur du client tant qu'il n'y a pas de serveur.
 - Formulaires et newsletter : ils ouvrent la messagerie vers contact@pizza-food.fr.
+
+## Conformité (version 12)
+
+Ce qui a été fait :
+
+- **Données minimales** : plus de civilité, de date de naissance ni de « Vous nous avez connu par ». Les champs obligatoires portent un « * ». Le formulaire de recrutement ne demande plus l'adresse ni la date de naissance.
+- **Information RGPD** au moment de la collecte, sous chaque formulaire, avec un lien vers `confidentialite.html` (finalités, bases légales, durées, droits, CNIL).
+- **Newsletter** : case de consentement obligatoire (non cochée), mobile facultatif.
+- **Commande** : bouton « Commander avec obligation de paiement » (art. L221-14 du Code de la consommation), lien vers les CGV, rappel de l'absence de rétractation (art. L221-28), mention Bloctel. Les coordonnées ne sont mémorisées sur l'appareil que si le client coche « Mémoriser mes coordonnées ».
+- **Compte client** : bouton « Supprimer mon compte et mes données de cet appareil ».
+- **Cookies** : aucun cookie, aucun traceur publicitaire ni de mesure d'audience ; seulement le stockage local nécessaire (panier, compte, préférences), exempté de consentement → **pas de bandeau**. Les polices sont hébergées sur le site ; les avis Google ne se chargent qu'après un clic. `cookies.html` liste tout ce qui est stocké et propose un bouton d'effacement.
+- **Allergènes** : les pizzas sans aucune information dans le tableau affichent « Information à demander au restaurant » (au lieu d'un tableau vide qui faisait croire à l'absence d'allergènes) ; pour les autres produits, invitation à appeler avant de commander.
+- **Accessibilité** : lien « Aller au contenu », un seul titre principal par page, textes alternatifs, groupes de choix annoncés, contrastes ≥ 4,5:1 (texte courant) vérifiés sur les 10 pages en ordinateur et iPhone, bandeaux défilants en pause au survol, animations désactivables.
+- **Agents IA et moteurs** : données structurées schema.org (Restaurant, et la carte complète sur `carte.html`), `llms.txt` (infos + carte complète avec les prix), `robots.txt`, `sitemap.xml`. Après une modification de la carte : `node outils/generer-seo.js`.
+
+**À compléter avant la mise en ligne** (repérés en jaune `[À compléter : …]` dans les pages) :
+
+1. `mentions-legales.html` : nom du **directeur de la publication** ; **hébergeur** (nom, adresse, téléphone) ; ville du **greffe RCS** (voir l'extrait Kbis).
+2. `cgv.html` : **médiateur de la consommation** (adhésion obligatoire, art. L612-1 du Code de la consommation).
+3. `confidentialite.html` : fournisseur de **messagerie** de contact@pizza-food.fr et hébergeur.
+4. Vérifier l'adresse définitive du site dans `outils/generer-seo.js` (`SITE`, aujourd'hui `https://pizza-food.fr/`), puis relancer le script.
+5. Compléter le tableau des allergènes (pizzas sans données, burgers, tacos, etc.).
+
+À faire côté restaurant : confirmer chaque commande reçue (par e-mail ou téléphone), comme l'indiquent les CGV ; tenir le registre des traitements (art. 30 du RGPD, modèle sur cnil.fr) ; faire relire CGV et mentions par un professionnel du droit.

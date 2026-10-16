@@ -315,8 +315,6 @@
       if (!r.width) continue;
       const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
       const dx = mouse.x - cx, dy = mouse.y - cy, d = Math.hypot(dx, dy) || 1;
-      const R = r.width * .75 + 140;
-      const k = mouse.active ? Math.pow(clamp(1 - (d - r.width / 2) / R), 1.6) : 0;
       const inside = mouse.active && d < r.width / 2;
       if (inside && !el._hover) {
         el._hover = true;
@@ -325,16 +323,16 @@
       const scale = r.width / 260;
       // pizza « fixe » (vitrine) : elle s'ouvre au survol mais ne suit pas le curseur
       if (el.dataset.steady) { el.style.setProperty('--cut', (inside ? 9 * scale : 0).toFixed(2)); continue; }
-      const cut = (k * 7 + (inside ? 9 : 0)) * scale;
-      // La pizza fuit légèrement le curseur et tourne vers lui
-      const push = -k * 10 * scale;
-      el.style.setProperty('--cut', cut.toFixed(2));
-      el.style.setProperty('--mx', (dx / d * push).toFixed(1) + 'px');
-      el.style.setProperty('--my', (dy / d * push).toFixed(1) + 'px');
-      el.style.setProperty('--rot', (k * (dx > 0 ? 14 : -14)).toFixed(1) + 'deg');
-      // La part la plus proche du curseur sort davantage
-      const ang = Math.atan2(dy, dx), idx = (((Math.round(((ang * 180 / Math.PI) + 90 - 22.5) / 45) % 8) + 8) % 8);
-      el._slices.forEach((s, i) => s.style.setProperty('--e', i === idx ? (k * 16 * scale).toFixed(2) : '0'));
+      // Comme la vitrine, en plus simple : au survol la pizza s'ouvre un peu et tourne ;
+      // elle ne suit plus le curseur (pas de poussée, pas de part qui sort vers la souris)
+      el._cutV = (el._cutV || 0) + ((inside ? 10 * scale : 0) - (el._cutV || 0)) * .14;
+      el._spin = (el._spin || 0) + ((inside ? 1.2 : 0) - (el._spin || 0)) * .06;
+      el._ang = ((el._ang || 0) + el._spin) % 360;
+      if (inside || el._cutV > .02 || el._spin > .01) {
+        el.style.setProperty('--cut', el._cutV.toFixed(2));
+        el.style.setProperty('--rot', el._ang.toFixed(1) + 'deg');
+      }
+      if (!el._reset) { el._reset = true; el.style.setProperty('--mx', '0px'); el.style.setProperty('--my', '0px'); el._slices.forEach(sl => sl.style.setProperty('--e', '0')); }
     }
     requestAnimationFrame(proximityFrame);
   }

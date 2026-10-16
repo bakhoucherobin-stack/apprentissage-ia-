@@ -122,7 +122,7 @@ main { position: relative; z-index: 0; }
 
 /* ---------- Boutons : effet verre bombé ---------- */
 .btn--pill, .btn--dark, .rail-ctrl__arrow, .catbar__arrow, .rcard__go { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 -3px 8px rgba(0, 0, 0, .18), 0 10px 22px -8px rgba(160, 40, 0, .5) !important; }
-.btn--pill { background: linear-gradient(180deg, #ff6a2e, #ff4100 60%, #e83a00); }
+.btn--pill { background: linear-gradient(180deg, #d9420c, #c93400 55%, #b52f00); }
 .btn--dark { background: linear-gradient(180deg, #3b3c3f, #292a2c 60%, #1d1e20); }
 .btn--ghost { background: var(--glass-fill); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border-color: rgba(41, 42, 44, .85); box-shadow: var(--glass-edge); }
 .btn--ghost:hover { background: var(--ink); }
@@ -160,9 +160,12 @@ section.manifesto::after, footer.footer::after { display: none; }
 .chip, .chip small, .chip b { color: var(--ink); }
 .chip:hover, .chip:hover small, .chip:hover b { color: var(--yellow); }
 /* orange un peu plus foncé pour les petits textes sur fond clair */
-.catbar a sup, .opt__price, .co__pname small, .panel__kicker, .cart__hint b, .rcard__num, .co__tot, .co__sug span, .co__det em, .card__price, .line--disc { color: #d63800 !important; }
+.catbar a sup, .opt__price, .co__pname small, .panel__kicker, .cart__hint b, .rcard__num, .co__tot, .co__sug span, .co__det em, .card__price, .line--disc { color: #c43200 !important; }
 .catbar a.is-active sup { color: var(--yellow) !important; }
-/* pastilles orange : texte blanc (le jaune se lisait mal sur l'orange) */
+/* pastilles orange : texte blanc sur un orange assez profond (contraste ≥ 4,5:1) */
 .burst-badge--orange > span, .burst-badge--orange b { color: #fff; }
+.burst-badge--orange > svg { fill: #c43200; }
 /* petits textes blancs sur orange : orange un peu plus profond */
-.mode__offer:not(.mode__offer--muted), .envie small, .co__bar:not(.co__bar--promo), .nav__cart-count, .footer .btn--dark, .citem__free, .co__total { background: #e03800 !important; }
+.mode__offer:not(.mode__offer--muted), .envie small, .co__bar:not(.co__bar--promo), .nav__cart-count, .footer .btn--dark, .citem__free, .co__total { background: #c93400 !important; }
+/* WCAG AA (16/10) : textes orange sur fond clair → #c43200 (5,2:1 sur crème) */
+.nav__link[aria-current="page"], .modal__body h4, .allergens .on { color: #c43200; }

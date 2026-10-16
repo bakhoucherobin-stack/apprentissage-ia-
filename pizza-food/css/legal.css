@@ -1,0 +1,84 @@
+/* =========================================================
+   PIZZA FOOD — pages légales, accessibilité, formulaires RGPD
+   (chargé après glass.css sur toutes les pages)
+   ========================================================= */
+
+/* Lien d'évitement : invisible jusqu'au focus clavier */
+.skip { position: fixed; top: 10px; left: 10px; z-index: 10000; padding: 12px 18px; border-radius: 12px; background: var(--ink); color: #fff; font-weight: 700; text-decoration: none; transform: translateY(-160%); transition: transform .2s; }
+.skip:focus, .skip:focus-visible { transform: none; outline: 3px solid var(--yellow); outline-offset: 2px; }
+main:focus { outline: none; }
+
+/* Valeurs à renseigner par l'éditeur (bien visibles tant qu'elles restent) */
+mark.todo { background: #fff1a8; color: #5a2a00; padding: 1px 6px; border-radius: 6px; border: 1px dashed #b45a00; font-weight: 600; }
+
+/* ---------- En-tête des pages légales ---------- */
+.lhero { padding: calc(var(--nav-h, 80px) + 40px) var(--gutter) 34px; max-width: 1296px; margin-inline: auto; }
+.lhero .phero__title { font-size: clamp(40px, 6.4vw, 92px); line-height: .95; overflow-wrap: anywhere; }
+.lhero .phero__text { max-width: 62ch; color: var(--muted); }
+.lhero__date { margin: 14px 0 0; font-size: 14px; color: var(--muted); }
+
+/* ---------- Corps ---------- */
+.legal { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); max-width: 1296px; margin: 0 auto; padding: 10px var(--gutter) var(--section, 90px); align-items: start; }
+.legal__toc { position: sticky; top: calc(var(--nav-h, 80px) + 20px); padding: 20px 22px; border-radius: 22px; background: rgba(255, 255, 255, .72); border: 1.5px solid var(--line); font-size: 14.5px; }
+.legal__toc-t { margin: 0 0 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; font-size: 12.5px; color: var(--muted); }
+.legal__toc ol, .legal__toc ul { margin: 0 0 18px; padding-left: 18px; display: grid; gap: 6px; }
+.legal__toc ul { list-style: none; padding: 0; margin-bottom: 0; }
+.legal__toc a { color: var(--ink); text-decoration: underline; text-decoration-color: rgba(41, 42, 44, .3); text-underline-offset: 3px; }
+.legal__toc a:hover, .legal__toc a[aria-current] { text-decoration-color: currentColor; }
+.legal__toc a[aria-current] { font-weight: 700; }
+.legal__body { max-width: 78ch; line-height: 1.65; }
+.legal__body section { scroll-margin-top: calc(var(--nav-h, 80px) + 20px); padding: 4px 0 18px; border-bottom: 1.5px solid var(--line); margin-bottom: 18px; }
+.legal__body section:last-child { border-bottom: 0; }
+.legal__body h2 { margin: 10px 0 12px; font-family: var(--body); font-weight: 800; font-size: clamp(21px, 2vw, 26px); letter-spacing: -.01em; text-transform: none; color: var(--ink); }
+.legal__body p, .legal__body li { color: var(--ink); }
+.legal__body a:not(.btn) { color: #a62f00; text-decoration: underline; text-underline-offset: 3px; }
+.legal__body ul { padding-left: 20px; display: grid; gap: 6px; }
+.legal__dl { display: grid; grid-template-columns: minmax(0, 210px) minmax(0, 1fr); gap: 8px 18px; margin: 0; }
+.legal__dl dt { font-weight: 700; }
+.legal__dl dd { margin: 0; }
+.legal__table { overflow-x: auto; margin: 6px 0 14px; border-radius: 16px; border: 1.5px solid var(--line); background: #fff; }
+.legal__table table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14.5px; line-height: 1.5; }
+.legal__table caption { text-align: left; padding: 12px 14px 4px; font-weight: 700; color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .05em; }
+.legal__table th, .legal__table td { padding: 10px 14px; text-align: left; vertical-align: top; border-top: 1px solid var(--line); }
+.legal__table thead th { background: #fbf3e6; }
+.legal__table code { font-size: 13px; background: #f4ece0; padding: 1px 5px; border-radius: 5px; }
+.legal__status { min-height: 1.4em; font-weight: 600; color: #1d6b2f; }
+.legal-noscript { padding: 14px var(--gutter); margin: 0; }
+
+@media (max-width: 860px) {
+  .legal { grid-template-columns: minmax(0, 1fr); }
+  .legal__toc { position: static; }
+  .legal__dl { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .legal__dl dd { margin-bottom: 10px; }
+}
+
+/* ---------- Formulaires : consentement, groupes, notes RGPD ---------- */
+.news__consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; line-height: 1.45; text-align: left; }
+.news__consent input { flex: none; width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--ink); }
+.news__consent a { color: inherit; text-decoration: underline; }
+.form-group { border: 0; margin: 0; padding: 0; min-width: 0; }
+.form-group legend { padding: 0; margin: 0 0 8px; font-weight: 600; font-size: 15px; }
+.form-privacy { opacity: 1; color: var(--muted); }
+.form-privacy a, .co__form .form-note a { color: #a62f00; text-decoration: underline; }
+.ac-del { margin-top: 18px; font-size: 14px; }
+.ac-del .linkish { color: #b00020; }
+.reviews__consent { max-width: 62ch; }
+.allergens td.na { font-size: 12px; color: var(--muted); font-style: italic; text-align: left; }
+
+/* ---------- Bandeaux défilants en pause au survol / focus ---------- */
+.marquee:hover *, .marquee:focus-within * { animation-play-state: paused !important; }
+
+/* ---------- Pied de page : liens légaux ---------- */
+.footer__legal { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0; padding: 0; list-style: none; font-size: 14px; }
+.footer__legal a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+
+/* Tableaux en fiches sur téléphone */
+@media (max-width: 700px) {
+  .legal__table table { min-width: 0; }
+  .legal__table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .legal__table tr, .legal__table th, .legal__table td { display: block; }
+  .legal__table tbody tr { border-top: 1.5px solid var(--line); padding: 6px 0; }
+  .legal__table tbody th { border: 0; padding-bottom: 2px; font-size: 16px; }
+  .legal__table td { border: 0; padding-top: 4px; padding-bottom: 4px; }
+  .legal__table td::before { content: attr(data-label) " : "; font-weight: 700; }
+}

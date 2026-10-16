@@ -1,0 +1,5 @@
+# Pizza Food — tous les robots, moteurs et agents IA sont les bienvenus.
+User-agent: *
+Allow: /
+
+Sitemap: https://pizza-food.fr/sitemap.xml

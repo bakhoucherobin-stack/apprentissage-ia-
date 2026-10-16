@@ -199,7 +199,6 @@
      ======================================================= */
   const accounts = () => A.store.get('pf-accounts', {});
   const session = () => { const e = A.store.get('pf-session', ''); return e ? accounts()[e] || null : null; };
-  const SOURCES = ['Email', 'SMS', 'Fax', 'Un ami', 'Un prospectus', 'Notre restaurant', 'Moteur de recherche'];
   const fld = (label, name, val = '', type = 'text', extra = '') => `<div><label for="ac-${name}">${label}</label><div class="field"><input id="ac-${name}" name="${name}" type="${type}" value="${A.esc(val || '')}" ${extra}></div></div>`;
   const sel = (label, name, opts, val = '', extra = '') => `<div><label for="ac-${name}">${label}</label><div class="field"><select id="ac-${name}" name="${name}" ${extra}>${opts.map(o => `<option${o === val ? ' selected' : ''}>${A.esc(o)}</option>`).join('')}</select></div></div>`;
   const normTel = t => (t || '').replace(/\D/g, '');
@@ -232,15 +231,14 @@
     if (me && (view === 'login' || view === 'create')) view = 'me';
     if (!me && /^(me|edit|addr)$/.test(view)) view = 'login';
     const persoFields = (v = {}) => `${fld('Téléphone *', 'tel', v.tel, 'tel', 'required autocomplete="tel"')}${fld('Email *', 'email', v.email, 'email', 'required autocomplete="email"' + (v.email ? ' readonly' : ''))}
-        ${sel('Civilité', 'civ', ['Monsieur', 'Madame', 'Mademoiselle'], v.civ)}${fld('Société', 'societe', v.societe, 'text', 'autocomplete="organization"')}
         ${fld('Nom *', 'nom', v.nom, 'text', 'required autocomplete="family-name"')}${fld('Prénom *', 'prenom', v.prenom, 'text', 'required autocomplete="given-name"')}
-        ${fld('Date de naissance', 'naiss', v.naiss, 'date')}`;
+        ${fld('Société (facultatif)', 'societe', v.societe, 'text', 'autocomplete="organization"')}`;
     if (view === 'create') {
       openModal('Nouveau compte', `<form class="form" id="acForm">
-        ${persoFields()}${sel('Vous nous avez connu par', 'source', ['—'].concat(SOURCES))}
+        ${persoFields()}
         <h4 class="full">Adresse de livraison <small>(facultatif, utile pour commander en livraison)</small></h4>
         ${addrFields()}
-        <p class="form-note full">Votre compte est enregistré sur cet appareil. Il permet de retrouver vos coordonnées, vos adresses et vos commandes.</p>
+        <p class="form-note full">Les champs marqués * sont obligatoires. Votre compte est enregistré <b>uniquement sur cet appareil</b> (stockage local du navigateur) : rien n'est envoyé au restaurant tant que vous ne lui transmettez pas une commande. Vous pouvez le supprimer à tout moment depuis « Mon compte ». <a href="confidentialite.html#compte" target="_blank" rel="noopener">Politique de confidentialité</a> · Liste d'opposition au démarchage téléphonique : <a href="https://www.bloctel.gouv.fr/" target="_blank" rel="noopener">Bloctel</a>.</p>
         <button class="btn btn--dark" type="submit" style="justify-self:start">Créer mon compte</button>
         <p class="full ac-switch">Déjà inscrit ? <button type="button" class="linkish" data-ac="login">Se connecter</button></p>
       </form>`);
@@ -248,7 +246,7 @@
         const data = Object.fromEntries(new FormData(f));
         if ((data.adresse || data.ville) && !pickAddr(data)) return 'Pour enregistrer l\'adresse, indiquez la ville et l\'adresse.';
         const acc = {};
-        ['tel', 'email', 'civ', 'societe', 'nom', 'prenom', 'naiss', 'source'].forEach(k => { acc[k] = (data[k] || '').trim(); });
+        ['tel', 'email', 'societe', 'nom', 'prenom'].forEach(k => { acc[k] = (data[k] || '').trim(); });
         acc.email = acc.email.toLowerCase();
         if (accounts()[acc.email]) return 'Un compte existe déjà avec cet email : connectez-vous.';
         const ad = pickAddr(data);
@@ -274,7 +272,7 @@
         <p class="full ac-switch"><button type="button" class="linkish" data-ac="me">← Mon compte</button></p></form>`);
       bindAcForm(f => {
         const data = Object.fromEntries(new FormData(f));
-        ['tel', 'civ', 'societe', 'nom', 'prenom', 'naiss'].forEach(k => { me[k] = (data[k] || '').trim(); });
+        ['tel', 'societe', 'nom', 'prenom'].forEach(k => { me[k] = (data[k] || '').trim(); });
         saveAccount(me); A.toast('Informations enregistrées');
       }, after);
     } else if (view === 'addr') {
@@ -288,15 +286,22 @@
       }, after);
     } else {
       const orders = (me.orders || []).slice().reverse(), ads = addresses(me);
-      openModal('Mon compte', `<p><b>${esc(me.civ || '')} ${esc(me.prenom)} ${esc(me.nom)}</b><br>${esc(me.email)} · ${esc(me.tel)}</p>
+      openModal('Mon compte', `<p><b>${esc(me.prenom)} ${esc(me.nom)}</b><br>${esc(me.email)} · ${esc(me.tel)}</p>
         <p><button type="button" class="linkish" data-ac="edit">Modifier mes informations</button></p>
         <h4>Mes adresses de livraison</h4>
         ${ads.length ? `<ul class="ac-addrs">${ads.map((ad, i) => `<li><span>${ad.nomAdr ? `<b>${esc(ad.nomAdr)}</b> · ` : ''}${esc(addrText(ad))}</span><button type="button" class="linkish" data-deladdr="${i}">Supprimer</button></li>`).join('')}</ul>` : '<p>Aucune adresse enregistrée.</p>'}
         <p><button type="button" class="btn btn--pill" data-ac="addr">+ Ajouter une adresse</button></p>
         <h4>Mes commandes</h4>
         ${orders.length ? `<ul class="ac-orders">${orders.map(o => `<li><b>${esc(o.no)}</b> · ${new Date(o.date).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })} · ${esc(o.mode)}<span>${euro(o.total)}</span><small>${o.items.map(i => `${i.qty} × ${esc(i.name)}`).join(', ')}</small></li>`).join('')}</ul>` : '<p>Aucune commande pour l\'instant.</p>'}
-        <p style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn--dark" href="carte.html">Commander</a><button class="btn btn--ghost" type="button" id="acOut"><span>Se déconnecter</span></button></p>`);
+        <p style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn--dark" href="carte.html">Commander</a><button class="btn btn--ghost" type="button" id="acOut"><span>Se déconnecter</span></button></p>
+        <p class="ac-del"><button type="button" class="linkish" id="acDel">Supprimer mon compte et mes données de cet appareil</button></p>`);
       $('#acOut').addEventListener('click', () => { A.store.set('pf-session', ''); closeModal(); A.toast('Vous êtes déconnecté.'); if (after) after(); });
+      $('#acDel').addEventListener('click', () => {
+        if (!confirm('Supprimer définitivement votre compte, vos adresses et l\'historique de vos commandes de cet appareil ?')) return;
+        const all = accounts(); delete all[me.email]; A.store.set('pf-accounts', all);
+        A.store.set('pf-session', ''); A.store.set('pf-checkout', {});
+        closeModal(); A.toast('Votre compte a été supprimé de cet appareil.'); if (after) after();
+      });
       $$('[data-deladdr]').forEach(b => b.addEventListener('click', () => { ads.splice(+b.dataset.deladdr, 1); saveAccount(me); account('me'); if (after) after(); }));
     }
   }
@@ -461,12 +466,12 @@
       root.innerHTML = `${accBar()}
         <form class="form co__form" id="payForm" novalidate>
           <h3 class="full">Vos informations</h3>
-          ${sel('Civilité', 'civ', ['Monsieur', 'Madame', 'Mademoiselle'], v('civ'))}${fld('Société', 'societe', v('societe'), 'text', 'autocomplete="organization"')}
+          <p class="full form-note">Les champs marqués * sont obligatoires : ils servent uniquement à préparer et remettre votre commande, et à vous joindre en cas de problème.</p>
           ${fld('Nom *', 'nom', v('nom'), 'text', 'required autocomplete="family-name"')}${fld('Prénom *', 'prenom', v('prenom'), 'text', 'required autocomplete="given-name"')}
           ${fld('Téléphone *', 'tel', v('tel'), 'tel', 'required autocomplete="tel" pattern="[0-9 +.]{10,}"')}${fld('Email *', 'email', v('email'), 'email', 'required autocomplete="email"')}
-          ${fld('Date de naissance', 'naiss', v('naiss'), 'date')}
+          ${fld('Société (facultatif)', 'societe', v('societe'), 'text', 'autocomplete="organization"')}
           ${addrBlock}
-          <div class="full"><label for="ac-rem">Remarques</label><div class="field"><textarea id="ac-rem" name="remarques" rows="3">${esc(saved.remarques || '')}</textarea></div></div>
+          <div class="full"><label for="ac-rem">Remarques <small>(facultatif : digicode, étage… N'indiquez pas d'informations de santé ; pour une allergie, appelez-nous.)</small></label><div class="field"><textarea id="ac-rem" name="remarques" rows="3"></textarea></div></div>
           <h3 class="full">Mode de paiement</h3>
           <div class="full radios">${PAY.map((m, i) => `<label><input type="radio" name="paiement" value="${esc(m)}"${(saved.paiement ? saved.paiement === m : i === 0) ? ' checked' : ''}><span>${esc(m)}</span></label>`).join('')}</div>
           <p class="full form-note">Paiement ${deliv ? 'à la livraison' : 'au retrait'}, comme indiqué dans nos CGV.</p>
@@ -474,10 +479,12 @@
           <div><label for="ac-jour">Jour</label><div class="field"><select id="ac-jour" name="jour">${ds.map(([iso, l]) => `<option value="${iso}">${esc(l)}</option>`).join('')}</select></div></div>
           <div><label for="ac-heure">Heure</label><div class="field"><select id="ac-heure" name="heure"></select></div></div>
           <div class="full"><label>Rappel par</label><div class="radios">${['Email', 'SMS'].map((m, i) => `<label><input type="radio" name="rappel" value="${m}"${(saved.rappel ? saved.rappel === m : i === 0) ? ' checked' : ''}><span>${m}</span></label>`).join('')}</div></div>
-          ${acc ? '' : `<label class="full co__cgv"><input type="checkbox" name="mkAcc"> <span>Créer mon compte avec ces informations (pour les retrouver à la prochaine commande)</span></label>`}
-          <label class="full co__cgv"><input type="checkbox" name="cgv" required> <span>J'accepte les <button type="button" class="linkish" data-modal="cgv">conditions générales de vente</button></span></label>
+          ${acc ? '' : `<label class="full co__cgv"><input type="checkbox" name="mkAcc"> <span>Créer mon compte sur cet appareil avec ces informations (facultatif)</span></label>
+          <label class="full co__cgv"><input type="checkbox" name="remember"${saved.nom ? ' checked' : ''}> <span>Mémoriser mes coordonnées sur cet appareil pour la prochaine commande (facultatif)</span></label>`}
+          <label class="full co__cgv"><input type="checkbox" name="cgv" required> <span>J'ai lu et j'accepte les <a href="cgv.html" target="_blank" rel="noopener">conditions générales de vente</a> *</span></label>
+          <p class="full form-note">Vos données servent à traiter votre commande (exécution du contrat). Détails, durées de conservation et vos droits : <a href="confidentialite.html#commande" target="_blank" rel="noopener">politique de confidentialité</a>. Vous pouvez vous inscrire gratuitement sur la liste d'opposition au démarchage téléphonique <a href="https://www.bloctel.gouv.fr/" target="_blank" rel="noopener">Bloctel</a>. Les produits alimentaires périssables ne bénéficient pas du droit de rétractation (art. L221-28 du Code de la consommation).</p>
           <p class="full ac-err" hidden></p>
-          <div class="full co__btns"><button class="btn btn--ghost" type="button" id="coBack"><span>← Mon panier</span></button><button class="btn btn--dark" type="submit">Valider ma commande · ${euro(totals().grand)}</button></div>
+          <div class="full co__btns"><button class="btn btn--ghost" type="button" id="coBack"><span>← Mon panier</span></button><button class="btn btn--dark" type="submit">Commander avec obligation de paiement · ${euro(totals().grand)}</button></div>
         </form>`;
       const f = $('#payForm'), jour = $('#ac-jour'), heure = $('#ac-heure');
       const fillH = () => { const hs = hours(jour.value); heure.innerHTML = hs.length ? hs.map(([k, l]) => `<option value="${k}">${l}</option>`).join('') : '<option value="">Plus de créneau ce jour</option>'; };
@@ -507,18 +514,21 @@
           if (!ad) { err.hidden = false; err.textContent = 'Indiquez la ville et l\'adresse de livraison.'; return; }
         }
         const client = {};
-        ['civ', 'societe', 'nom', 'prenom', 'tel', 'email', 'naiss', 'remarques', 'paiement', 'jour', 'heure', 'rappel'].forEach(k => { client[k] = (data[k] || '').trim(); });
+        ['societe', 'nom', 'prenom', 'tel', 'email', 'remarques', 'paiement', 'jour', 'heure', 'rappel'].forEach(k => { client[k] = (data[k] || '').trim(); });
         if (ad) Object.assign(client, ad);
         // enregistrement sur le compte (nouvelle adresse) ou création du compte
         if (acc && ad && data.saveAddr && !ads.some(x => addrText(x) === addrText(ad))) { ads.push(ad); saveAccount(acc); }
         if (!acc && data.mkAcc) {
           const email = client.email.toLowerCase();
           if (!accounts()[email]) {
-            saveAccount({ tel: client.tel, email, civ: client.civ, societe: client.societe, nom: client.nom, prenom: client.prenom, naiss: client.naiss, addresses: ad ? [ad] : [], orders: [], points: 0 });
+            saveAccount({ tel: client.tel, email, societe: client.societe, nom: client.nom, prenom: client.prenom, addresses: ad ? [ad] : [], orders: [], points: 0 });
             A.store.set('pf-session', email);
           }
         }
-        A.store.set('pf-checkout', Object.assign({ paiement: client.paiement, rappel: client.rappel, remarques: client.remarques }, acc ? {} : client));
+        // préférences seulement ; les coordonnées ne sont mémorisées que sur demande (case « Mémoriser »)
+        const keep = { paiement: client.paiement, rappel: client.rappel };
+        if (!acc && data.remember) ['societe', 'nom', 'prenom', 'tel', 'email'].concat(ADDR, 'nomAdr').forEach(k => { if (client[k]) keep[k] = client[k]; });
+        A.store.set('pf-checkout', keep);
         placeOrder(client);
       });
     }
@@ -537,7 +547,7 @@
     }
     function orderText(o) {
       const c = o.client, L = [];
-      L.push(`Commande ${o.no} — ${o.mode}`, `${c.civ || ''} ${c.prenom} ${c.nom} · ${c.tel} · ${c.email}`);
+      L.push(`Commande ${o.no} — ${o.mode}`, `${c.prenom} ${c.nom}${c.societe ? ' (' + c.societe + ')' : ''} · ${c.tel} · ${c.email}`);
       if (c.adresse) L.push(`Adresse : ${addrText(c)}`);
       L.push(`Quand : ${c.heure === 'asap' ? 'dès que possible' : c.jour + ' à ' + c.heure} · Paiement : ${c.paiement} · Rappel : ${c.rappel}`, '');
       o.items.forEach(i => { L.push(`${i.qty} × ${i.cat} : ${i.name} — ${euro(i.unit * i.qty)}`); i.lines.forEach(d => L.push(`   ${d.label} : ${d.text}`)); });

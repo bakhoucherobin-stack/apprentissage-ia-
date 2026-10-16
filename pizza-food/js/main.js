@@ -1,6 +1,6 @@
 /* =========================================================
    PIZZA FOOD — site, panier, offres, animations
-   Dépend de js/data.js (carte, allergènes, textes légaux)
+   Dépend de js/data.js (carte, allergènes)
    et js/pizza.js (pizzas interactives, particules).
    La composition des produits et la page de commande sont
    dans js/shop.js (options reprises du site d'origine).
@@ -36,7 +36,7 @@
   /* =======================================================
      DONNÉES
      ======================================================= */
-  const DATA = window.PF_DATA || { cats: [], allergens: { cols: [], rows: [] }, legal: {} };
+  const DATA = window.PF_DATA || { cats: [], allergens: { cols: [], rows: [] } };
   const PRODUCTS = {};
   DATA.cats.forEach(cat => cat.items.forEach(it => { PRODUCTS[it.id] = Object.assign({ cat }, it); }));
 
@@ -117,7 +117,8 @@
             <p>Les nouveautés et les offres, en premier.</p>
             <form id="newsForm" novalidate>
               <div class="field"><label class="sr-only" for="nEmail">E-mail</label><input id="nEmail" type="email" placeholder="Votre e-mail" autocomplete="email" required></div>
-              <div class="field"><label class="sr-only" for="nMobile">Mobile</label><input id="nMobile" type="tel" placeholder="Votre mobile" autocomplete="tel"></div>
+              <div class="field"><label class="sr-only" for="nMobile">Mobile (facultatif, pour les offres par SMS)</label><input id="nMobile" type="tel" placeholder="Mobile (facultatif, offres par SMS)" autocomplete="tel"></div>
+              <label class="news__consent"><input type="checkbox" id="nConsent" required> <span>J'accepte de recevoir les offres de Pizza Food par e-mail (et par SMS si j'indique mon mobile). Désinscription à tout moment. <a href="confidentialite.html#newsletter">Données personnelles</a></span></label>
               <button class="btn btn--dark" type="submit" style="justify-self:start" data-cursor="OK">OK ${ARROW}</button>
             </form>
           </div>
@@ -128,7 +129,7 @@
             ${fl('Charte qualité', 'data-modal="charte"')}${fl('Programme de fidélité', 'data-modal="fidelite"')}${fl('Votre appréciation', 'data-modal="appreciation"')}${fl('Recrutement', 'data-modal="recrutement"')}
           </ul></div>
           <div><h3>Infos</h3><ul class="flinks">
-            ${fl('Contact', 'data-modal="contact"')}${fl('Allergènes', 'data-modal="allergenes"')}${fl('Mentions légales', 'data-modal="mentions"')}${fl('C.G.V', 'data-modal="cgv"')}
+            ${fl('Contact', 'data-modal="contact"')}${fl('Allergènes', 'data-modal="allergenes"')}${fl('Mentions légales', 'href="mentions-legales.html"')}${fl('Conditions de vente (CGV)', 'href="cgv.html"')}${fl('Accessibilité', 'href="accessibilite.html"')}
           </ul>
             <div class="socials">
               <a href="https://www.facebook.com/Pizza-Food-1682159702074299" target="_blank" rel="noopener" aria-label="Facebook">${ICONS.fb}</a>
@@ -140,6 +141,7 @@
         </div>
         <p class="footer__giant" id="giant" data-split>Pizza Food</p>
         <div class="footer__bottom"><span>© ${new Date().getFullYear()} Pizza Food — ${INFO.address}, ${INFO.city}</span><span>${INFO.tel1} · ${INFO.tel2}</span>
+          <ul class="footer__legal" aria-label="Informations légales"><li><a href="mentions-legales.html">Mentions légales</a></li><li><a href="cgv.html">CGV</a></li><li><a href="cgu.html">Conditions d'utilisation</a></li><li><a href="confidentialite.html">Confidentialité</a></li><li><a href="cookies.html">Cookies</a></li><li><a href="accessibilite.html">Accessibilité</a></li></ul>
           <span class="footer__meta"><button type="button" class="motion-toggle" id="motionToggle" aria-pressed="${!reduceMotion}">Animations : ${reduceMotion ? 'désactivées' : 'activées'}</button> · version ${window.PF_VERSION || ''}</span></div>
       </footer>
 
@@ -331,8 +333,12 @@
      ======================================================= */
   const radios = (name, opts, type = 'radio') => `<div class="radios">${opts.map((o, i) => `<label><input type="${type}" name="${name}" value="${o}"${type === 'radio' && i === 0 ? ' checked' : ''}><span>${o}</span></label>`).join('')}</div>`;
   const field = (label, name, type = 'text', full = false, extra = '') => `<div class="${full ? 'full' : ''}"><label for="f-${name}">${label}</label><div class="field">${type === 'textarea' ? `<textarea id="f-${name}" name="${label}" rows="4" ${extra}></textarea>` : `<input id="f-${name}" name="${label}" type="${type}" ${extra}>`}</div></div>`;
+  // groupe de choix accessible : fieldset + légende lue par les lecteurs d'écran
+  const group = (legend, name, opts, type = 'radio', cls = 'full') => `<fieldset class="${cls} form-group"><legend>${legend}</legend>${radios(name, opts, type)}</fieldset>`;
   const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-  const mailNote = `<p class="form-note">L'envoi ouvre votre messagerie avec le formulaire pré-rempli, à destination de ${INFO.email}.</p>`;
+  const mailNote = `<p class="form-note">L'envoi ouvre votre messagerie avec le formulaire pré-rempli, à destination de ${INFO.email}. Les champs marqués * sont obligatoires.</p>`;
+  // information au moment de la collecte (RGPD, art. 13)
+  const privacy = (what, id = '') => `<p class="form-note form-privacy">${what} <a href="confidentialite.html${id ? '#' + id : ''}">Politique de confidentialité</a> : accès, rectification, effacement sur simple demande à ${INFO.email}.</p>`;
   const submit = `<button class="btn btn--dark full" type="submit" style="justify-self:start;margin-top:16px">Envoyer ${ARROW}</button>`;
   const LEVELS = ['Très satisfaisant', 'Satisfaisant', 'Moyen', 'Insatisfaisant', 'Très insatisfaisant'];
 
@@ -341,48 +347,47 @@
       <h4>La sélection des produits</h4><p>La qualité des produits servis faisant la force de son concept, Pizza Food a toujours eu pour principe de sélectionner les meilleurs produits. Plusieurs livraisons par semaine assurent une qualité constante et permettent à Pizza Food de vous apporter des produits savoureux chez vous.</p>
       <h4>Traçabilité des produits</h4><p>Pizza Food vérifie scrupuleusement tous ses produits à chaque livraison et entretient des relations régulières avec des fournisseurs sélectionnés pour la qualité des produits.</p>
       <h4>Respect de la chaîne du froid</h4><p>Pizza Food exerce un contrôle minutieux sur ses produits. Ainsi, tous les produits frais et surgelés qu'utilise Pizza Food sont des produits livrés par camion frigorifique, et respectant la chaîne du froid.</p>`],
-    fidelite: ['Programme de fidélité', `<p class="quote">Votre fidélité chez nous est récompensée…</p><h4>Une fidélité récompensée</h4><p>Transformez vos points en cadeaux ! Consultez votre compte pour suivre vos points.</p><p><a class="btn btn--dark" href="carte.html">Commander ${ARROW}</a></p>`],
+    fidelite: ['Programme de fidélité', `<p class="quote">Votre fidélité chez nous est récompensée…</p><h4>Une fidélité récompensée</h4><p>Transformez vos points en cadeaux ! Demandez les conditions du programme au restaurant.</p><p><a class="btn btn--dark" href="carte.html">Commander ${ARROW}</a></p>`],
     mobile: ['Mobile', `<p class="quote">Choisissez, commandez, c'est livré.</p><p>Commandez à partir de votre mobile sur notre nouvelle interface. Quelle que soit la marque de votre mobile, pas d'application à télécharger : juste une adresse à composer, <b>pizza-food.fr</b>.</p>`],
-    mentions: ['Mentions légales', () => DATA.legal.mentions || ''],
-    cgv: ['C.G.V', () => DATA.legal.cgv || ''],
     contact: ['Contact', `<p><b>Pizza Food</b><br>${INFO.address}<br>${INFO.city}<br>Tél : <a href="${INFO.tel1Href}">${INFO.tel1}</a> · <a href="${INFO.tel2Href}">${INFO.tel2}</a><br>E-mail : <a href="mailto:${INFO.email}">${INFO.email}</a></p>
       <form class="form" data-mail="Contact depuis le site">
-        ${field('Nom', 'nom', 'text', false, 'required autocomplete="family-name"')}${field('Prénom', 'prenom', 'text', false, 'autocomplete="given-name"')}
-        ${field('E-mail', 'email', 'email', false, 'required autocomplete="email"')}${field('Téléphone', 'tel', 'tel', false, 'autocomplete="tel"')}
-        ${field('Objet', 'objet', 'text', true)}${field('Commentaires', 'com', 'textarea', true, 'required')}${submit}${mailNote}
+        ${field('Nom *', 'nom', 'text', false, 'required autocomplete="family-name"')}${field('Prénom', 'prenom', 'text', false, 'autocomplete="given-name"')}
+        ${field('E-mail *', 'email', 'email', false, 'required autocomplete="email"')}${field('Téléphone (facultatif)', 'tel', 'tel', false, 'autocomplete="tel"')}
+        ${field('Objet', 'objet', 'text', true)}${field('Message *', 'com', 'textarea', true, 'required')}${submit}${mailNote}
+        ${privacy('Vos coordonnées servent uniquement à répondre à votre message ; elles sont conservées 3 ans au plus après notre dernier échange.', 'contact')}
       </form>`],
     recrutement: ['Recrutement', `<h4>Une entreprise qui se développe et qui développe ses collaborateurs</h4>
       <p>La recherche de l'excellence passe en premier lieu par le recrutement le plus adapté et l'accompagnement de nos collaborateurs dans le développement de leur carrière.</p>
       <h4>Intégrer Pizza Food, c'est intégrer</h4>
       <p>Une entreprise qui va de l'avant, qui évolue grâce à ses innovations produits, au dynamisme et à la motivation des équipes qui la composent. Une entreprise qui offre de véritables opportunités de carrières. Une entreprise qui met en œuvre une politique sociale axée sur la formation et sur la confiance qu'elle accorde au potentiel de chacun.</p>
       <form class="form" data-mail="Candidature">
-        <div class="full"><label>Civilité</label>${radios('Civilité', ['Madame', 'Mademoiselle', 'Monsieur'])}</div>
-        ${field('Nom', 'rnom', 'text', false, 'required')}${field('Prénom', 'rprenom', 'text', false, 'required')}
-        ${field('Adresse mail', 'rmail', 'email', false, 'required')}${field('Date de naissance', 'rnaiss', 'date')}
-        ${field('Adresse', 'radr', 'text', true)}${field('Code postal', 'rcp', 'text', false, 'inputmode="numeric"')}${field('Ville', 'rville')}
-        ${field('Téléphone 1', 'rtel1', 'tel', false, 'required')}${field('Téléphone 2', 'rtel2', 'tel')}
-        <div class="full"><label>Vous recherchez</label>${radios('Vous recherchez', ['Temps plein', 'Temps partiel'])}</div>
-        <div><label>Disponibilités (matin)</label>${radios('Matin', DAYS, 'checkbox')}</div><div><label>Disponibilités (soir)</label>${radios('Soir', DAYS, 'checkbox')}</div>
+        ${field('Nom *', 'rnom', 'text', false, 'required autocomplete="family-name"')}${field('Prénom *', 'rprenom', 'text', false, 'required autocomplete="given-name"')}
+        ${field('E-mail *', 'rmail', 'email', false, 'required autocomplete="email"')}${field('Téléphone *', 'rtel1', 'tel', false, 'required autocomplete="tel"')}
+        ${field('Ville', 'rville', 'text', false, 'autocomplete="address-level2"')}
+        ${group('Vous recherchez', 'Vous recherchez', ['Temps plein', 'Temps partiel'])}
+        ${group('Disponibilités (midi)', 'Midi', DAYS, 'checkbox', '')}${group('Disponibilités (soir)', 'Soir', DAYS, 'checkbox', '')}
         ${submit}${mailNote}
+        ${privacy('Votre candidature sert uniquement au recrutement ; sans suite, elle est supprimée au plus tard 2 ans après notre dernier contact.', 'recrutement')}
       </form>`],
     appreciation: ['Votre appréciation', `<p>Toujours dans le but d'améliorer notre qualité de service, et de satisfaire pleinement vos attentes, nous attachons une grande importance à votre appréciation.</p>
       <form class="form" data-mail="Votre appréciation">
-        <div class="full"><label>Civilité</label>${radios('Civilité', ['Madame', 'Mademoiselle', 'Monsieur'])}</div>
-        ${field('Nom', 'anom', 'text', false, 'required')}${field('Prénom', 'aprenom')}${field('Votre e-mail', 'amail', 'email', true, 'required')}
-        <div class="full"><label>Sujet</label>${radios('Sujet', ['Idées et questions', "J'ai aimé…", "Je n'ai pas aimé…"])}</div>
-        <div class="full"><label>Restaurant concerné</label>${radios('Restaurant concerné', ['Site web', 'Pizza Food'])}</div>
-        ${field('Commentaires', 'acom', 'textarea', true, 'required')}
-        <div class="full"><label>Appréciation globale</label>${radios('Appréciation globale', LEVELS)}</div>
-        <div class="full"><label>Rapport qualité/prix</label>${radios('Rapport qualité/prix', LEVELS)}</div>
-        <div class="full"><label>Recommanderiez-vous ce restaurant à un ami ?</label>${radios('Recommandation', ['Oui', 'Non'])}</div>
+        ${field('Nom (facultatif)', 'anom', 'text', false, 'autocomplete="family-name"')}${field('E-mail (facultatif, pour vous répondre)', 'amail', 'email', false, 'autocomplete="email"')}
+        ${group('Sujet', 'Sujet', ['Idées et questions', "J'ai aimé…", "Je n'ai pas aimé…"])}
+        ${group('Concerne', 'Concerne', ['Le site web', 'Le restaurant'])}
+        ${field('Commentaires *', 'acom', 'textarea', true, 'required')}
+        ${group('Appréciation globale', 'Appréciation globale', LEVELS)}
+        ${group('Rapport qualité/prix', 'Rapport qualité/prix', LEVELS)}
+        ${group('Recommanderiez-vous ce restaurant à un ami ?', 'Recommandation', ['Oui', 'Non'])}
         ${submit}${mailNote}
+        ${privacy('Votre avis sert à améliorer notre service. Si vous laissez un e-mail, il sert seulement à vous répondre.', 'avis')}
       </form>`],
     allergenes: ['Allergènes', () => {
       const a = DATA.allergens;
       return `<p><b>Allergènes dans les produits Pizza Food — carte 2026 (France).</b> Légende : « X » = présence.</p>
         <p>Ces informations ont été établies sur la base des déclarations de nos fournisseurs à propos de la composition de leurs produits. Outre les présences signalées dans le tableau, nous ne pouvons pas exclure une présence accidentelle d'autres ingrédients allergènes qui serait apparue lors de la fabrication des produits chez nos fournisseurs ou lors de leur manipulation dans nos restaurants.</p>
         <div class="allergens-wrap"><table class="allergens"><thead><tr><th scope="col">Produit</th>${a.cols.map(c => `<th scope="col">${esc(c)}</th>`).join('')}</tr></thead>
-        <tbody>${a.rows.map(([n, bits]) => `<tr><th scope="row">${esc(n)}</th>${[...bits].map(b => `<td class="${b === '1' ? 'on' : ''}">${b === '1' ? 'X' : ''}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+        <tbody>${a.rows.map(([n, bits]) => `<tr><th scope="row">${esc(n)}</th>${bits.includes('1') ? [...bits].map(b => `<td class="${b === '1' ? 'on' : ''}">${b === '1' ? 'X' : ''}</td>`).join('') : `<td class="na" colspan="${a.cols.length}">Information à demander au restaurant avant de commander</td>`}</tr>`).join('')}</tbody></table></div>
+        <p><b>Produits qui ne figurent pas dans ce tableau</b> (burgers, tacos, sandwichs, desserts…) : appelez-nous au <a href="${INFO.tel1Href}">${INFO.tel1}</a> avant de commander, l'équipe vous indique les allergènes présents.</p>`;
     }]
   };
 
@@ -431,7 +436,9 @@
       e.preventDefault();
       const email = $('#nEmail');
       if (!email.value || !email.checkValidity()) { email.focus(); toast('Indiquez un e-mail valide'); return; }
-      const body = `Bonjour,\nJe souhaite m'inscrire à la newsletter Pizza Food.\nE-mail : ${email.value}\nMobile : ${$('#nMobile').value}`;
+      if (!$('#nConsent').checked) { $('#nConsent').focus(); toast('Cochez la case pour accepter de recevoir nos offres'); return; }
+      const mob = $('#nMobile').value.trim();
+      const body = `Bonjour,\nJe souhaite m'inscrire à la newsletter Pizza Food et j'accepte de recevoir vos offres par e-mail${mob ? ' et par SMS' : ''}.\nE-mail : ${email.value}${mob ? '\nMobile : ' + mob : ''}\nDate du consentement : ${new Date().toLocaleString('fr-FR')}`;
       window.location.href = `mailto:${INFO.email}?subject=${encodeURIComponent('Inscription newsletter')}&body=${encodeURIComponent(body)}`;
       toast('Votre messagerie s’ouvre…');
     });
@@ -870,8 +877,11 @@
       if (d) { go(+d.dataset.rv); auto(); }
       if (st) { go(i + +st.dataset.rvstep); auto(); }
     });
+    // le défilement automatique s'arrête au survol et quand un élément a le focus (clavier)
     body.addEventListener('pointerenter', () => clearInterval(timer));
     body.addEventListener('pointerleave', auto);
+    body.addEventListener('focusin', () => clearInterval(timer));
+    body.addEventListener('focusout', auto);
     go(0); auto();
   }
 
@@ -880,7 +890,11 @@
     if (!body) return;
     const cfg = window.PF_CONFIG || {};
     if (!cfg.googleMapsKey) { reviewsFallback(body); return; }
-    body.innerHTML = '<p class="reviews__source">Chargement des avis Google…</p>';
+    // Contenu tiers : rien n'est chargé depuis Google tant que le visiteur ne l'a pas demandé
+    body.innerHTML = `<p class="reviews__consent">Les avis sont hébergés par Google. En les affichant, Google reçoit votre adresse IP et peut déposer des traceurs. <a href="cookies.html">En savoir plus</a></p>
+      <div class="reviews__btns"><button type="button" class="btn btn--dark" id="reviewsLoad">Afficher les avis Google</button><a class="btn btn--pill" href="${MAPS_URL}" target="_blank" rel="noopener">Voir sur Google</a></div>`;
+    await new Promise(res => $('#reviewsLoad').addEventListener('click', res, { once: true }));
+    body.innerHTML = '<p class="reviews__source" role="status">Chargement des avis Google…</p>';
     try {
       if (!(window.google && google.maps && google.maps.importLibrary)) {
         await new Promise((res, rej) => {
@@ -996,7 +1010,11 @@
       let guard = 0;
       while (track.scrollWidth < innerWidth * 1.6 && guard++ < 12) track.innerHTML += original;
       track.innerHTML += track.innerHTML;
-      return { track, dir: +m.dataset.marquee, x: 0, half: track.scrollWidth / 2 };
+      const mq = { track, dir: +m.dataset.marquee, x: 0, half: track.scrollWidth / 2, paused: false };
+      // pause au survol (WCAG 2.2.2) ; le bouton « Animations » du pied de page les arrête toutes
+      m.addEventListener('pointerenter', () => { mq.paused = true; });
+      m.addEventListener('pointerleave', () => { mq.paused = false; });
+      return mq;
     });
   }
 
@@ -1077,6 +1095,7 @@
         speedEls.forEach(el => { const r = el.parentElement.getBoundingClientRect(); el.style.translate = `0 ${((r.top + r.height / 2 - vh / 2) * +el.dataset.speed).toFixed(1)}px`; });
         // bandeaux : vitesse constante, indépendante du scroll
         marquees.forEach(m => {
+          if (m.paused) return;
           m.x -= m.dir * 70 * dt;
           if (m.x <= -m.half) m.x += m.half;
           if (m.x > 0) m.x -= m.half;
@@ -1170,6 +1189,17 @@
   updateOpen();
   setInterval(updateOpen, 60000);
   hydrate();
+
+  const wipe = $('#wipeData');
+  if (wipe) wipe.addEventListener('click', () => {
+    if (!confirm('Effacer le panier, les comptes et les préférences enregistrés par Pizza Food sur cet appareil ?')) return;
+    try {
+      Object.keys(localStorage).filter(k => k.startsWith('pf-')).forEach(k => localStorage.removeItem(k));
+      Object.keys(sessionStorage).filter(k => k.startsWith('pf-')).forEach(k => sessionStorage.removeItem(k));
+    } catch (e) { /* stockage indisponible */ }
+    cart.items.splice(0); renderCart();
+    $('#wipeStatus').textContent = 'C\'est fait : plus aucune donnée de Pizza Food n\'est enregistrée sur cet appareil.';
+  });
 
   const marquees = setupMarquees();
   const cursorEl = setupPointer();

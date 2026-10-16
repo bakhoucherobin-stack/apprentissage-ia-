@@ -6,22 +6,25 @@
   <title>Pizza Food — Pizzas, burgers & tacos à Chennevières-sur-Marne</title>
   <meta name="description" content="Pizza Food : pizzas, burgers, tacos, tex-mex. Livraison gratuite en 40 min dans 11 villes du Val-de-Marne. En livraison 2 pizzas achetées = la 3e offerte, à emporter 1 achetée = la 2e offerte. 01 45 94 29 50.">
   <meta name="theme-color" content="#ff4100">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Bowlby+One+SC&family=Inter:wght@400;500;600;700;800&family=Open+Sans:wght@400;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=11.1">
-  <link rel="stylesheet" href="css/raffine.css?v=11.1">
-  <link rel="stylesheet" href="css/glass.css?v=11.1">
+  <link rel="stylesheet" href="css/fonts.css?v=12">
+  <link rel="stylesheet" href="css/style.css?v=12">
+  <link rel="stylesheet" href="css/raffine.css?v=12">
+  <link rel="stylesheet" href="css/glass.css?v=12">
+  <link rel="stylesheet" href="css/legal.css?v=12">
   <noscript><style>.curtain{display:none}</style></noscript>
+  <!-- seo:jsonld (généré par outils/generer-seo.js) -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Restaurant","@id":"https://pizza-food.fr/#restaurant","name":"Pizza Food","legalName":"PIZZA FOOD (SASU)","url":"https://pizza-food.fr/","telephone":"+33 1 45 94 29 50","email":"contact@pizza-food.fr","image":"https://pizza-food.fr/img/bandeaux/livraison.webp","address":{"@type":"PostalAddress","streetAddress":"34 rue du Général de Gaulle","postalCode":"94430","addressLocality":"Chennevières-sur-Marne","addressRegion":"Val-de-Marne","addressCountry":"FR"},"servesCuisine":["Pizza","Burgers","Tacos","Tex-Mex","Sandwichs"],"priceRange":"€","currenciesAccepted":"EUR","paymentAccepted":"Carte bancaire, Espèces, Titres-restaurant","openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"11:00","closes":"23:00"}],"areaServed":[{"@type":"City","name":"Chennevières-sur-Marne"},{"@type":"City","name":"Bonneuil-sur-Marne"},{"@type":"City","name":"Champigny-sur-Marne"},{"@type":"City","name":"La Queue-en-Brie"},{"@type":"City","name":"La Varenne Saint-Hilaire"},{"@type":"City","name":"Le Plessis-Trévise"},{"@type":"City","name":"Noiseau"},{"@type":"City","name":"Ormesson-sur-Marne"},{"@type":"City","name":"Saint-Maur-des-Fossés"},{"@type":"City","name":"Sucy-en-Brie"},{"@type":"City","name":"Villiers-sur-Marne"}],"hasMenu":"https://pizza-food.fr/carte.html","sameAs":["https://www.facebook.com/Pizza-Food-1682159702074299","https://www.instagram.com/pizzafood94430/","https://twitter.com/pizzafood94430","https://www.youtube.com/channel/UCCv9ak1TfnuyedFZNZe30Tw"]}</script>
+  <!-- /seo:jsonld -->
 </head>
 <body data-page="home">
+  <a class="skip" href="#contenu">Aller au contenu</a>
   <div class="curtain" id="curtain" aria-hidden="true">
     <div class="curtain__pizza pz pz--svg" data-svgpizza="" data-interactive="off"></div>
     <p class="curtain__word">Chaud devant…</p>
     <p class="curtain__count"><span id="curtainCount">0</span>%</p>
   </div>
 
-  <main>
+  <main id="contenu" tabindex="-1">
     <!-- ============ HÉROS ============ -->
     <section class="hero band--orange" id="top">
       <svg class="zigzag zigzag--l" data-speed="-0.25" viewBox="0 0 40 400" aria-hidden="true"><polyline data-zigzag="40,400,14"/></svg>
@@ -131,13 +134,13 @@
           <div class="burst-badge burst-badge--orange" data-burst="18"><span>Livraison<b>gratuite</b></span></div>
           <span class="offer__tag">En livraison</span>
           <p class="offer__big"><small>2 pizzas achetées =</small>la 3e offerte*</p>
-          <div class="offer__img" data-sfx><img src="img/bandeaux/livraison.webp" alt="Deux pizzas sur fond de bois" loading="lazy"></div>
+          <div class="offer__img" data-sfx><img src="img/bandeaux/livraison.webp" alt="Deux pizzas fumantes garnies d'olives, de poivrons et de champignons, sur fond de bois sombre" loading="lazy"></div>
         </article>
         <article class="offer" data-reveal="right">
           <div class="burst-badge" data-burst="18"><span>À emporter<b>1 + 1</b></span></div>
           <span class="offer__tag">À emporter</span>
           <p class="offer__big"><small>1 pizza achetée =</small>la 2e offerte*</p>
-          <div class="offer__img" data-sfx><img src="img/bandeaux/emporter.webp" alt="Une pizza sur fond de bois" loading="lazy"></div>
+          <div class="offer__img" data-sfx><img src="img/bandeaux/emporter.webp" alt="Pizza fumante aux olives noires, tomates cerises et basilic" loading="lazy"></div>
         </article>
       </div>
       <p class="offers__note">* Valable sur les pizzas Senior et Mega, sauf Marguerita. La remise se calcule toute seule dans le panier.</p>
@@ -248,13 +251,13 @@
     </section>
   </main>
 
-  <script>window.PF_VERSION = "11.1 verre (15/10)";</script>
-  <script src="js/config.js?v=11.1"></script>
-  <script src="js/data.js?v=11.1"></script>
-  <script src="js/options.js?v=11.1"></script>
-  <script src="js/pizza.js?v=11.1"></script>
-  <script src="js/shop.js?v=11.1"></script>
-  <script src="js/main.js?v=11.1"></script>
-  <script src="js/glass.js?v=11.1"></script>
+  <script>window.PF_VERSION = "12 conformité (16/10)";</script>
+  <script src="js/config.js?v=12"></script>
+  <script src="js/data.js?v=12"></script>
+  <script src="js/options.js?v=12"></script>
+  <script src="js/pizza.js?v=12"></script>
+  <script src="js/shop.js?v=12"></script>
+  <script src="js/main.js?v=12"></script>
+  <script src="js/glass.js?v=12"></script>
 </body>
 </html>
