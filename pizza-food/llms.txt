@@ -21,7 +21,7 @@
 - [Ma commande](https://pizza-food.fr/commande.html)
 - [Mentions légales](https://pizza-food.fr/mentions-legales.html)
 - [Conditions générales de vente](https://pizza-food.fr/cgv.html)
-- [Conditions d'utilisation](https://pizza-food.fr/cgu.html)
+- [Conditions générales d'utilisation (CGU)](https://pizza-food.fr/cgu.html)
 - [Politique de confidentialité](https://pizza-food.fr/confidentialite.html)
 - [Politique cookies](https://pizza-food.fr/cookies.html)
 - [Accessibilité](https://pizza-food.fr/accessibilite.html)

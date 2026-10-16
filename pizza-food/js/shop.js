@@ -239,6 +239,7 @@
         <h4 class="full">Adresse de livraison <small>(facultatif, utile pour commander en livraison)</small></h4>
         ${addrFields()}
         <p class="form-note full">Les champs marqués * sont obligatoires. Votre compte est enregistré <b>uniquement sur cet appareil</b> (stockage local du navigateur) : rien n'est envoyé au restaurant tant que vous ne lui transmettez pas une commande. Vous pouvez le supprimer à tout moment depuis « Mon compte ». <a href="confidentialite.html#compte" target="_blank" rel="noopener">Politique de confidentialité</a> · Liste d'opposition au démarchage téléphonique : <a href="https://www.bloctel.gouv.fr/" target="_blank" rel="noopener">Bloctel</a>.</p>
+        <label class="full co__cgv"><input type="checkbox" name="cgu" required> <span>J'ai lu et j'accepte les <a href="cgu.html" target="_blank" rel="noopener">conditions générales d'utilisation (CGU)</a> *</span></label>
         <button class="btn btn--dark" type="submit" style="justify-self:start">Créer mon compte</button>
         <p class="full ac-switch">Déjà inscrit ? <button type="button" class="linkish" data-ac="login">Se connecter</button></p>
       </form>`);
@@ -479,9 +480,9 @@
           <div><label for="ac-jour">Jour</label><div class="field"><select id="ac-jour" name="jour">${ds.map(([iso, l]) => `<option value="${iso}">${esc(l)}</option>`).join('')}</select></div></div>
           <div><label for="ac-heure">Heure</label><div class="field"><select id="ac-heure" name="heure"></select></div></div>
           <div class="full"><label>Rappel par</label><div class="radios">${['Email', 'SMS'].map((m, i) => `<label><input type="radio" name="rappel" value="${m}"${(saved.rappel ? saved.rappel === m : i === 0) ? ' checked' : ''}><span>${m}</span></label>`).join('')}</div></div>
-          ${acc ? '' : `<label class="full co__cgv"><input type="checkbox" name="mkAcc"> <span>Créer mon compte sur cet appareil avec ces informations (facultatif)</span></label>
+          ${acc ? '' : `<label class="full co__cgv"><input type="checkbox" name="mkAcc"> <span>Créer mon compte sur cet appareil avec ces informations (facultatif ; j'accepte alors les <a href="cgu.html" target="_blank" rel="noopener">CGU</a>)</span></label>
           <label class="full co__cgv"><input type="checkbox" name="remember"${saved.nom ? ' checked' : ''}> <span>Mémoriser mes coordonnées sur cet appareil pour la prochaine commande (facultatif)</span></label>`}
-          <label class="full co__cgv"><input type="checkbox" name="cgv" required> <span>J'ai lu et j'accepte les <a href="cgv.html" target="_blank" rel="noopener">conditions générales de vente</a> *</span></label>
+          <label class="full co__cgv"><input type="checkbox" name="cgv" required> <span>J'ai lu et j'accepte les <a href="cgv.html" target="_blank" rel="noopener">conditions générales de vente (CGV)</a> et d'<a href="cgu.html" target="_blank" rel="noopener">utilisation (CGU)</a> *</span></label>
           <p class="full form-note">Vos données servent à traiter votre commande (exécution du contrat). Détails, durées de conservation et vos droits : <a href="confidentialite.html#commande" target="_blank" rel="noopener">politique de confidentialité</a>. Vous pouvez vous inscrire gratuitement sur la liste d'opposition au démarchage téléphonique <a href="https://www.bloctel.gouv.fr/" target="_blank" rel="noopener">Bloctel</a>. Les produits alimentaires périssables ne bénéficient pas du droit de rétractation (art. L221-28 du Code de la consommation).</p>
           <p class="full ac-err" hidden></p>
           <div class="full co__btns"><button class="btn btn--ghost" type="button" id="coBack"><span>← Mon panier</span></button><button class="btn btn--dark" type="submit">Commander avec obligation de paiement · ${euro(totals().grand)}</button></div>

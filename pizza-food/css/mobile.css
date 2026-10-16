@@ -102,6 +102,7 @@
   .card__foot:has(.card__price) { grid-column: 2; margin-top: 4px; }
 
   /* ---------- Héros des pages intérieures ---------- */
+  .lhero .phero__title { font-size: clamp(26px, 8.4vw, 60px); overflow-wrap: normal; }
   .co-hero__title { font-size: clamp(34px, 12.6vw, 76px); }
   .phero__title { font-size: clamp(40px, 14.5vw, 84px); }
   .phero { padding-top: calc(var(--nav-h) + 28px); padding-bottom: 30px; gap: 18px; }

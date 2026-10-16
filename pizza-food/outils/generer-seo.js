@@ -24,7 +24,7 @@ const INFO = {
 const ZONES = ['Chennevières-sur-Marne', 'Bonneuil-sur-Marne', 'Champigny-sur-Marne', 'La Queue-en-Brie', 'La Varenne Saint-Hilaire', 'Le Plessis-Trévise', 'Noiseau', 'Ormesson-sur-Marne', 'Saint-Maur-des-Fossés', 'Sucy-en-Brie', 'Villiers-sur-Marne'];
 const PAGES = [
   ['index.html', 'Accueil', 1.0], ['carte.html', 'La carte', 0.9], ['livraison.html', 'Livraison et à emporter', 0.8], ['commande.html', 'Ma commande', 0.5],
-  ['mentions-legales.html', 'Mentions légales', 0.2], ['cgv.html', 'Conditions générales de vente', 0.3], ['cgu.html', "Conditions d'utilisation", 0.2],
+  ['mentions-legales.html', 'Mentions légales', 0.2], ['cgv.html', 'Conditions générales de vente', 0.3], ['cgu.html', "Conditions générales d'utilisation (CGU)", 0.2],
   ['confidentialite.html', 'Politique de confidentialité', 0.3], ['cookies.html', 'Politique cookies', 0.2], ['accessibilite.html', 'Accessibilité', 0.2]
 ];
 

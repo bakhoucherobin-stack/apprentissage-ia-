@@ -129,7 +129,7 @@
             ${fl('Charte qualité', 'data-modal="charte"')}${fl('Programme de fidélité', 'data-modal="fidelite"')}${fl('Votre appréciation', 'data-modal="appreciation"')}${fl('Recrutement', 'data-modal="recrutement"')}
           </ul></div>
           <div><h3>Infos</h3><ul class="flinks">
-            ${fl('Contact', 'data-modal="contact"')}${fl('Allergènes', 'data-modal="allergenes"')}${fl('Mentions légales', 'href="mentions-legales.html"')}${fl('Conditions de vente (CGV)', 'href="cgv.html"')}${fl('Accessibilité', 'href="accessibilite.html"')}
+            ${fl('Contact', 'data-modal="contact"')}${fl('Allergènes', 'data-modal="allergenes"')}${fl('Mentions légales', 'href="mentions-legales.html"')}${fl('Conditions de vente (CGV)', 'href="cgv.html"')}${fl("Conditions d'utilisation (CGU)", 'href="cgu.html"')}${fl('Accessibilité', 'href="accessibilite.html"')}
           </ul>
             <div class="socials">
               <a href="https://www.facebook.com/Pizza-Food-1682159702074299" target="_blank" rel="noopener" aria-label="Facebook">${ICONS.fb}</a>
@@ -141,7 +141,7 @@
         </div>
         <p class="footer__giant" id="giant" data-split>Pizza Food</p>
         <div class="footer__bottom"><span>© ${new Date().getFullYear()} Pizza Food — ${INFO.address}, ${INFO.city}</span><span>${INFO.tel1} · ${INFO.tel2}</span>
-          <ul class="footer__legal" aria-label="Informations légales"><li><a href="mentions-legales.html">Mentions légales</a></li><li><a href="cgv.html">CGV</a></li><li><a href="cgu.html">Conditions d'utilisation</a></li><li><a href="confidentialite.html">Confidentialité</a></li><li><a href="cookies.html">Cookies</a></li><li><a href="accessibilite.html">Accessibilité</a></li></ul>
+          <ul class="footer__legal" aria-label="Informations légales"><li><a href="mentions-legales.html">Mentions légales</a></li><li><a href="cgv.html">CGV</a></li><li><a href="cgu.html">CGU</a></li><li><a href="confidentialite.html">Confidentialité</a></li><li><a href="cookies.html">Cookies</a></li><li><a href="accessibilite.html">Accessibilité</a></li></ul>
           <span class="footer__meta"><button type="button" class="motion-toggle" id="motionToggle" aria-pressed="${!reduceMotion}">Animations : ${reduceMotion ? 'désactivées' : 'activées'}</button> · version ${window.PF_VERSION || ''}</span></div>
       </footer>
 

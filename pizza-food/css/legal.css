@@ -13,7 +13,7 @@ mark.todo { background: #fff1a8; color: #5a2a00; padding: 1px 6px; border-radius
 
 /* ---------- En-tête des pages légales ---------- */
 .lhero { padding: calc(var(--nav-h, 80px) + 40px) var(--gutter) 34px; max-width: 1296px; margin-inline: auto; }
-.lhero .phero__title { font-size: clamp(40px, 6.4vw, 92px); line-height: .95; overflow-wrap: anywhere; }
+.lhero .phero__title { font-size: clamp(40px, 6.4vw, 92px); line-height: 1.22; overflow-wrap: anywhere; }
 .lhero .phero__text { max-width: 62ch; color: var(--muted); }
 .lhero__date { margin: 14px 0 0; font-size: 14px; color: var(--muted); }
 
