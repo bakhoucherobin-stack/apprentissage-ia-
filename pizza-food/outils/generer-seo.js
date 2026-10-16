@@ -85,7 +85,7 @@ L.push('# Pizza Food', '',
   `- Villes livrées : ${ZONES.join(', ')}.`,
   '- Offres : en livraison, 2 pizzas achetées = la 3e offerte ; à emporter, 1 pizza achetée = la 2e offerte.',
   '- Paiement à la livraison ou au retrait uniquement : carte bancaire (terminal), espèces, titres-restaurant. Aucun paiement en ligne.',
-  '- Commande : sur le site (panier, puis e-mail pré-rempli envoyé au restaurant) ou par téléphone.',
+  '- Commande : par téléphone (le site aide à préparer un récapitulatif à dicter) ou par e-mail.',
   '- Allergènes : tableau sur le site pour les pizzas ; pour les autres produits, appeler le restaurant avant de commander.', '',
   '## Pages', '');
 PAGES.forEach(([f, t]) => L.push(`- [${t}](${SITE}${f})`));

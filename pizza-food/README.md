@@ -100,6 +100,12 @@ Ce qui a été fait :
 - **Accessibilité** : lien « Aller au contenu », un seul titre principal par page, textes alternatifs, groupes de choix annoncés, contrastes ≥ 4,5:1 (texte courant) vérifiés sur les 10 pages en ordinateur et iPhone, bandeaux défilants en pause au survol, animations désactivables.
 - **Agents IA et moteurs** : données structurées schema.org (Restaurant, et la carte complète sur `carte.html`), `llms.txt` (infos + carte complète avec les prix), `robots.txt`, `sitemap.xml`. Après une modification de la carte : `node outils/generer-seo.js`.
 
+**⚠️ Nom de domaine** : d'après le registre AFNIC (16/10/2026), pizza-food.fr est enregistré au nom de DESCLICK (l'ancienne agence) et expire le 6 décembre 2026 ; le site actuel et la boîte contact@pizza-food.fr tournent sur un serveur géré par des-click (Scaleway). Faire transférer le domaine au nom de PIZZA FOOD, le renouveler, et migrer la messagerie avant tout changement d'hébergement.
+
+**Fiche pour le restaurant** : `../pizza-food-a-remplir/A-REMPLIR-PAR-LE-RESTAURANT.md` et le tableau `allergenes-pizza-food-a-remplir.xlsx` (190 produits). Une fois rempli : `python3 outils/importer-allergenes.py chemin/du/fichier.xlsx` (seules les lignes « Vérifié = OUI » sont publiées).
+
+**Commandes** : le récapitulatif (étape 3) met en avant l'appel au restaurant ; l'e-mail reste en option.
+
 **À compléter avant la mise en ligne** (repérés en jaune `[À compléter : …]` dans les pages) :
 
 1. `mentions-legales.html` : nom du **directeur de la publication** ; **hébergeur** (nom, adresse, téléphone) ; ville du **greffe RCS** (voir l'extrait Kbis).

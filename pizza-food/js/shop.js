@@ -485,7 +485,7 @@
           <label class="full co__cgv"><input type="checkbox" name="cgv" required> <span>J'ai lu et j'accepte les <a href="cgv.html" target="_blank" rel="noopener">conditions générales de vente (CGV)</a> et d'<a href="cgu.html" target="_blank" rel="noopener">utilisation (CGU)</a> *</span></label>
           <p class="full form-note">Vos données servent à traiter votre commande (exécution du contrat). Détails, durées de conservation et vos droits : <a href="confidentialite.html#commande" target="_blank" rel="noopener">politique de confidentialité</a>. Vous pouvez vous inscrire gratuitement sur la liste d'opposition au démarchage téléphonique <a href="https://www.bloctel.gouv.fr/" target="_blank" rel="noopener">Bloctel</a>. Les produits alimentaires périssables ne bénéficient pas du droit de rétractation (art. L221-28 du Code de la consommation).</p>
           <p class="full ac-err" hidden></p>
-          <div class="full co__btns"><button class="btn btn--ghost" type="button" id="coBack"><span>← Mon panier</span></button><button class="btn btn--dark" type="submit">Commander avec obligation de paiement · ${euro(totals().grand)}</button></div>
+          <div class="full co__btns"><button class="btn btn--ghost" type="button" id="coBack"><span>← Mon panier</span></button><button class="btn btn--dark" type="submit">Valider mon récapitulatif · ${euro(totals().grand)}</button></div>
         </form>`;
       const f = $('#payForm'), jour = $('#ac-jour'), heure = $('#ac-heure');
       const fillH = () => { const hs = hours(jour.value); heure.innerHTML = hs.length ? hs.map(([k, l]) => `<option value="${k}">${l}</option>`).join('') : '<option value="">Plus de créneau ce jour</option>'; };
@@ -564,17 +564,23 @@
       const when = c.heure === 'asap' ? 'dès que possible' : `${new Date(c.jour + 'T12:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })} à ${c.heure}`;
       const mail = `mailto:${INFO.email}?subject=${encodeURIComponent('Commande ' + o.no)}&body=${encodeURIComponent(orderText(o))}`;
       root.innerHTML = `<div class="co__done">
-        <p class="eyebrow">Confirmation</p>
-        <h2 class="title-3d title-3d--md">Merci ${esc(c.prenom)} !</h2>
+        <p class="eyebrow">Votre récapitulatif</p>
+        <h2 class="title-3d title-3d--md">Presque fini, ${esc(c.prenom)} !</h2>
         <p class="co__no">Commande <b>${esc(o.no)}</b> · ${esc(o.mode)} · ${esc(when)}</p>
         <div class="co__recap">${o.items.map(i => `<p class="co__rline"><span><b>${i.qty} × ${esc(i.name)}</b>${i.lines.map(d => `<small>${esc(d.label)} : ${esc(d.text)}</small>`).join('')}${i.free ? `<small class="citem__free">${i.free} offerte${i.free > 1 ? 's' : ''}</small>` : ''}</span><span>${euro(i.unit * i.qty)}</span></p>`).join('')}
           ${o.disc ? `<p class="co__rline line--disc"><span>Offre : ${esc(o.offer)}</span><span>− ${euro(o.disc)}</span></p>` : ''}
           ${o.promo ? `<p class="co__rline line--disc"><span>Code ${esc(o.promo.code)}</span><span>− ${euro(o.promo.amount)}</span></p>` : ''}
           <p class="co__total"><span>Total</span><span>${euro(o.total)}</span></p></div>
-        <p>${o.mode === 'Livraison' ? `Livraison au ${esc((c.numrue || '') + ' ' + c.adresse)}, ${esc(c.ville)}.` : `${o.mode === 'À emporter' ? 'À retirer' : 'Sur place'} au ${esc(INFO.address)}, ${esc(INFO.city)}.`} Paiement : ${esc(c.paiement)}.</p>
-        <p class="co__send">Envoyez la commande au restaurant pour qu'elle parte en cuisine :</p>
-        <div class="co__btns"><a class="btn btn--dark" href="${mail}">Envoyer ma commande ${A.ARROW}</a><a class="btn btn--pill" href="${INFO.tel1Href}">Appeler le ${INFO.tel1}</a></div>
-        <p class="form-note">L'envoi ouvre votre messagerie avec la commande pré-remplie, à destination de ${esc(INFO.email)}.</p>
+        <p>${o.mode === 'Livraison' ? `Livraison : ${esc(((c.numrue || '') + ' ' + c.adresse).trim())}, ${esc(c.ville)}.` : `${o.mode === 'À emporter' ? 'À retirer' : 'Sur place'} au ${esc(INFO.address)}, ${esc(INFO.city)}.`} Paiement : ${esc(c.paiement)}.</p>
+        <div class="co__call">
+          <p class="co__send">Dernière étape : appelez le restaurant pour passer la commande.</p>
+          <a class="btn btn--dark co__callbtn" href="${INFO.tel1Href}"><span>Appeler le <span class="nowrap">${INFO.tel1}</span></span> ${A.ARROW}</a>
+          <p class="co__ref">Gardez cette page ouverte et dictez votre récapitulatif (commande <b>${esc(o.no)}</b>). Autre ligne : <a class="nowrap" href="${INFO.tel2Href}">${INFO.tel2}</a>.</p>
+        </div>
+        <details class="co__mailalt"><summary>Je préfère commander par e-mail</summary>
+          <p class="form-note">Le bouton ouvre votre messagerie avec la commande pré-remplie, à destination de ${esc(INFO.email)}. La commande n'est prise en compte qu'après confirmation du restaurant.</p>
+          <a class="btn btn--ghost" href="${mail}"><span>Envoyer ma commande avec obligation de paiement</span></a>
+        </details>
         <p><a class="linkish" href="carte.html">Retour à la carte</a></p>
       </div>`;
     }

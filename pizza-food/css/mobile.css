@@ -112,3 +112,16 @@
   /* ---------- Chiffres clés du héros ---------- */
   .hero__facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; }
 }
+
+/* ---------- Confirmation : commander par téléphone (cas le plus courant) ---------- */
+.co__call { display: grid; justify-items: center; gap: 12px; max-width: 520px; margin: 22px auto 6px; padding: 22px 20px; border-radius: 26px; background: linear-gradient(160deg, #fff6d6, #ffe7b3); border: 1px solid rgba(255, 199, 0, .6); box-shadow: 0 18px 38px -20px rgba(150, 60, 0, .4); }
+.co__call .co__send { margin: 0; font-size: 18px; }
+.co__callbtn { font-size: 20px; padding: 16px 28px; }
+.co__ref { margin: 0; font-size: 15px; line-height: 1.5; }
+.co__ref b { padding: 2px 8px; border-radius: 8px; background: var(--ink); color: var(--yellow); letter-spacing: .04em; }
+.co__ref a { color: #a62f00; }
+.co__mailalt { max-width: 520px; margin: 10px auto 16px; text-align: center; }
+.co__mailalt summary { cursor: pointer; font-weight: 600; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+.co__mailalt[open] summary { margin-bottom: 8px; }
+.nowrap, .co__ref b { white-space: nowrap; }
+@media (max-width: 520px) { .co__callbtn { font-size: 17px; padding: 14px 20px; } }
