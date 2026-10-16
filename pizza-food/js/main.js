@@ -166,6 +166,7 @@
         <div class="modal__box"><div class="modal__head"><h2 id="modalTitle"></h2><button class="x" id="modalClose" aria-label="Fermer">×</button></div><div class="modal__body" id="modalBody"></div></div>
       </div>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      <a class="mbar" id="mbar" href="commande.html" hidden><span class="mbar__count" id="mbarCount">0</span><span class="mbar__label">Voir mon panier</span><b class="mbar__total" id="mbarTotal"></b></a>
       <button class="to-top" id="toTop" aria-label="Revenir en haut"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>`);
   }
 
@@ -248,6 +249,15 @@
     $('#cartDiscLbl').textContent = c.offer ? 'Offre : ' + c.offer.label : '';
     $('#cartShip').textContent = cart.mode === 'Livraison' ? 'Gratuite · 40 min' : '—';
     $('#cartTotal').textContent = euro(c.total);
+    // barre panier en bas de l'écran (téléphone), sauf sur la page commande
+    const mbar = $('#mbar');
+    if (mbar) {
+      const on = c.count > 0 && page !== 'commande';
+      mbar.hidden = !on; document.body.classList.toggle('has-mbar', on);
+      $('#mbarCount').textContent = c.count;
+      $('#mbarTotal').textContent = euro(c.total);
+      mbar.setAttribute('aria-label', `Voir mon panier : ${c.count} article${c.count > 1 ? 's' : ''}, ${euro(c.total)}`);
+    }
     let hint;
     if (c.offer) {
       const left = c.offer.every - (c.eligibleCount % c.offer.every);
@@ -1176,6 +1186,7 @@
   $$('#mmenu a').forEach(a => a.addEventListener('click', () => toggleMenu(false)));
 
   renderStars();
+  if (!finePointer) { const l = $('.stars .lede'); if (l) l.textContent = 'Touchez une pizza : elle s\'ouvre. Faites glisser pour voir les autres, puis choisissez la taille.'; }
   renderEnvieLinks();
   renderZones();
   renderCarte();

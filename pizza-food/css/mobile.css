@@ -1,0 +1,113 @@
+/* =========================================================
+   PIZZA FOOD — finitions téléphone (chargé en dernier)
+   Objectif : même rendu soigné que sur ordinateur, en plus compact.
+   ========================================================= */
+
+/* Barre panier : n'existe que sur téléphone */
+.mbar { display: none; }
+
+@media (max-width: 860px) {
+  :root { --section: 52px; }
+
+  /* ---------- En-tête : logo à gauche, panier + menu à droite ---------- */
+  .nav { grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; }
+  .nav .logo { grid-column: 1; }
+  .nav__right { grid-column: 2; order: 1; }
+  .nav__side:first-child { grid-column: 3; order: 2; justify-content: flex-end; }
+  .nav__burger { width: 46px; height: 46px; box-shadow: 0 6px 16px -6px rgba(140, 50, 0, .25); }
+
+  /* ---------- Bouton « remonter » : discret, ne masque plus le texte ---------- */
+  .to-top { right: 14px; bottom: calc(14px + env(safe-area-inset-bottom)); width: 44px; height: 44px; opacity: .92; }
+  .to-top::before { inset: 3px; }
+  .to-top svg { width: 20px; height: 20px; }
+  .has-mbar .to-top { bottom: calc(86px + env(safe-area-inset-bottom)); }
+
+  /* ---------- Barre panier collée en bas ---------- */
+  .mbar { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 85; display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 10px; border-radius: 22px; background: rgba(41, 42, 44, .94); color: #fff; text-decoration: none; font-weight: 700; box-shadow: 0 16px 34px -12px rgba(41, 42, 44, .55), inset 0 1px 0 rgba(255, 255, 255, .12); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); animation: mbar-in .45s cubic-bezier(.2, 1.4, .4, 1); }
+  .mbar[hidden] { display: none; }
+  .mbar__count { display: grid; place-items: center; min-width: 34px; height: 34px; padding: 0 8px; border-radius: 12px; background: var(--yellow); color: var(--ink); font-size: 16px; }
+  .mbar__label { flex: 1; font-size: 16px; }
+  .mbar__total { padding: 8px 14px; border-radius: 14px; background: #c93400; color: #fff; font-size: 16px; white-space: nowrap; }
+  .mbar:active { transform: scale(.98); }
+  body.has-mbar .footer__bottom { padding-bottom: 96px; }
+  .cart.is-open ~ .mbar, .is-locked .mbar { display: none; }
+  @keyframes mbar-in { from { transform: translateY(120%); } to { transform: none; } }
+
+  /* ---------- Menu mobile : liste nette, alignée à gauche ---------- */
+  .mobile-menu { align-content: start; justify-items: stretch; gap: 22px; padding: calc(var(--nav-h) + 34px) var(--gutter) calc(30px + env(safe-area-inset-bottom)); background: linear-gradient(170deg, #fff8ee 0%, #ffe9c7 100%); overflow-y: auto; }
+  .mobile-menu nav { gap: 0; text-align: left; }
+  .mobile-menu nav a, .mobile-menu nav button { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 14px 2px; border-bottom: 1.5px solid rgba(41, 42, 44, .1); font-family: var(--display); font-size: clamp(28px, 8.4vw, 40px); line-height: 1.05; text-transform: uppercase; color: var(--ink); text-shadow: none; -webkit-text-stroke: 0; }
+  .mobile-menu nav a::after, .mobile-menu nav button::after { content: '→'; font-family: var(--body); font-weight: 700; font-size: 22px; color: #c43200; transition: transform .3s; }
+  .mobile-menu nav a:active::after, .mobile-menu nav button:active::after { transform: translateX(6px); }
+  .mobile-menu nav button { opacity: 0; transform: translateY(20px); transition: opacity .4s .3s, transform .4s .3s; cursor: pointer; }
+  .mobile-menu.is-open nav button { opacity: 1; transform: none; }
+  .mobile-menu__tel { justify-self: stretch; text-align: center; border: 0; padding: 16px 24px; background: linear-gradient(180deg, #d9420c, #c93400 55%, #b52f00); color: #fff; font-size: 22px; box-shadow: 0 14px 28px -12px rgba(160, 40, 0, .6); }
+  .mobile-menu__tel::before { content: 'Appeler le '; font-weight: 600; font-size: 17px; opacity: .9; }
+
+  /* ---------- Formulaires de commande / compte : petits champs côte à côte ---------- */
+  .co__newaddr, #acForm { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; column-gap: 12px; }
+  .co__newaddr > div:has(input[name="numrue"]), .co__newaddr > div:has(input[name="adresse"]), #acForm > div:has(input[name="numrue"]), #acForm > div:has(input[name="adresse"]), #acForm > div:has(input[type="email"]), #acForm > div:has(input[type="tel"]), #acForm > div:has(input[name="societe"]) { grid-column: 1 / -1; }
+  .co__form { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; column-gap: 12px; }
+  .co__form > * { grid-column: 1 / -1; }
+  .co__form > div:has(input[name="nom"]), .co__form > div:has(input[name="prenom"]), .co__form > div:has(#ac-jour), .co__form > div:has(#ac-heure) { grid-column: auto; }
+  .co__newaddr > .full, #acForm > .full, #acForm > h4, #acForm > p, #acForm > button { grid-column: 1 / -1; }
+
+  /* ---------- Notes sous les offres : discrètes ---------- */
+  .offers__note { margin-top: 18px; text-transform: none; font-size: 13px; letter-spacing: .02em; line-height: 1.5; }
+
+  /* ---------- Titres et en-têtes de section ---------- */
+  .section-head { margin-bottom: 26px; }
+  .hero__kicker, .hero .eyebrow { font-size: 12.5px; letter-spacing: .05em; }
+
+  /* ---------- Pizzas stars : carrousel à faire glisser ---------- */
+  .stars .lede { margin: -10px auto 18px !important; font-size: 15px; }
+  .stars__grid { display: flex; grid-template-columns: none; max-width: none; gap: 14px; margin: 0 calc(-1 * var(--gutter)); padding: 8px var(--gutter) 26px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .stars__grid::-webkit-scrollbar { display: none; }
+  .star { flex: 0 0 min(76vw, 320px); scroll-snap-align: center; padding: 14px 12px 18px; border-radius: 28px; background: linear-gradient(160deg, rgba(255, 255, 255, .78), rgba(255, 255, 255, .42)); border: 1px solid rgba(255, 255, 255, .8); box-shadow: 0 18px 38px -18px rgba(150, 60, 0, .35); }
+  .star__burst { width: 82%; margin: 0 auto 12px; }
+  .star__name { font-size: 28px; }
+  .star__desc { min-height: 2.6em; margin-bottom: 12px; font-size: 14.5px; }
+
+  /* ---------- Boutons de taille : une seule ligne de 3 ---------- */
+  .sizes:has(> .chip:nth-child(3)) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; width: 100%; }
+  .sizes:has(> .chip:nth-child(3)) .chip { position: relative; flex-direction: column; justify-content: center; gap: 1px; min-height: 52px; padding: 7px 4px; border-radius: 16px; }
+  .sizes:has(> .chip:nth-child(3)) .chip small { font-size: 10.5px; letter-spacing: .06em; }
+  .sizes:has(> .chip:nth-child(3)) .chip b { font-size: 15px; }
+  .sizes:has(> .chip:nth-child(3)) .chip::after { position: absolute; top: -6px; right: -4px; width: 20px; height: 20px; font-size: 14px; box-shadow: 0 2px 6px rgba(0, 0, 0, .18); }
+
+  /* ---------- Rangée « Pas que des pizzas » ---------- */
+  .rail-ctrl { margin-bottom: 0; }
+  .rail { padding-top: 22px; padding-bottom: 30px; }
+  #offres { padding-bottom: 24px !important; }
+  section.stars, section.rail-sec { padding-top: 36px !important; }
+
+  /* ---------- Pied de page : colonnes de liens côte à côte ---------- */
+  .footer__top { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px 18px; }
+  .footer__top > .news { grid-column: 1 / -1; }
+  .footer__top > div:last-child { grid-column: 1 / -1; }
+  .footer__top > div:last-child .flinks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 18px; }
+  .flinks li { font-size: 15px; }
+  .footer__giant { margin: 10px 0 24px; }
+  .footer__bottom { font-size: 14px; }
+  .motion-toggle { white-space: nowrap; }
+}
+
+@media (max-width: 520px) {
+  /* ---------- Cartes produits : photo + texte, puis les tailles en ligne ---------- */
+  .card { grid-template-columns: 96px minmax(0, 1fr); grid-template-rows: auto auto auto; column-gap: 14px; row-gap: 4px; padding: 14px; }
+  .card__media { grid-row: 1 / span 2; }
+  .card__name { font-size: 19px; line-height: 1.05; }
+  .card__desc { font-size: 13.5px; line-height: 1.4; }
+  .card__foot { grid-column: 1 / -1; margin-top: 8px; }
+  .card__foot:has(.card__price) { grid-column: 2; margin-top: 4px; }
+
+  /* ---------- Héros des pages intérieures ---------- */
+  .co-hero__title { font-size: clamp(34px, 12.6vw, 76px); }
+  .phero__title { font-size: clamp(40px, 14.5vw, 84px); }
+  .phero { padding-top: calc(var(--nav-h) + 28px); padding-bottom: 30px; gap: 18px; }
+  .phero__text { font-size: 16px; }
+  .phero__art { width: min(68vw, 300px); }
+
+  /* ---------- Chiffres clés du héros ---------- */
+  .hero__facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; }
+}
