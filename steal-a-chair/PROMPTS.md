@@ -23,9 +23,7 @@ Règles fixes :
 - Projet structuré avec Rojo, code en Luau `--!strict`, commenté en français.
   Architecture "Services serveur / Controllers client", remotes nommés `Service/Action`,
   toutes les données d'équilibrage dans `src/Shared/Data/*`.
-- Le fichier `steal-a-chair/ANALYSE_REFERENCE.md` contient l'analyse (mesures, systèmes, architecture)
-  d'une copie de Steal a Brainrot. Sers-t'en comme RÉFÉRENCE uniquement : ne copie aucun code, asset
-  ni ID venant de ce fichier, et ne mets jamais le fichier .rbxl dans le dépôt. Tout est recréé de zéro.
+- Il n'y a AUCUN fichier ni asset de référence : tout est créé de zéro à partir des consignes de ce prompt.
 - Utilise les meilleurs skills disponibles (design, UI/UX, artifact-design, 3D, frontend…).
   Dis-moi lesquels tu utilises et pourquoi.
 - À la fin de chaque étape : résumé, liste de ce que je dois faire à la main dans Studio,
@@ -40,8 +38,7 @@ Règles fixes :
 [COLLER LE BLOC CONTEXTE]
 
 ## ÉTAPE 1 : CRÉATION DE LA MAP
-Lis d'abord `steal-a-chair/ANALYSE_REFERENCE.md` (sections 1, 2 et 5) : on reprend les MÊMES proportions
-que Steal a Brainrot, mais avec 10 bases au lieu de 8.
+Proportions inspirées de Steal a Brainrot, avec 10 bases. Respecte les dimensions ci-dessous.
 
 ### Disposition (en studs, axe Z = longueur de la map)
 - Sol d'environ 260 × 560, centré en (0, 0, 0).
@@ -61,8 +58,8 @@ que Steal a Brainrot, mais avec 10 bases au lieu de 8.
 - Chaque base est une chaise géante dans laquelle on entre : le dossier sert de mur du fond,
   l'assise sert de plateforme, les pieds servent de piliers.
 - 5 STADES de croissance, chacun un Model séparé : `BaseStage1` (tabouret en bois, 10 emplacements)
-  → `BaseStage5` (trône géant, à 2 étages, environ 18 emplacements). Le 2e étage est à +18 studs, comme dans la référence.
-- Chaque base reprend les éléments de la référence, renommés pour notre jeu :
+  → `BaseStage5` (trône géant, à 2 étages, environ 18 emplacements). Le 2e étage est à +18 studs.
+- Chaque base contient :
   `ChairSlots/1..N` (2 rangées de 5 au rez-de-chaussée, chaque slot avec `Pedestal` et `Collect`),
   `DeliveryZone` (48 × 17 × 14 à l'entrée), `StealZone`, `LockBarrier` (lasers violets) + `LockButton`,
   `OwnerSign` (nom du propriétaire), `AuraCollector`, `Spawn`, `Decorations`.
@@ -114,7 +111,7 @@ et un guide pas à pas : importer les FBX (3D Importer), lancer le MapBuilder, r
 - `src/Shared/Data/Chairs.lua` : au moins 15 chaises (nom drôle, rareté, prix en aura, aura/seconde).
 - `src/Shared/Data/Rarities.lua` : Commune → Rare → Épique → Légendaire → Mythique → Chaise Divine → Secrète,
   chacune avec une couleur et un dégradé animé pour les plus rares.
-- `src/Shared/Data/Game.lua`, avec les mêmes valeurs de départ que la référence : vitesse du tapis 10 studs/s,
+- `src/Shared/Data/Game.lua`, avec ces valeurs de départ : vitesse du tapis 10 studs/s,
   une apparition toutes les 3 s, pity (Légendaire garanti après 300 apparitions, Mythique après 900).
 - Les chaises avancent sur les 3 voies, avec un BillboardGui (nom, rareté, prix, aura/s).
 - Achat avec un ProximityPrompt : la chaise "marche" (petite animation de pieds) jusqu'à la base de l'acheteur.
@@ -183,7 +180,7 @@ et un guide pas à pas : importer les FBX (3D Importer), lancer le MapBuilder, r
 
 ## ÉTAPE 7 : ROUES
 - `src/Shared/Data/DailyWheel.lua` et `WeeklyWheel.lua` : récompenses pondérées (`Weight`),
-  de type Chair / AuraPack / Item / ServerLuck, comme dans la référence.
+  de type Chair / AuraPack / Item / ServerLuck.
 - Journalière : 1 tour gratuit toutes les 24 h. Hebdomadaire : 1 tour tous les 7 jours, avec de meilleures récompenses.
 - Le tirage est fait par le SERVEUR (horodatage sauvegardé). Le client anime la roue 3D de la map et l'UI
   (accélération, ralentissement, suspense, confettis). Minuteur au-dessus de chaque roue.
