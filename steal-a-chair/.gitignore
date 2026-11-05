@@ -1,0 +1,9 @@
+# Fichiers lourds de la bibliothèque : restent en local (voir Bibliotheque/LISEZ-MOI.md)
+_assets/**
+!_assets/*/
+!_assets/*/.gitkeep
+
+# Réglages perso d'Obsidian (chacun garde les siens)
+.obsidian/workspace*.json
+.obsidian/cache
+.trash/
