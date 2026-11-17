@@ -4,6 +4,7 @@ Coffre Obsidian du projet. Ouvre **ce dossier** (`steal-a-chair`) avec Obsidian 
 
 ## Projet
 - [[PROMPTS]] : les prompts Claude Code, étape par étape
+- [[docs/GUIDE_ETAPE1]] : étape 1 (la map), guide pas à pas
 - [[ANALYSE_REFERENCE]] : notes d'analyse (mesures et systèmes)
 
 ## Bibliothèque d'inspiration
